@@ -1,2 +1,2 @@
 # 校园失物招领app
-## 首次使用请修改'url.properties'文件中的ip地址为你的服务器的ip地址
+## 首次使用请修改'\utils\api\RetrofitClient.java'文件中的BASE_URL为服务器的地址

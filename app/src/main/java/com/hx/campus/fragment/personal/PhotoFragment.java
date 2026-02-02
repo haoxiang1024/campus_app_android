@@ -1,4 +1,4 @@
-package com.hx.campus.fragment.personal.user;
+package com.hx.campus.fragment.personal;
 
 
 import static com.hx.campus.core.webview.AgentWebFragment.TAG;

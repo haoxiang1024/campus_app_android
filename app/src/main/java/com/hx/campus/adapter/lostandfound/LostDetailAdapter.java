@@ -1,4 +1,4 @@
-package com.hx.campus.adapter.lostandfoundnav;
+package com.hx.campus.adapter.lostandfound;
 
 
 import android.content.Context;

@@ -1,6 +1,7 @@
-package com.hx.campus.fragment.navigation.content;
+package com.hx.campus.fragment.navigation;
 
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,12 +10,11 @@ import androidx.annotation.NonNull;
 
 import com.bumptech.glide.Glide;
 import com.hx.campus.R;
-import com.hx.campus.adapter.entity.Found;
+import com.hx.campus.adapter.entity.LostFound;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.databinding.FragmentFoundDetailBinding;
 import com.hx.campus.utils.Utils;
 import com.xuexiang.xpage.annotation.Page;
-import com.xuexiang.xrouter.annotation.AutoWired;
 import com.xuexiang.xrouter.launcher.XRouter;
 
 @Page
@@ -22,8 +22,8 @@ public class FoundDetailFragment extends BaseFragment<FragmentFoundDetailBinding
     public static final String KEY_FOUND = "found";
 
 
-    @AutoWired(name = KEY_FOUND)
-    Found found;//实体类不能序列化，否则无法注入
+    //@AutoWired(name = KEY_FOUND)
+    LostFound found;//实体类不能序列化，否则无法注入
 
     /**
      * 构建ViewBinding
@@ -45,6 +45,18 @@ public class FoundDetailFragment extends BaseFragment<FragmentFoundDetailBinding
     protected void initArgs() {
         super.initArgs();
         XRouter.getInstance().inject(this);
+        if (getArguments() != null) {
+            try {
+                // 手动获取序列化对象并强转
+                Object data = getArguments().getSerializable(KEY_FOUND);
+                if (data instanceof LostFound) {
+                    this.found = (LostFound) data;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.e("FoundDetail", "参数解析异常: " + e.getMessage());
+            }
+        }
     }
 
     /**
@@ -85,7 +97,7 @@ public class FoundDetailFragment extends BaseFragment<FragmentFoundDetailBinding
         //设置状态
         binding.state.setText(found.getState());
         //设置发布日期
-        String date = Utils.dateFormat(found.getPub_date());
+        String date = Utils.dateFormat(found.getPubDate());
         binding.tvDate.setText(date);
     }
 }

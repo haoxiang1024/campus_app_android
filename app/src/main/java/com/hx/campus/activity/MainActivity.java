@@ -30,7 +30,7 @@ import com.hx.campus.fragment.look.LookFragment;
 import com.hx.campus.fragment.other.AboutFragment;
 import com.hx.campus.fragment.other.SearchFragment;
 import com.hx.campus.fragment.personal.PersonalFragment;
-import com.hx.campus.fragment.personal.user.AccountFragment;
+import com.hx.campus.fragment.personal.AccountFragment;
 import com.hx.campus.fragment.settings.SettingsFragment;
 import com.hx.campus.utils.TokenUtils;
 import com.hx.campus.utils.Utils;

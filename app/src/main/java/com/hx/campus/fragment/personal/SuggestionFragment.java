@@ -1,4 +1,4 @@
-package com.hx.campus.fragment.personal.user;
+package com.hx.campus.fragment.personal;
 
 import android.annotation.SuppressLint;
 import android.view.LayoutInflater;

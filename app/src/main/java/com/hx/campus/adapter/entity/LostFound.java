@@ -1,17 +1,20 @@
 package com.hx.campus.adapter.entity;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 import java.util.Date;
 
 
 public class LostFound implements Serializable {
+    private static final long serialVersionUID = 1L;
     private Integer id;
 
     private String title;
 
     private String img;
-
-    private Date pub_date;
+    @SerializedName("pubDate")
+    private Date pubDate;
 
     private String content;
 
@@ -23,25 +26,25 @@ public class LostFound implements Serializable {
 
     private Integer stick;
 
-    private Integer lostfoundtype_id;
+    private Integer lostfoundtypeId;
 
-    private Integer user_id;
+    private Integer userId;
     private String nickname;
     private  String type;
     private LostFoundType lostfoundtype;
 
-    public LostFound(Integer id, String title, String img, Date pub_date, String content, String place, String phone, String state, Integer stick, Integer lostfoundtype_id, Integer user_id, String nickname, String type, LostFoundType lostfoundtype) {
+    public LostFound(Integer id, String title, String img, Date pubDate, String content, String place, String phone, String state, Integer stick, Integer lostfoundtype_id, Integer user_id, String nickname, String type, LostFoundType lostfoundtype) {
         this.id = id;
         this.title = title;
         this.img = img;
-        this.pub_date = pub_date;
+        this.pubDate = pubDate;
         this.content = content;
         this.place = place;
         this.phone = phone;
         this.state = state;
         this.stick = stick;
-        this.lostfoundtype_id = lostfoundtype_id;
-        this.user_id = user_id;
+        this.lostfoundtypeId = lostfoundtype_id;
+        this.userId = user_id;
         this.nickname = nickname;
         this.type = type;
         this.lostfoundtype = lostfoundtype;
@@ -107,12 +110,12 @@ public class LostFound implements Serializable {
 
 
     public Date getPubDate() {
-        return pub_date;
+        return pubDate;
     }
 
 
     public void setPubDate(Date pubDate) {
-        this.pub_date = pubDate;
+        this.pubDate = pubDate;
     }
 
 
@@ -167,24 +170,41 @@ public class LostFound implements Serializable {
 
 
     public Integer getLostfoundtypeId() {
-        return lostfoundtype_id;
+        return lostfoundtypeId;
     }
 
 
     public void setLostfoundtypeId(Integer lostfoundtype_id) {
-        this.lostfoundtype_id = lostfoundtype_id;
+        this.lostfoundtypeId = lostfoundtype_id;
     }
 
 
     public Integer getUserId() {
-        return user_id;
+        return userId;
     }
 
 
     public void setUserId(Integer user_id) {
-        this.user_id = user_id;
+        this.userId = user_id;
     }
 
-
-
+    @Override
+    public String toString() {
+        return "LostFound{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", img='" + img + '\'' +
+                ", pubDate=" + pubDate +
+                ", content='" + content + '\'' +
+                ", place='" + place + '\'' +
+                ", phone='" + phone + '\'' +
+                ", state='" + state + '\'' +
+                ", stick=" + stick +
+                ", lostfoundtypeId=" + lostfoundtypeId +
+                ", userId=" + userId +
+                ", nickname='" + nickname + '\'' +
+                ", type='" + type + '\'' +
+                ", lostfoundtype=" + lostfoundtype +
+                '}';
+    }
 }

@@ -1,4 +1,4 @@
-package com.hx.campus.fragment.navigation.content;
+package com.hx.campus.fragment.navigation;
 
 import static com.hx.campus.core.webview.AgentWebFragment.TAG;
 import static com.xuexiang.xutil.XUtil.runOnUiThread;

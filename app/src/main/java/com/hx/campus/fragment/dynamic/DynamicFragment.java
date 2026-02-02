@@ -1,8 +1,6 @@
 package com.hx.campus.fragment.dynamic;
 
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -25,8 +23,8 @@ import com.hx.campus.core.webview.AgentWebActivity;
 import com.hx.campus.databinding.FragmentNewsBinding;
 import com.hx.campus.fragment.navigation.FoundFragment;
 import com.hx.campus.fragment.navigation.LostFragment;
-import com.hx.campus.fragment.navigation.content.FoundDetailFragment;
-import com.hx.campus.fragment.navigation.content.LostDetailFragment;
+import com.hx.campus.fragment.navigation.FoundDetailFragment;
+import com.hx.campus.fragment.navigation.LostDetailFragment;
 import com.hx.campus.fragment.other.SearchFragment;
 import com.hx.campus.utils.DemoDataProvider;
 import com.hx.campus.utils.Utils;
@@ -37,9 +35,7 @@ import com.xuexiang.xpage.enums.CoreAnim;
 import com.xuexiang.xui.adapter.recyclerview.RecyclerViewHolder;
 import com.xuexiang.xui.adapter.simple.AdapterItem;
 import com.xuexiang.xui.widget.actionbar.TitleBar;
-import com.xuexiang.xui.widget.banner.widget.banner.BannerItem;
 import com.xuexiang.xui.widget.banner.widget.banner.SimpleImageBanner;
-import com.xuexiang.xui.widget.banner.widget.banner.base.BaseBanner;
 import com.xuexiang.xui.widget.imageview.ImageLoader;
 import com.xuexiang.xui.widget.imageview.RadiusImageView;
 
@@ -76,13 +72,13 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
         binding.recyclerView.setRecycledViewPool(viewPool);
         viewPool.setMaxRecycledViews(0, 10);
 
-        // 轮播条适配器 (保持不变)
+        // 轮播条适配器
         SingleDelegateAdapter bannerAdapter = createBannerAdapter();
 
-        // 九宫格菜单适配器 (保持不变)
+        // 九宫格菜单适配器
         SimpleDelegateAdapter<AdapterItem> commonAdapter = createGridAdapter();
 
-        // 标题适配器 (保持不变)
+        // 标题适配器
         SingleDelegateAdapter titleAdapter = new SingleDelegateAdapter(R.layout.adapter_title_item) {
             @Override
             public void onBindViewHolder(@NonNull RecyclerViewHolder holder, int position) {
@@ -90,7 +86,7 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
             }
         };
 
-        // 推荐内容适配器 (关键：不再在初始化时通过 getNewInfo() 传数据)
+        // 推荐内容适配器
         mNewsAdapter = new BroccoliSimpleDelegateAdapter<NewInfo>(R.layout.adapter_news_card_view_list_item, new LinearLayoutHelper(), DemoDataProvider.getEmptyNewInfo()) {
             @Override
             protected void onBindData(RecyclerViewHolder holder, NewInfo model, int position) {

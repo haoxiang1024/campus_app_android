@@ -1,4 +1,4 @@
-package com.hx.campus.fragment.navigation.content;
+package com.hx.campus.fragment.navigation;
 
 import android.text.TextUtils;
 import android.view.LayoutInflater;
