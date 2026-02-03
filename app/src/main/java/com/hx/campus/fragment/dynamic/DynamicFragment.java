@@ -180,12 +180,11 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
     }
 
     private void handleItemClick(NewInfo newInfo) {
-        Lost lost = new Lost(newInfo.getTitle(), newInfo.getImageUrl(), newInfo.getPub_Date(), newInfo.getSummary(), newInfo.getPlace(), newInfo.getPhone(), newInfo.getState(), newInfo.getUserName());
-        Found found = new Found(newInfo.getTitle(), newInfo.getImageUrl(), newInfo.getPub_Date(), newInfo.getSummary(), newInfo.getPlace(), newInfo.getPhone(), newInfo.getState(), newInfo.getUserName());
-        if ("未找到".equals(newInfo.getState())) {
-            openNewPage(LostDetailFragment.class, LostDetailFragment.KEY_LOST, lost);
+        LostFound lostFound = new LostFound(newInfo.getTitle(), newInfo.getImageUrl(), newInfo.getPub_Date(), newInfo.getSummary(), newInfo.getPlace(), newInfo.getPhone(), newInfo.getState(), newInfo.getUserName());
+        if ("寻找中".equals(newInfo.getState())) {
+            openNewPage(LostDetailFragment.class, LostDetailFragment.KEY_LOST, lostFound);
         } else {
-            openNewPage(FoundDetailFragment.class, FoundDetailFragment.KEY_FOUND, found);
+            openNewPage(FoundDetailFragment.class, FoundDetailFragment.KEY_FOUND, lostFound);
         }
     }
 

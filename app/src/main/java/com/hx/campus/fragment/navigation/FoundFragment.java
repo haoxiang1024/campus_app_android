@@ -11,11 +11,15 @@ import androidx.annotation.NonNull;
 import com.google.android.material.tabs.TabLayout;
 import com.hx.campus.R;
 import com.hx.campus.adapter.entity.Found;
+import com.hx.campus.adapter.entity.LostFound;
 import com.hx.campus.adapter.lostandfound.FoundDetailAdapter;
+import com.hx.campus.adapter.lostandfound.LostFoundDetailAdapter;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.databinding.FragmentFoundBinding;
 import com.hx.campus.utils.LoadingDialog;
 import com.hx.campus.utils.Utils;
+import com.hx.campus.utils.api.Result;
+import com.hx.campus.utils.api.RetrofitClient;
 import com.hx.campus.utils.internet.OkHttpCallback;
 import com.hx.campus.utils.internet.OkhttpUtils;
 import com.hx.campus.utils.service.JsonOperate;
@@ -30,6 +34,7 @@ import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Response;
+import retrofit2.Callback;
 
 @Page
 public class FoundFragment extends BaseFragment<FragmentFoundBinding> {
@@ -44,8 +49,7 @@ public class FoundFragment extends BaseFragment<FragmentFoundBinding> {
     String title;
     private String[] tabs_data = new String[]{};//选项卡组
     private int currentPosition;//当前选项卡的位置
-    private FoundDetailAdapter foundDetailAdapter;//招领物品详情adapter
-    private List<Found> detailList = new ArrayList<>();//数据list
+    private LostFoundDetailAdapter lostFoundDetailAdapter;//丢失物品详情adapter
 
     /**
      * 构建ViewBinding
@@ -91,8 +95,8 @@ public class FoundFragment extends BaseFragment<FragmentFoundBinding> {
         String[] types = getResources().getStringArray(R.array.type_titles);//根据app语言获取不同的数据
         operate_tabs(types);//选项卡
         tabTitle = types[0];//初始值
-        foundDetailAdapter = new FoundDetailAdapter(getContext());
-        binding.listview.setAdapter(foundDetailAdapter);
+        lostFoundDetailAdapter = new LostFoundDetailAdapter(getContext());
+        binding.listview.setAdapter(lostFoundDetailAdapter);
         getTypeDetailList();
     }
 
@@ -103,7 +107,7 @@ public class FoundFragment extends BaseFragment<FragmentFoundBinding> {
         binding.listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Found found = foundDetailAdapter.getItem(position);
+                LostFound found = lostFoundDetailAdapter.getItem(position);
                 openPage(FoundDetailFragment.class, FoundDetailFragment.KEY_FOUND, found);
 
             }
@@ -121,27 +125,31 @@ public class FoundFragment extends BaseFragment<FragmentFoundBinding> {
     //发送请求获取分类下的所有内容
     private void getTypeDetailList() {
         showLoadingDialog();
-        new Thread() {
+        RetrofitClient.getInstance().getApi().DetailByTitle(tabTitle,"招领").enqueue(new Callback<Result<List<LostFound>>>() {
             @Override
-            public void run() {
-                super.run();
-                OkhttpUtils.get(Utils.rebuildUrl("/DetailByTitleByFound?title=" + tabTitle, getContext()), new OkHttpCallback() {
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        super.onResponse(call, response);
-                        //获取返回结果转换list
-                        detailList = JsonOperate.getList(result, Found.class);
-                        //回调主线程
-                        getActivity().runOnUiThread(() -> foundDetailAdapter.setData(detailList, 1));
-                        getActivity().runOnUiThread(FoundFragment.this::hideLoadingDialog);
-
-                    }
-
-                });
+            public void onResponse(retrofit2.Call<Result<List<LostFound>>> call, retrofit2.Response<Result<List<LostFound>>> response) {
+                if(response.body() != null && response.body().isSuccess()){
+                    List<LostFound> dataList = response.body().getData();
+                    setAdapter(dataList);
+                    hideLoadingDialog();
+                }
             }
-        }.start();
-    }
 
+            @Override
+            public void onFailure(retrofit2.Call<Result<List<LostFound>>> call, Throwable t) {
+                hideLoadingDialog();
+                Utils.showResponse("网络异常");
+
+            }
+        });
+    }
+    private void setAdapter(List<LostFound> list) {
+        if (list == null || list.isEmpty()) {
+            Utils.showResponse(Utils.getString(getContext(), R.string.no_relevant_info_found));
+            return;
+        }
+        lostFoundDetailAdapter.setData(list, 1);
+    }
 
 
     //对选项卡进行操作
@@ -158,8 +166,8 @@ public class FoundFragment extends BaseFragment<FragmentFoundBinding> {
                 currentPosition = tab.getPosition();
                 tabTitle = tabs_data[currentPosition];
                 //数据更新
-                foundDetailAdapter = new FoundDetailAdapter(getContext());
-                binding.listview.setAdapter(foundDetailAdapter);
+                lostFoundDetailAdapter = new LostFoundDetailAdapter(getContext());
+                binding.listview.setAdapter(lostFoundDetailAdapter);
                 getTypeDetailList();
                 tab.setText(tabTitle);
             }

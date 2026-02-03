@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import com.bumptech.glide.Glide;
 import com.hx.campus.R;
 import com.hx.campus.adapter.entity.Lost;
+import com.hx.campus.adapter.entity.LostFound;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.databinding.FragmentLostDetailBinding;
 import com.hx.campus.utils.Utils;
@@ -22,8 +23,7 @@ public class LostDetailFragment extends BaseFragment<FragmentLostDetailBinding> 
     public static final String KEY_LOST = "lost";
 
 
-    @AutoWired(name = KEY_LOST)
-    Lost lost;//实体类不能序列化，否则无法注入
+    LostFound lost;
 
 
     /**
@@ -32,7 +32,10 @@ public class LostDetailFragment extends BaseFragment<FragmentLostDetailBinding> 
     @Override
     protected void initArgs() {
         super.initArgs();
-        XRouter.getInstance().inject(this);
+        //XRouter.getInstance().inject(this);
+        if (getArguments() != null) {
+            lost = (LostFound) getArguments().getSerializable(KEY_LOST);
+        }
     }
 
     /**

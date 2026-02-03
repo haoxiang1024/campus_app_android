@@ -56,8 +56,6 @@ public class LostFragment extends BaseFragment<FragmentLostBinding> {
     String title;
     private String[] tabs_data = new String[]{};//选项卡组
     private int currentPosition;//当前选项卡的位置
-    private LostDetailAdapter lostDetailAdapter;//丢失物品详情adapter
-    private List<Lost> detailList = new ArrayList<>();//数据list
     private LostFoundDetailAdapter lostFoundDetailAdapter;//丢失物品详情adapter
 
     @NonNull
@@ -97,7 +95,6 @@ public class LostFragment extends BaseFragment<FragmentLostBinding> {
         String[] types = getResources().getStringArray(R.array.type_titles);//根据app语言获取不同的数据
         operate_tabs(types);//选项卡
         tabTitle = types[0];//初始值
-        lostDetailAdapter = new LostDetailAdapter(getContext());
         lostFoundDetailAdapter = new LostFoundDetailAdapter(getContext());
         binding.listview.setAdapter(lostFoundDetailAdapter);
         getTypeDetailList();
@@ -108,7 +105,7 @@ public class LostFragment extends BaseFragment<FragmentLostBinding> {
         super.initListeners();
         //跳转丢失物品详情页面
         binding.listview.setOnItemClickListener((parent, view, position, id) -> {
-            Lost lost = lostDetailAdapter.getItem(position);//获取lost实例
+            LostFound lost = lostFoundDetailAdapter.getItem(position);//获取lost实例
             openPage(LostDetailFragment.class, LostDetailFragment.KEY_LOST, lost);
         });
 

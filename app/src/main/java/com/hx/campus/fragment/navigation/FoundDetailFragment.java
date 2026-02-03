@@ -22,7 +22,6 @@ public class FoundDetailFragment extends BaseFragment<FragmentFoundDetailBinding
     public static final String KEY_FOUND = "found";
 
 
-    //@AutoWired(name = KEY_FOUND)
     LostFound found;//实体类不能序列化，否则无法注入
 
     /**
@@ -44,18 +43,9 @@ public class FoundDetailFragment extends BaseFragment<FragmentFoundDetailBinding
     @Override
     protected void initArgs() {
         super.initArgs();
-        XRouter.getInstance().inject(this);
+        //XRouter.getInstance().inject(this);
         if (getArguments() != null) {
-            try {
-                // 手动获取序列化对象并强转
-                Object data = getArguments().getSerializable(KEY_FOUND);
-                if (data instanceof LostFound) {
-                    this.found = (LostFound) data;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                Log.e("FoundDetail", "参数解析异常: " + e.getMessage());
-            }
+            found = (LostFound) getArguments().getSerializable(KEY_FOUND);
         }
     }
 
