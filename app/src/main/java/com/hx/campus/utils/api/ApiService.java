@@ -1,13 +1,17 @@
 package com.hx.campus.utils.api;
 
 import com.hx.campus.adapter.entity.LostFound;
+import com.hx.campus.adapter.entity.SearchInfo;
 import com.hx.campus.adapter.entity.User;
 
 import java.util.List;
-
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
 import retrofit2.http.Query;
 
 public interface ApiService {
@@ -22,7 +26,6 @@ public interface ApiService {
     Call<Result<List<LostFound>>> getLostFoundList(@Query("type") String type);
 
     // 获取指定用户的列表
-    // type: "0" for Lost, "1" for Found
     @POST("getLostFoundByUserId")
     Call<Result<List<LostFound>>> getLostFoundListByUserId( @Query("user_id") int userId);
 
@@ -34,5 +37,43 @@ public interface ApiService {
     @POST("DetailByTitle")
     Call<Result<List<LostFound>>> DetailByTitle( @Query("title") String title,@Query("type") String type);
 
+    //添加物品信息
+    @Multipart
+    @POST("addLostFound")
+    Call<Result<String>> addLostFound(
+            @Part MultipartBody.Part file,
+            @Part("lostJson") RequestBody lostJson,
+            @Part("foundJson") RequestBody foundJson,
+            @Part("op") RequestBody op
+    );
 
+    //获取分类id
+    @POST("getIdByName")
+    Call<Result<String>>getTypeid(@Query("name") String name);
+    // 发送验证码
+    @POST("send_code")
+    Call<Result<Object>> sendCode(@Query("email") String email);
+
+    // 校验验证码
+    @POST("verify_code")
+    Call<Result<Object>> verifyCode(@Query("email") String email, @Query("code") String code);
+
+    // 重置密码
+    @POST("resetPwd")
+    Call<Result<Object>> resetPwd(
+            @Query("phone") String phone,
+            @Query("newPwd") String password,
+            @Query("email") String email,
+            @Query("email_code") String code
+    );
+    //搜索
+    @POST("searchInfo")
+    Call<Result<List<SearchInfo>>> searchInfo(@Query("value") String value);
+    //用户修改信息
+    @POST("updateAc")
+    Call<Result<User>> updateAccount(
+            @Query("nickname") String nickname,
+            @Query("sex") String sex,
+            @Query("id") int id
+    );
 }

@@ -22,11 +22,14 @@ import androidx.core.content.ContextCompat;
 import com.alibaba.fastjson.JSON;
 import com.hx.campus.R;
 import com.hx.campus.adapter.entity.Found;
+import com.hx.campus.adapter.entity.LostFound;
 import com.hx.campus.adapter.entity.User;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.databinding.FragmentAddFoundBinding;
 import com.hx.campus.utils.LoadingDialog;
 import com.hx.campus.utils.Utils;
+import com.hx.campus.utils.api.Result;
+import com.hx.campus.utils.api.RetrofitClient;
 import com.hx.campus.utils.internet.OkHttpCallback;
 import com.hx.campus.utils.internet.OkhttpUtils;
 import com.hx.campus.utils.service.JsonOperate;
@@ -40,11 +43,11 @@ import java.util.Date;
 import java.util.List;
 
 import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import retrofit2.Callback;
 
 @Page
 public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
@@ -60,13 +63,6 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
     private String locationEditValue;//地点
     private String result;
     LoadingDialog loadingDialog;//加载动画
-    /**
-     * 构建ViewBinding
-     *
-     * @param inflater  inflater
-     * @param container 容器
-     * @return ViewBinding
-     */
     @NonNull
     @Override
     protected FragmentAddFoundBinding viewBindingInflate(@NonNull LayoutInflater inflater, ViewGroup container, boolean attachToRoot)  {
@@ -92,10 +88,6 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
     @Override
     protected void initListeners() {
         super.initListeners();
-        /**
-         * 1 图片选择
-         * 2 图片上传
-         */
         //图片选择
         binding.chooseImage.setOnClickListener(v -> {
             if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -107,10 +99,14 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
         //物品信息提交
         binding.btnSubmitLost.setOnClickListener(v -> {
             showLoadingDialog();
+            if (id == 0) {
+                XToast.warning(getContext(), "请稍后，分类信息正在加载...").show();
+                return;
+            }
             User user = Utils.getBeanFromSp(getContext(), "User", "user");//获取user
             //对象构造
             Date date = new Date();//获取日期
-            String state = "未认领"; //状态
+            String state = "待审核"; //状态
             int stick = 0;//是否置顶
             Integer userId = user.getId();//获取用户id
             String phone = user.getPhone();//用户手机号
@@ -122,10 +118,10 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
             //地点
             locationEditValue = binding.etLocation.getEditValue();
             //构造对象
-            Found found = new Found(foundTitleEditValue, "", date, contentEditValue, locationEditValue, phone, state, stick, id, userId);
+            LostFound lostFound=new LostFound(foundTitleEditValue, "", date, contentEditValue, locationEditValue, phone, state, stick, id, userId);
+            lostFound.setType("招领");
             //对象转换json用于传输
-            foundJson = JSON.toJSONString(found);
-//            Log.e(TAG, "Data: " + foundJson);
+            foundJson = JSON.toJSONString(lostFound);
             //上传图片
             if (file == null) {
                 result = Utils.getString(getContext(),R.string.no_image_selected_yet);
@@ -159,32 +155,34 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
         //CHOOSE_PHOTO：全局常量，标识
     }
 
-    //上传图片
+    //上传信息
     private void upload(String foundJson) {
-        fileName.replace(".jpg", "");
-        //1、创建请求体
-        RequestBody requestBody = new MultipartBody.Builder()
-                .setType(MultipartBody.FORM)//请求类型
-                .addFormDataPart("foundJson", foundJson)
-                .addFormDataPart("upload_file", fileName, RequestBody.create(MediaType.parse("*/*"), file)) // 第一个参数传到服务器的字段名，第二个你自己的文件名，第三个MediaType.parse("*/*")数据类型，这个是所有类型的意思,file就是我们之前创建的全局file，里面是创建的图片
-                .build();
-        //2、调用工具类上传图片以及参数
-        OkhttpUtils.uploadFile(Utils.rebuildUrl("/upload?op=" + "招领", getContext()), requestBody, new Callback() {
+        RequestBody requestFile = RequestBody.create(MediaType.parse("image/jpeg"), file);
+        MultipartBody.Part filePart = MultipartBody.Part.createFormData("upload_file", file.getName(), requestFile);
+        RequestBody opPart = RequestBody.create(MediaType.parse("text/plain"), "招领");
+        RequestBody foundJsonPart = RequestBody.create(MediaType.parse("text/plain"), foundJson);
+        RequestBody lostJsonPart = RequestBody.create(MediaType.parse("text/plain"), "");
+        RetrofitClient.getInstance()
+                .getApi()
+                .addLostFound(filePart, lostJsonPart, foundJsonPart, opPart)
+                .enqueue(new retrofit2.Callback<Result<String>>() {
+                    @Override
+                    public void onResponse(retrofit2.Call<Result<String>> call, retrofit2.Response<Result<String>> response) {
+                        hideLoadingDialog();
+                        if (response.isSuccessful() && response.body() != null) {
+                            if (response.body().isSuccess()) {
+                                showResponse(Utils.getString(getContext(), R.string.send_su));
+                                runOnUiThread(() -> clearUI());
+                            }
+                        }
+                    }
 
-            //请求失败回调函数
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.e(TAG, "onFailure: 异常");
-                e.printStackTrace();
-            }
-
-            //请求成功响应函数
-            @Override
-            public void onResponse(Call call, Response response) {
-                hideLoadingDialog();
-                showResponse(Utils.getString(getContext(),R.string.send_su));
-            }
-        });
+                    @Override
+                    public void onFailure(retrofit2.Call<Result<String>> call, Throwable t) {
+                        hideLoadingDialog();
+                        t.printStackTrace();
+                    }
+                });
     }
 
     //ui操作，提示框
@@ -209,41 +207,40 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
         setRadioBtn(Arrays.asList(types));
         //获取标题id
         binding.radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            int checkedRadioButtonId = binding.radioGroup.getCheckedRadioButtonId();
-            RadioButton radioButton = findViewById(checkedRadioButtonId);
-            String name = String.valueOf(radioButton.getText());
-            getIdByName(name);
+            RadioButton radioButton = group.findViewById(checkedId);
+            if (radioButton != null) {
+                String name = radioButton.getText().toString();
+                getIdByName(name); // 去服务器查 ID
+            }
         });
     }
 
 
     //获取分类id
     private void getIdByName(String name) {
-        new Thread() {
+        RetrofitClient.getInstance().getApi().getTypeid(name).enqueue(new Callback<Result<String>>() {
             @Override
-            public void run() {
-                super.run();
-                OkhttpUtils.get(Utils.rebuildUrl("/getTypeid?name=" + name, getContext()), new OkHttpCallback() {
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        super.onResponse(call, response);
-                        String data = JsonOperate.getValue(result, "data");
-                        id = Integer.parseInt(data);
-                        Log.e(TAG, "onResponse: " + data);
-                    }
-                });
+            public void onResponse(retrofit2.Call<Result<String>> call, retrofit2.Response<Result<String>> response) {
+                if(response.body() != null && response.body().isSuccess()){
+                    String data=response.body().getData();
+                    id = Integer.parseInt(data);
+                }
             }
-        }.start();
+
+            @Override
+            public void onFailure(retrofit2.Call<Result<String>> call, Throwable t) {
+                Utils.showResponse("网络异常");
+            }
+        });
     }
 
     //设置多选按钮
     private void setRadioBtn(List<String> list) {
-        Log.e(TAG, "setRadioBtn: " + list);
         //找到btngroup并动态加入按钮
-        for (int i = 0; i < list.size(); i++) {
+        binding.radioGroup.removeAllViews(); // 清空旧的，防止重复添加
+        for (String typeName : list) {
             RadioButton radioButton = new RadioButton(getContext());
-            radioButton.setText(list.get(i));
-            radioButton.setId(i);//设置唯一id以便之后获取btn内容
+            radioButton.setText(typeName);
             binding.radioGroup.addView(radioButton);
         }
 
@@ -270,16 +267,14 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
         //requestCode：标识码
         //data：选择的图片的信息
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CHOOSE_PHOTO) {//显示图片
+        if (requestCode == CHOOSE_PHOTO) {
+            //显示图片
             binding.ivImage.setImageURI(data.getData());
-            Log.e(TAG, "图片在手机上的虚拟路径为:" + data.getData());
             String realPath = Utils.getRealPath(getContext(), data);
-            Log.e(TAG, "图片在手机上的真实路径为:" + realPath);
             String[] temp = realPath.replaceAll("\\\\", "/").split("/");
             if (temp.length > 1) {
                 fileName = temp[temp.length - 1];
             }
-            Log.e(TAG, "onActivityResult: " + fileName);
             file = new File(realPath);
         }
     }
@@ -297,5 +292,20 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
         if (loadingDialog != null && loadingDialog.isShowing()) {
             loadingDialog.dismiss();
         }
+    }
+    private void clearUI() {
+        //  清空所有输入框
+        binding.etLostTitle.setText("");    // 标题
+        binding.addContent.setText("");     // 内容
+        binding.etLocation.setText("");    // 地点
+
+        //  重置单选按钮（分类）
+        binding.radioGroup.clearCheck();
+        this.id = 0; // 记得重置保存的分类ID变量
+
+        // 重置图片预览和文件对象
+        binding.ivImage.setImageDrawable(null);
+        this.file = null;
+        this.fileName = "";
     }
 }

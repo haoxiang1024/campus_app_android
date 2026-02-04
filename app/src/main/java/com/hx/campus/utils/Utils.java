@@ -342,8 +342,6 @@ public final class Utils {
         });
     }
     //获取服务端返回的用户数据并存储
-
-
     public static void doUserData(User user) {
         if (user == null) return;
         //存储SharedPreferences以便之后调用

@@ -61,6 +61,19 @@ public class LostFound implements Serializable {
         this.nickname=userName;
     }
 
+    public LostFound(String title, String img, Date pub_date, String content, String place, String phone, String state, Integer stick, Integer lostfoundtypeId, Integer user_id) {
+        this.title = title;
+        this.img = img;
+        this.pubDate = pub_date;
+        this.content = content;
+        this.place = place;
+        this.phone = phone;
+        this.state = state;
+        this.stick = stick;
+        this.userId = user_id;
+        this.lostfoundtypeId = lostfoundtypeId;
+    }
+
 
     public LostFoundType getLostfoundtype() {
         return lostfoundtype;
