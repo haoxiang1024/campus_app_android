@@ -18,8 +18,6 @@ import com.hx.campus.utils.Utils;
 import com.hx.campus.utils.api.Result;
 import com.hx.campus.utils.api.RetrofitClient;
 import com.xuexiang.xpage.annotation.Page;
-import com.xuexiang.xrouter.annotation.AutoWired;
-import com.xuexiang.xrouter.launcher.XRouter;
 
 import java.util.Arrays;
 

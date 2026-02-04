@@ -3,8 +3,6 @@ package com.hx.campus.fragment.navigation;
 import static com.xuexiang.xutil.XUtil.runOnUiThread;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.text.TextUtils;
@@ -24,10 +22,10 @@ import com.hx.campus.adapter.entity.LostFound;
 import com.hx.campus.adapter.entity.User;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.databinding.FragmentAddLostBinding;
-import com.hx.campus.utils.LoadingDialog;
 import com.hx.campus.utils.Utils;
 import com.hx.campus.utils.api.Result;
 import com.hx.campus.utils.api.RetrofitClient;
+import com.hx.campus.utils.common.LoadingDialog;
 import com.xuexiang.xpage.annotation.Page;
 import com.xuexiang.xui.widget.toast.XToast;
 

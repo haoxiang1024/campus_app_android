@@ -100,9 +100,9 @@ public class PersonalFragment extends BaseFragment<FragmentProfileBinding> imple
                 //获取app当前语言
                 String currentLanguage = Utils.language(getContext());
                 if(currentLanguage.equals("zh")){
-                    AgentWebActivity.goWeb(getContext(), Utils.rebuildUrl("/static/pages/notification.html", getContext()));
+                    AgentWebActivity.goWeb(getContext(), Utils.rebuildUrl("/pages/notification.html", getContext()));
                 } else if (currentLanguage.equals("en")) {
-                    AgentWebActivity.goWeb(getContext(), Utils.rebuildUrl("/static/pages/notification_en.html", getContext()));
+                    AgentWebActivity.goWeb(getContext(), Utils.rebuildUrl("/pages/notification_en.html", getContext()));
                 }
                 break;
             case R.id.suggestion:

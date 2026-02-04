@@ -1,4 +1,5 @@
-package com.hx.campus.adapter.lostandfound;
+package com.hx.campus.adapter;
+
 import android.content.Context;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -7,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import com.bumptech.glide.Glide;
-import com.hx.campus.adapter.entity.LostFound; // 使用合并后的实体类
+import com.hx.campus.adapter.entity.LostFound;
 import com.hx.campus.databinding.FoundItemsBinding;
 import com.hx.campus.databinding.LostItemsBinding;
 

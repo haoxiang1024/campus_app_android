@@ -1,5 +1,5 @@
 
-package com.hx.campus.utils;
+package com.hx.campus.utils.common;
 
 import java.util.ArrayList;
 import java.util.HashMap;

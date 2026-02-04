@@ -5,7 +5,7 @@ import android.app.Application;
 
 import com.hx.campus.MyApp;
 import com.hx.campus.core.BaseActivity;
-import com.hx.campus.utils.TokenUtils;
+import com.hx.campus.utils.common.TokenUtils;
 import com.xuexiang.xaop.XAOP;
 import com.xuexiang.xhttp2.XHttpSDK;
 import com.xuexiang.xpage.PageConfig;

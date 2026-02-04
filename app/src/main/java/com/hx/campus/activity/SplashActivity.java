@@ -5,8 +5,8 @@ import android.preference.PreferenceManager;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.hx.campus.utils.LanguageUtil;
-import com.hx.campus.utils.TokenUtils;
+import com.hx.campus.utils.common.LanguageUtil;
+import com.hx.campus.utils.common.TokenUtils;
 import com.xuexiang.xrouter.utils.TextUtils;
 
 public class SplashActivity extends AppCompatActivity {

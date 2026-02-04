@@ -9,14 +9,11 @@ import androidx.annotation.NonNull;
 
 import com.bumptech.glide.Glide;
 import com.hx.campus.R;
-import com.hx.campus.adapter.entity.Lost;
 import com.hx.campus.adapter.entity.LostFound;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.databinding.FragmentLostDetailBinding;
 import com.hx.campus.utils.Utils;
 import com.xuexiang.xpage.annotation.Page;
-import com.xuexiang.xrouter.annotation.AutoWired;
-import com.xuexiang.xrouter.launcher.XRouter;
 
 @Page
 public class LostDetailFragment extends BaseFragment<FragmentLostDetailBinding> {

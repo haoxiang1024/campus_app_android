@@ -10,7 +10,7 @@ import com.hx.campus.R;
 import com.hx.campus.activity.MainActivity;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.databinding.FragmentMultiLanguageBinding;
-import com.hx.campus.utils.LanguageUtil;
+import com.hx.campus.utils.common.LanguageUtil;
 import com.xuexiang.xpage.annotation.Page;
 import com.xuexiang.xui.widget.textview.supertextview.SuperTextView;
 

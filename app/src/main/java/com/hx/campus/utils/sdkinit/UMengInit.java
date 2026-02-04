@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 
 import com.hx.campus.BuildConfig;
 import com.hx.campus.MyApp;
-import com.hx.campus.utils.SettingUtils;
+import com.hx.campus.utils.common.SettingUtils;
 import com.meituan.android.walle.WalleChannelReader;
 import com.umeng.analytics.MobclickAgent;
 import com.umeng.commonsdk.UMConfigure;

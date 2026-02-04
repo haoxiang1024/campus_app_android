@@ -1,6 +1,5 @@
 package com.hx.campus.fragment.navigation;
 
-import static com.hx.campus.core.webview.AgentWebFragment.TAG;
 import static com.xuexiang.xutil.XUtil.runOnUiThread;
 
 import android.Manifest;
@@ -9,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
@@ -21,32 +19,25 @@ import androidx.core.content.ContextCompat;
 
 import com.alibaba.fastjson.JSON;
 import com.hx.campus.R;
-import com.hx.campus.adapter.entity.Found;
 import com.hx.campus.adapter.entity.LostFound;
 import com.hx.campus.adapter.entity.User;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.databinding.FragmentAddFoundBinding;
-import com.hx.campus.utils.LoadingDialog;
 import com.hx.campus.utils.Utils;
 import com.hx.campus.utils.api.Result;
 import com.hx.campus.utils.api.RetrofitClient;
-import com.hx.campus.utils.internet.OkHttpCallback;
-import com.hx.campus.utils.internet.OkhttpUtils;
-import com.hx.campus.utils.service.JsonOperate;
+import com.hx.campus.utils.common.LoadingDialog;
 import com.xuexiang.xpage.annotation.Page;
 import com.xuexiang.xui.widget.toast.XToast;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import okhttp3.Call;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
-import okhttp3.Response;
 import retrofit2.Callback;
 
 @Page

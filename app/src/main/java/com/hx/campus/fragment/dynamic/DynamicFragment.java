@@ -14,22 +14,20 @@ import com.hx.campus.R;
 import com.hx.campus.adapter.base.broccoli.BroccoliSimpleDelegateAdapter;
 import com.hx.campus.adapter.base.delegate.SimpleDelegateAdapter;
 import com.hx.campus.adapter.base.delegate.SingleDelegateAdapter;
-import com.hx.campus.adapter.entity.Found;
-import com.hx.campus.adapter.entity.Lost;
 import com.hx.campus.adapter.entity.LostFound;
 import com.hx.campus.adapter.entity.NewInfo;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.core.webview.AgentWebActivity;
 import com.hx.campus.databinding.FragmentNewsBinding;
-import com.hx.campus.fragment.navigation.FoundFragment;
-import com.hx.campus.fragment.navigation.LostFragment;
 import com.hx.campus.fragment.navigation.FoundDetailFragment;
+import com.hx.campus.fragment.navigation.FoundFragment;
 import com.hx.campus.fragment.navigation.LostDetailFragment;
+import com.hx.campus.fragment.navigation.LostFragment;
 import com.hx.campus.fragment.other.SearchFragment;
-import com.hx.campus.utils.DemoDataProvider;
 import com.hx.campus.utils.Utils;
 import com.hx.campus.utils.api.Result;
 import com.hx.campus.utils.api.RetrofitClient;
+import com.hx.campus.utils.common.DemoDataProvider;
 import com.xuexiang.xpage.annotation.Page;
 import com.xuexiang.xpage.enums.CoreAnim;
 import com.xuexiang.xui.adapter.recyclerview.RecyclerViewHolder;
@@ -196,7 +194,7 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
                 SimpleImageBanner banner = holder.findViewById(R.id.sib_simple_usage);
                 banner.setSource(DemoDataProvider.getBannerList())
                         .setOnItemClickListener((view, item, pos) -> {
-                            String url = Utils.language(getContext()).equals("en") ? "/static/pages/notification_en.html" : "/static/pages/notification.html";
+                            String url = Utils.language(getContext()).equals("en") ? "/pages/notification_en.html" : "/pages/notification.html";
                             // 简化逻辑示例
                             AgentWebActivity.goWeb(getContext(), Utils.rebuildUrl(url, getContext()));
                         }).startScroll();

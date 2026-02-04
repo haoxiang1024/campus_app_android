@@ -16,7 +16,7 @@ import androidx.annotation.RequiresApi;
 import com.hx.campus.R;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.databinding.FragmentSettingsBinding;
-import com.hx.campus.utils.TokenUtils;
+import com.hx.campus.utils.common.TokenUtils;
 import com.xuexiang.xaop.annotation.SingleClick;
 import com.xuexiang.xpage.annotation.Page;
 import com.xuexiang.xui.widget.dialog.DialogLoader;

@@ -13,7 +13,7 @@ import com.hx.campus.R;
 import com.hx.campus.core.http.api.ApiService;
 import com.hx.campus.core.http.callback.NoTipCallBack;
 import com.hx.campus.core.http.entity.TipInfo;
-import com.hx.campus.utils.MMKVUtils;
+import com.hx.campus.utils.common.MMKVUtils;
 import com.xuexiang.constant.TimeConstants;
 import com.xuexiang.xaop.annotation.SingleClick;
 import com.xuexiang.xhttp2.XHttp;

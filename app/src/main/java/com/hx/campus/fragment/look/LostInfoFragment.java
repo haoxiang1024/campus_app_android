@@ -6,9 +6,9 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 
 import com.hx.campus.R;
+import com.hx.campus.adapter.LostFoundDetailAdapter;
 import com.hx.campus.adapter.entity.LostFound;
 import com.hx.campus.adapter.entity.User;
-import com.hx.campus.adapter.lostandfound.LostFoundDetailAdapter;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.databinding.FragmentLostInfoBinding;
 import com.hx.campus.utils.Utils;

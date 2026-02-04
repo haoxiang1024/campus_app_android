@@ -1,4 +1,4 @@
-package com.hx.campus.utils;
+package com.hx.campus.utils.common;
 
 import android.graphics.Color;
 import android.text.TextUtils;

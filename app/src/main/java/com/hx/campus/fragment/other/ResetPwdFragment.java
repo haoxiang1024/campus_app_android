@@ -1,6 +1,5 @@
 package com.hx.campus.fragment.other;
 
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,7 +14,6 @@ import com.hx.campus.utils.api.Result;
 import com.hx.campus.utils.api.RetrofitClient;
 import com.xuexiang.xpage.annotation.Page;
 import com.xuexiang.xui.utils.CountDownButtonHelper;
-import com.xuexiang.xui.widget.actionbar.TitleBar;
 
 import retrofit2.Call;
 import retrofit2.Callback;

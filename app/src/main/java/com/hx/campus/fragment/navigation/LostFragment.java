@@ -9,30 +9,21 @@ import androidx.annotation.NonNull;
 
 import com.google.android.material.tabs.TabLayout;
 import com.hx.campus.R;
-import com.hx.campus.adapter.entity.Lost;
+import com.hx.campus.adapter.LostFoundDetailAdapter;
 import com.hx.campus.adapter.entity.LostFound;
-import com.hx.campus.adapter.lostandfound.LostDetailAdapter;
-import com.hx.campus.adapter.lostandfound.LostFoundDetailAdapter;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.databinding.FragmentLostBinding;
-import com.hx.campus.utils.LoadingDialog;
 import com.hx.campus.utils.Utils;
 import com.hx.campus.utils.api.Result;
 import com.hx.campus.utils.api.RetrofitClient;
-import com.hx.campus.utils.internet.OkHttpCallback;
-import com.hx.campus.utils.internet.OkhttpUtils;
-import com.hx.campus.utils.service.JsonOperate;
+import com.hx.campus.utils.common.LoadingDialog;
 import com.xuexiang.xpage.annotation.Page;
 import com.xuexiang.xrouter.annotation.AutoWired;
 import com.xuexiang.xrouter.launcher.XRouter;
 import com.xuexiang.xui.widget.actionbar.TitleBar;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
-import okhttp3.Call;
-import okhttp3.Response;
 import retrofit2.Callback;
 
 @Page

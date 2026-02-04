@@ -1,5 +1,5 @@
 
-package com.hx.campus.utils;
+package com.hx.campus.utils.common;
 
 
 import android.content.Context;

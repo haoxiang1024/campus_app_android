@@ -12,39 +12,27 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 
-import com.alibaba.fastjson.JSON;
 import com.hx.campus.R;
 import com.hx.campus.activity.MainActivity;
 import com.hx.campus.adapter.entity.User;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.databinding.FragmentLoginBinding;
-import com.hx.campus.utils.LoadingDialog;
-import com.hx.campus.utils.RandomUtils;
-import com.hx.campus.utils.ResponseMsg;
-import com.hx.campus.utils.SettingUtils;
-import com.hx.campus.utils.TokenUtils;
 import com.hx.campus.utils.Utils;
-import com.hx.campus.utils.api.ApiService;
 import com.hx.campus.utils.api.Result;
 import com.hx.campus.utils.api.RetrofitClient;
-import com.hx.campus.utils.internet.OkHttpCallback;
-import com.hx.campus.utils.internet.OkhttpUtils;
+import com.hx.campus.utils.common.LoadingDialog;
+import com.hx.campus.utils.common.RandomUtils;
+import com.hx.campus.utils.common.ResponseMsg;
+import com.hx.campus.utils.common.SettingUtils;
+import com.hx.campus.utils.common.TokenUtils;
 import com.hx.campus.utils.sdkinit.UMengInit;
-import com.hx.campus.utils.service.JsonOperate;
 import com.xuexiang.xaop.annotation.SingleClick;
 import com.xuexiang.xpage.annotation.Page;
 import com.xuexiang.xpage.enums.CoreAnim;
-import com.xuexiang.xrouter.annotation.AutoWired;
 import com.xuexiang.xui.utils.ThemeUtils;
 import com.xuexiang.xui.utils.ViewUtils;
 import com.xuexiang.xui.widget.actionbar.TitleBar;
 import com.xuexiang.xutil.app.ActivityUtils;
-
-import java.io.IOException;
-
-import okhttp3.Call;
-import okhttp3.Response;
-import retrofit2.Callback;
 
 
 @Page(anim = CoreAnim.none)

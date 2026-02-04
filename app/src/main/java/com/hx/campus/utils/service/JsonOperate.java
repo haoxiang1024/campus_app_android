@@ -6,20 +6,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.hx.campus.adapter.entity.NewInfo;
-import com.hx.campus.utils.internet.OkHttpCallback;
-import com.hx.campus.utils.internet.OkhttpUtils;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import okhttp3.Call;
-import okhttp3.Response;
 
 public class JsonOperate {
     //    public static String newsKey = "bec633393690881151584f0ce9462ecf";//新闻key
@@ -87,58 +76,7 @@ public class JsonOperate {
 
     }
 
-    /**
-     * 解析动态页面的新闻资讯
-     *
-     * @param jsonStr   传入json数据
-     * @param fieldName 要解析的字段
-     */
 
-    public static List<NewInfo> newsParseJsonData(String jsonStr, String fieldName) {
-        // 使用 Gson 解析 JSON 字符串，获取指定字段对应的 JsonObject 对象
-        JsonObject jsonObj = new Gson().fromJson(jsonStr, JsonObject.class);
-        JsonObject fieldObj = jsonObj.getAsJsonObject(fieldName);
-        // 获取 data 数组对应的 JsonArray 对象
-        JsonArray dataArray = fieldObj.getAsJsonArray("data");
-        List<NewInfo> list = new ArrayList<>();//资讯List
-        for (int i = 0; i < dataArray.size(); i++) {
-            JsonObject dataObj = dataArray.get(i).getAsJsonObject();
-            String title = dataObj.get("title").getAsString();
-            String category = dataObj.get("category").getAsString();
-            String author_name = dataObj.get("author_name").getAsString();
-            String newsurl = dataObj.get("url").getAsString();
-            String thumbnail_pic_s = dataObj.get("thumbnail_pic_s").getAsString();//新闻图片链接
-            String uniquekey = dataObj.get("uniquekey").getAsString();//新闻uniquekey用于获取新闻内容
-            list.add(new NewInfo(category, title)
-                    .setDetailUrl(newsurl)
-                    .setUserName(author_name)
-                    .setUniquekey(uniquekey)
-                    .setImageUrl(thumbnail_pic_s));
-        }
-        //设置新闻摘要
-        for (NewInfo news : list) {
-            String uniquekey = news.getUniquekey();
-            //根据key获取摘要
-            new Thread() {
-                @Override
-                public void run() {
-                    super.run();
-                    OkhttpUtils.get("http://v.juhe.cn/toutiao/content?key=" + newsKey + "&uniquekey=" + uniquekey, new OkHttpCallback() {
-                        @Override
-                        public void onResponse(Call call, Response response) throws IOException {
-                            super.onResponse(call, response);
-                            String result1 = JsonOperate.getValue(result, "result");
-                            String content = JsonOperate.getValue(result1, "content");
-                            content = content.replaceAll("<p.*?>", "").replaceAll("</p>", "");
-                            news.setSummary(content);
 
-                        }
-                    });
-                }
-            }.start();
-
-        }
-        return list;
-    }
 
 }

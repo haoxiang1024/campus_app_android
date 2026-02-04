@@ -1,10 +1,11 @@
 
-package com.hx.campus.utils;
+package com.hx.campus.utils.common;
 
 import android.content.Context;
 
 import com.hx.campus.R;
 import com.hx.campus.activity.LoginActivity;
+import com.hx.campus.utils.Utils;
 import com.umeng.analytics.MobclickAgent;
 import com.xuexiang.xui.utils.XToastUtils;
 import com.xuexiang.xutil.app.ActivityUtils;

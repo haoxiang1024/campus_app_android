@@ -1,6 +1,5 @@
 package com.hx.campus.fragment.other;
 
-import android.content.Context;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -12,10 +11,10 @@ import com.hx.campus.adapter.SearchInfoAdapter;
 import com.hx.campus.adapter.entity.SearchInfo;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.databinding.FragmentSearchBinding;
-import com.hx.campus.utils.LoadingDialog;
 import com.hx.campus.utils.Utils;
 import com.hx.campus.utils.api.Result;
 import com.hx.campus.utils.api.RetrofitClient;
+import com.hx.campus.utils.common.LoadingDialog;
 import com.xuexiang.xpage.annotation.Page;
 
 import java.util.ArrayList;

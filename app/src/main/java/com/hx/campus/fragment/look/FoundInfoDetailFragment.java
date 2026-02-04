@@ -1,7 +1,6 @@
 package com.hx.campus.fragment.look;
 
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +18,6 @@ import com.hx.campus.utils.Utils;
 import com.hx.campus.utils.api.Result;
 import com.hx.campus.utils.api.RetrofitClient;
 import com.xuexiang.xpage.annotation.Page;
-import com.xuexiang.xrouter.launcher.XRouter;
 
 import java.util.Arrays;
 

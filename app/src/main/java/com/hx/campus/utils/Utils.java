@@ -26,18 +26,16 @@ import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.util.Base64;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.hx.campus.R;
 import com.hx.campus.adapter.entity.User;
 import com.hx.campus.core.webview.AgentWebActivity;
 import com.hx.campus.fragment.other.ServiceProtocolFragment;
+import com.hx.campus.utils.common.PropertiesUtil;
 import com.xuexiang.xpage.base.XPageFragment;
 import com.xuexiang.xpage.core.PageOption;
 import com.xuexiang.xui.utils.ColorUtils;

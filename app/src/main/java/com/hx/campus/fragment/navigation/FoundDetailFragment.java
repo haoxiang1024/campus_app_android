@@ -1,7 +1,6 @@
 package com.hx.campus.fragment.navigation;
 
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +14,6 @@ import com.hx.campus.core.BaseFragment;
 import com.hx.campus.databinding.FragmentFoundDetailBinding;
 import com.hx.campus.utils.Utils;
 import com.xuexiang.xpage.annotation.Page;
-import com.xuexiang.xrouter.launcher.XRouter;
 
 @Page
 public class FoundDetailFragment extends BaseFragment<FragmentFoundDetailBinding> {

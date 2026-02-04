@@ -1,6 +1,6 @@
 
 
-package com.hx.campus.utils;
+package com.hx.campus.utils.common;
 
 public class ResponseMsg{
     // ===================== 基础操作提示 =====================
