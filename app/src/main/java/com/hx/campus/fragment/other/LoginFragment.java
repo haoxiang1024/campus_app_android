@@ -41,7 +41,7 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements
 
 
 
-    String loginMsg = "";//登录信息
+
 
     LoadingDialog loadingDialog;//加载动画
 
@@ -94,6 +94,7 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements
         binding.tvForgetPassword.setOnClickListener(this);
         binding.tvUserProtocol.setOnClickListener(this);
         binding.tvPrivacyProtocol.setOnClickListener(this);
+        binding.tvReg.setOnClickListener(this);
     }
 
     @NonNull
@@ -144,6 +145,10 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements
                 case R.id.tv_forget_password:
                     // 忘记密码
                     openNewPage(ResetPwdFragment.class);
+                    break;
+                case R.id.tv_reg:
+                    //注册
+                    openNewPage(RegFragment.class);
                     break;
                 default:
                     Utils.showResponse(ResponseMsg.REQUEST_FAIL);

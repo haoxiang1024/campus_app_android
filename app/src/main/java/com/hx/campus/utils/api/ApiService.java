@@ -83,4 +83,11 @@ public interface ApiService {
             @Part MultipartBody.Part file,
             @Query("id") int userId
     );
+    //注册接口
+    @POST("register")
+    Call<Result<Object>> register(
+            @Query("phone") String phone,
+            @Query("email") String email,
+            @Query("password") String password
+    );
 }

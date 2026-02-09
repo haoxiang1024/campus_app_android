@@ -6,6 +6,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="menu_news">动态</string>
+    <string name="menu_message">消息</string>
     <string name="menu_trending">查看</string>
     <string name="menu_profile">我的</string>
 
@@ -100,7 +101,7 @@
     <string name="title">丢失物品标题</string>
     <string name="recommendation">推荐</string>
     <string name="content">内容</string>
-    <string name="loation">地点</string>
+    <string name="loation">地点:</string>
     <string name="loster">发布人：</string>
     <string name="contract">联系方式：</string>
     <string name="submit">提交</string>

@@ -194,8 +194,24 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
                 SimpleImageBanner banner = holder.findViewById(R.id.sib_simple_usage);
                 banner.setSource(DemoDataProvider.getBannerList())
                         .setOnItemClickListener((view, item, pos) -> {
-                            String url = Utils.language(getContext()).equals("en") ? "/pages/notification_en.html" : "/pages/notification.html";
-                            // 简化逻辑示例
+                            String url="";
+                            switch (pos){
+                                case 0:
+                                    url="/pages/notification.html";
+                                    break;
+                                case 1:
+                                    url="/pages/contract.html";
+                                    break;
+                                case 2:
+                                    url="/pages/appcrash.html";
+                                    break;
+                                case 3:
+                                    url="/pages/privacy.html";
+                                    break;
+                                default:
+                                    url="/pages/notification.html";
+                                    break;
+                            }
                             AgentWebActivity.goWeb(getContext(), Utils.rebuildUrl(url, getContext()));
                         }).startScroll();
             }
@@ -219,6 +235,7 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
                     if (title.contains("失物")) openNewPage(LostFragment.class, LostFragment.KEY_TITLE_NAME, title);
                     else if (title.contains("招领")) openNewPage(FoundFragment.class, FoundFragment.KEY_TITLE_NAME, title);
                     else if (title.contains("搜索")) openNewPage(SearchFragment.class);
+                    else if (title.contains("意见")) AgentWebActivity.goWeb(getContext(), Utils.rebuildUrl("/pages/contract.html", getContext()));
                 });
             }
         };

@@ -27,6 +27,7 @@ import com.hx.campus.core.BaseFragment;
 import com.hx.campus.databinding.ActivityMainBinding;
 import com.hx.campus.fragment.dynamic.DynamicFragment;
 import com.hx.campus.fragment.look.LookFragment;
+import com.hx.campus.fragment.message.MessageMainFragment;
 import com.hx.campus.fragment.other.AboutFragment;
 import com.hx.campus.fragment.other.SearchFragment;
 import com.hx.campus.fragment.personal.AccountFragment;
@@ -82,6 +83,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
         //主页内容填充
         BaseFragment[] fragments = new BaseFragment[]{
                 new DynamicFragment(),//主页
+                new MessageMainFragment(),//消息页
                 new LookFragment(),//查看信息页
                 new PersonalFragment()//我的页面
         };

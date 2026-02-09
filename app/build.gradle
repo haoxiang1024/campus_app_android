@@ -134,7 +134,7 @@ dependencies {
 
     implementation 'com.zzhoujay.richtext:richtext:3.0.8'
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-
+    implementation 'github.bumptech.glide:glide:4.0.0'
     //ANR异常捕获
     implementation 'com.github.anrwatchdog:anrwatchdog:1.4.0'
 

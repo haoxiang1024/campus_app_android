@@ -107,6 +107,7 @@ public class LostInfoFragment extends BaseFragment<FragmentLostInfoBinding> {
     private void setAdapter(List<LostFound> list) {
         if (list == null || list.isEmpty()) {
             Utils.showResponse(Utils.getString(getContext(), R.string.no_info_posted_yet));
+
             return;
         }
         adapter.setData(list, 1);

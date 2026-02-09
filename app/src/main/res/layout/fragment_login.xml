@@ -90,23 +90,28 @@
         </com.xuexiang.xui.widget.layout.XUIFrameLayout>
 
 
-        <FrameLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp">
 
+            <com.xuexiang.xui.widget.alpha.XUIAlphaTextView
+                android:id="@+id/tv_reg"
+                style="@style/TextStyle.Explain"
+                android:layout_alignParentStart="true"
+                android:padding="5dp"
+                android:text="我要注册"
+                android:textColor="@color/xui_config_color_primary_text" />
 
             <com.xuexiang.xui.widget.alpha.XUIAlphaTextView
                 android:id="@+id/tv_forget_password"
                 style="@style/TextStyle.Explain"
-                android:layout_gravity="end"
-                android:paddingStart="10dp"
-                android:paddingTop="5dp"
-                android:paddingEnd="10dp"
-                android:paddingBottom="5dp"
+                android:layout_alignParentEnd="true"
+                android:padding="5dp"
                 android:text="忘记密码"
                 android:textColor="@color/xui_config_color_primary_text" />
 
-        </FrameLayout>
+        </RelativeLayout>
 
     </LinearLayout>
 
