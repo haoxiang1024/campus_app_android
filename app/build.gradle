@@ -9,19 +9,6 @@ if (isNeedPackage.toBoolean() && isUseBooster.toBoolean()) {
 android {
     compileSdkVersion build_versions.compileSdkVersion
     buildToolsVersion build_versions.build_tools
-    sourceSets {
-        main {
-            res.srcDirs = [
-                    'src/main/res/layout/user',
-                    'src/main/res/layout/lost',
-                    'src/main/res/layout/found',
-                    'src/main/res/layout/common',
-                    'src/main/res/layout/message',
-                    'src/main/res/layout/search',
-                    'src/main/res'
-            ]
-        }
-    }
     defaultConfig {
         applicationId "com.hx.campus"
         minSdkVersion 21
