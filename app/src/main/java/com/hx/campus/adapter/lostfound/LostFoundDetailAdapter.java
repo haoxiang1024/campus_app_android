@@ -1,4 +1,4 @@
-package com.hx.campus.adapter;
+package com.hx.campus.adapter.lostfound;
 
 import android.content.Context;
 import android.text.TextUtils;

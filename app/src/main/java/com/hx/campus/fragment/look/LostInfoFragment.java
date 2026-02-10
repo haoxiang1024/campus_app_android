@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 
 import com.hx.campus.R;
-import com.hx.campus.adapter.LostFoundDetailAdapter;
+import com.hx.campus.adapter.lostfound.LostFoundDetailAdapter;
 import com.hx.campus.adapter.entity.LostFound;
 import com.hx.campus.adapter.entity.User;
 import com.hx.campus.core.BaseFragment;

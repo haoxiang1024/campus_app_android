@@ -9,7 +9,19 @@ if (isNeedPackage.toBoolean() && isUseBooster.toBoolean()) {
 android {
     compileSdkVersion build_versions.compileSdkVersion
     buildToolsVersion build_versions.build_tools
-
+    sourceSets {
+        main {
+            res.srcDirs = [
+                    'src/main/res/layout/user',
+                    'src/main/res/layout/lost',
+                    'src/main/res/layout/found',
+                    'src/main/res/layout/common',
+                    'src/main/res/layout/message',
+                    'src/main/res/layout/search',
+                    'src/main/res'
+            ]
+        }
+    }
     defaultConfig {
         applicationId "com.hx.campus"
         minSdkVersion 21
@@ -134,7 +146,7 @@ dependencies {
 
     implementation 'com.zzhoujay.richtext:richtext:3.0.8'
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    implementation 'github.bumptech.glide:glide:4.0.0'
+    implementation 'com.github.bumptech.glide:glide:4.16.0'
     //ANR异常捕获
     implementation 'com.github.anrwatchdog:anrwatchdog:1.4.0'
 
