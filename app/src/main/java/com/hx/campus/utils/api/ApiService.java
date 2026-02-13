@@ -90,4 +90,10 @@ public interface ApiService {
             @Query("email") String email,
             @Query("password") String password
     );
+    //获取IM用户token
+    @POST("getIMUserToken")
+    Call<Result<String>> getIMUserToken(
+            @Query("uid") int uid,
+            @Query("nickname") String nickname
+    );
 }

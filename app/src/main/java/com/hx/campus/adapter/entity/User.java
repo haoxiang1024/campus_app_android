@@ -18,6 +18,15 @@ public class User implements Serializable {
     private String email;
     private int state;
     private int role;
+    private String im_token;
+
+    public String getIm_token() {
+        return im_token;
+    }
+
+    public void setIm_token(String im_token) {
+        this.im_token = im_token;
+    }
 
     public int getRole() {
         return role;
@@ -201,6 +210,8 @@ public class User implements Serializable {
                 ", reg_date=" + reg_date +
                 ", email='" + email + '\'' +
                 ", state=" + state +
+                ", role=" + role +
+                ", im_token='" + im_token + '\'' +
                 '}';
     }
 }

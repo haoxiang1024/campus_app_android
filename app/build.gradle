@@ -26,7 +26,6 @@ android {
             }
         }
     }
-
     signingConfigs {
         if (isNeedPackage.toBoolean()) {
             release {
@@ -159,8 +158,9 @@ dependencies {
     implementation "com.apistd.uni:uni-sdk:0.0.4"
 
     implementation 'org.apache.commons:commons-lang3:3.12.0'
-    // 即时聊天模块
-    implementation 'org.matrix.android:matrix-android-sdk2:1.2.1'
+
+    // 即时通讯 UI 基础组件
+    implementation 'cn.rongcloud.sdk:im_kit:5.21.1'
 
 
 

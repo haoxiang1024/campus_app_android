@@ -23,6 +23,8 @@ import com.xuexiang.xui.widget.dialog.DialogLoader;
 import com.xuexiang.xui.widget.textview.supertextview.SuperTextView;
 import com.xuexiang.xutil.XUtil;
 
+import io.rong.imkit.IMCenter;
+
 
 @Page()
 public class SettingsFragment extends BaseFragment<FragmentSettingsBinding> implements SuperTextView.OnSuperTextViewClickListener {
@@ -74,6 +76,8 @@ public class SettingsFragment extends BaseFragment<FragmentSettingsBinding> impl
                         getString(R.string.lab_yes),
                         (dialog, which) -> {
                             dialog.dismiss();
+                            //im断开连接
+                            IMCenter.getInstance().disconnect();
                             XUtil.getActivityLifecycleHelper().exit();
                             TokenUtils.handleLogoutSuccess();
                         },

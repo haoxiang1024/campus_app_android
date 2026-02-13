@@ -15,6 +15,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -49,6 +50,7 @@ import com.xuexiang.xutil.XUtil;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.text.SimpleDateFormat;
@@ -210,6 +212,19 @@ public final class Utils {
             endUrl = url + reurl;
         }
         return endUrl;
+    }
+    //获取key
+    public static String getAppKey(Context context) {
+        Properties properties = new Properties();
+        try {
+            AssetManager assetManager = context.getAssets();
+            InputStream inputStream = assetManager.open("config.properties");
+            properties.load(inputStream);
+            return properties.getProperty("IM_APP_KEY");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     //时间格式转换

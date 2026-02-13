@@ -4,15 +4,20 @@ package com.hx.campus;
 
 import android.app.Application;
 import android.content.Context;
+import android.util.Log;
 
 import androidx.multidex.MultiDex;
-
+import com.hx.campus.utils.Utils;
 import com.hx.campus.utils.sdkinit.ANRWatchDogInit;
 import com.hx.campus.utils.sdkinit.UMengInit;
 import com.hx.campus.utils.sdkinit.XBasicLibInit;
 import com.hx.campus.utils.sdkinit.XUpdateInit;
-import com.xuexiang.xui.BuildConfig;
 
+import io.rong.imkit.IMCenter;
+import io.rong.imkit.RongIM;
+import io.rong.imlib.model.InitOption;
+
+import com.xuexiang.xui.BuildConfig;
 
 public class MyApp extends Application {
 
@@ -33,6 +38,14 @@ public class MyApp extends Application {
     public void onCreate() {
         super.onCreate();
         initLibs();
+        initIM();
+    }
+
+    private void initIM() {
+        //初始化Imsdk
+        String appKey = Utils.getAppKey(this);
+        Boolean enablePush = true;
+        RongIM.init(this, appKey, enablePush);
     }
 
     /**

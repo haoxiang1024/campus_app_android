@@ -15,7 +15,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitClient {
     // 确保这里的 IP 地址与你当前后端服务的 IP 一致
-    private static final String BASE_URL = "http://192.168.114.122:8081/school/";
+    private static final String BASE_URL = "http://192.168.229.122:8081/school/";
     private static volatile RetrofitClient mInstance;
     private Retrofit retrofit;
 

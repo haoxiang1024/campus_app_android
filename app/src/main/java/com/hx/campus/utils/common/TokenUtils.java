@@ -18,7 +18,21 @@ public final class TokenUtils {
     private static final String KEY_PROFILE_CHANNEL = "github";
     private static String sToken;
     private static Context context;
+    // 新增：专门存储融云 IM Token 的键
+    private static final String KEY_IM_TOKEN = "com.hx.campus.utils.KEY_IM_TOKEN";
+    /**
+     * 获取存储的 IM Token
+     */
+    public static String getImToken() {
+        return MMKVUtils.getString(KEY_IM_TOKEN, "");
+    }
 
+    /**
+     * 设置并持久化 IM Token
+     */
+    public static void setImToken(String imToken) {
+        MMKVUtils.put(KEY_IM_TOKEN, imToken);
+    }
     public TokenUtils(Context context) {
         TokenUtils.context = context;
     }
@@ -43,6 +57,7 @@ public final class TokenUtils {
     public static void clearToken() {
         sToken = null;
         MMKVUtils.remove(KEY_TOKEN);
+        MMKVUtils.remove(KEY_IM_TOKEN);
     }
 
     public static String getToken() {
