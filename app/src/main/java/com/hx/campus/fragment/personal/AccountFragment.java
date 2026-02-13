@@ -145,7 +145,8 @@ public class AccountFragment extends BaseFragment<FragmentAccountBinding> implem
                             if (isAdded()) { // 检查 Fragment 是否还在 Activity 中
                                 startActivity(new Intent(getContext(), MainActivity.class));
                             }
-                        }, 800);                    } else {
+                        }, 800); }
+                    else {
                         Utils.showResponse(result.getMsg());
                     }
                 }

@@ -5,6 +5,7 @@ package com.hx.campus.activity;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -48,6 +49,9 @@ import com.xuexiang.xutil.common.ClickUtils;
 import com.xuexiang.xutil.common.CollectionUtils;
 import com.xuexiang.xutil.display.Colors;
 
+import io.rong.imkit.IMCenter;
+import io.rong.imlib.RongIMClient;
+
 public class MainActivity extends BaseActivity<ActivityMainBinding> implements View.OnClickListener, BottomNavigationView.OnNavigationItemSelectedListener, ClickUtils.OnClick2ExitListener, Toolbar.OnMenuItemClickListener {
 
     private String[] mTitles;//标题数组
@@ -63,6 +67,37 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
         initViews();
         initData();
         initListeners();
+        checkIMStatus();
+    }
+
+    private void checkIMStatus() {
+        // 检查融云当前的连接状态
+        RongIMClient.ConnectionStatusListener.ConnectionStatus status =
+                IMCenter.getInstance().getCurrentConnectionStatus();
+
+        if (status != RongIMClient.ConnectionStatusListener.ConnectionStatus.CONNECTED) {
+            // 从本地获取缓存的 Token 进行连接
+            String cachedToken = TokenUtils.getImToken();
+            if (!TextUtils.isEmpty(cachedToken)) {
+                RongIMClient.ConnectCallback connectCallback=new RongIMClient.ConnectCallback() {
+                    @Override
+                    public void onSuccess(String userId) {
+                        Log.e("IM_LOG", "融云连接成功: " + userId);
+                    }
+
+                    @Override
+                    public void onError(RongIMClient.ConnectionErrorCode e) {
+                        Log.e("IM_LOG", "连接失败码: " + e.getValue());
+                    }
+
+                    @Override
+                    public void onDatabaseOpened(RongIMClient.DatabaseOpenStatus code) {
+
+                    }
+                };
+                IMCenter.getInstance().connect(cachedToken, connectCallback);
+            }
+        }
     }
 
 

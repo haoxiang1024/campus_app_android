@@ -7,6 +7,8 @@ import android.content.Context;
 import android.util.Log;
 
 import androidx.multidex.MultiDex;
+
+import com.hx.campus.activity.chat.ConversationActivity;
 import com.hx.campus.utils.Utils;
 import com.hx.campus.utils.sdkinit.ANRWatchDogInit;
 import com.hx.campus.utils.sdkinit.UMengInit;
@@ -15,6 +17,7 @@ import com.hx.campus.utils.sdkinit.XUpdateInit;
 
 import io.rong.imkit.IMCenter;
 import io.rong.imkit.RongIM;
+import io.rong.imkit.utils.RouteUtils;
 import io.rong.imlib.model.InitOption;
 
 import com.xuexiang.xui.BuildConfig;
@@ -46,6 +49,7 @@ public class MyApp extends Application {
         String appKey = Utils.getAppKey(this);
         Boolean enablePush = true;
         RongIM.init(this, appKey, enablePush);
+        RouteUtils.registerActivity(RouteUtils.RongActivityType.ConversationActivity, ConversationActivity.class);
     }
 
     /**
