@@ -1,5 +1,6 @@
 package com.hx.campus.fragment.dynamic;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -48,7 +49,7 @@ import retrofit2.Response;
 @Page(anim = CoreAnim.fade)
 public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
 
-    private SimpleDelegateAdapter<NewInfo> mNewsAdapter;
+    private SimpleDelegateAdapter<NewInfo> newInfoSimpleDelegateAdapter;
     private List<NewInfo> list = new ArrayList<>();
 
     @NonNull
@@ -85,7 +86,7 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
         };
 
         // 推荐内容适配器
-        mNewsAdapter = new BroccoliSimpleDelegateAdapter<NewInfo>(R.layout.adapter_news_card_view_list_item, new LinearLayoutHelper(), DemoDataProvider.getEmptyNewInfo()) {
+        newInfoSimpleDelegateAdapter = new BroccoliSimpleDelegateAdapter<NewInfo>(R.layout.adapter_news_card_view_list_item, new LinearLayoutHelper(), DemoDataProvider.getEmptyNewInfo()) {
             @Override
             protected void onBindData(RecyclerViewHolder holder, NewInfo model, int position) {
                 if (model != null) {
@@ -119,7 +120,7 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
         delegateAdapter.addAdapter(bannerAdapter);
         delegateAdapter.addAdapter(commonAdapter);
         delegateAdapter.addAdapter(titleAdapter);
-        delegateAdapter.addAdapter(mNewsAdapter);
+        delegateAdapter.addAdapter(newInfoSimpleDelegateAdapter);
         binding.recyclerView.setAdapter(delegateAdapter);
 
         // 初始自动刷新数据
@@ -158,21 +159,22 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
                                     .setPhone(item.getPhone())
                                     .setPlace(item.getPlace())
                                     .setPub_Date(item.getPubDate())
-                                    .setImageUrl(item.getImg()));
+                                    .setImageUrl(item.getImg())
+                                    .setUser_id(item.getUserId()));
                         }
                         // 刷新适配器数据
-                        mNewsAdapter.refresh(list);
+                        newInfoSimpleDelegateAdapter.refresh(list);
                     }
                 } else {
                     Utils.showResponse("数据加载失败");
                 }
-                if (binding.refreshLayout != null) binding.refreshLayout.finishRefresh();
+                binding.refreshLayout.finishRefresh();
             }
 
             @Override
             public void onFailure(@NonNull Call<Result<List<LostFound>>> call, @NonNull Throwable t) {
                 Utils.showResponse("网络异常");
-                if (binding.refreshLayout != null) binding.refreshLayout.finishRefresh();
+                binding.refreshLayout.finishRefresh();
             }
         });
     }

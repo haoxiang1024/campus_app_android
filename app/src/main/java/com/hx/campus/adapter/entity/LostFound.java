@@ -14,7 +14,7 @@ public class LostFound implements Serializable {
 
     private String img;
     @SerializedName("pubDate")
-    private Date pubDate;
+    private Date pub_date;
 
     private String content;
 
@@ -25,10 +25,10 @@ public class LostFound implements Serializable {
     private String state;
 
     private Integer stick;
-
-    private Integer lostfoundtypeId;
-
-    private Integer userId;
+    @SerializedName("lostfoundtypeId")
+    private Integer lostfoundtype_id;
+    @SerializedName("userId")
+    private Integer user_id;
     private String nickname;
     private  String type;
     private LostFoundType lostfoundtype;
@@ -37,14 +37,14 @@ public class LostFound implements Serializable {
         this.id = id;
         this.title = title;
         this.img = img;
-        this.pubDate = pubDate;
+        this.pub_date = pubDate;
         this.content = content;
         this.place = place;
         this.phone = phone;
         this.state = state;
         this.stick = stick;
-        this.lostfoundtypeId = lostfoundtype_id;
-        this.userId = user_id;
+        this.lostfoundtype_id = lostfoundtype_id;
+        this.user_id = user_id;
         this.nickname = nickname;
         this.type = type;
         this.lostfoundtype = lostfoundtype;
@@ -53,7 +53,7 @@ public class LostFound implements Serializable {
     public LostFound(String title, String imageUrl, Date pubDate, String summary, String place, String phone, String state, String userName) {
         this.title=title;
         this.img=imageUrl;
-        this.pubDate=pubDate;
+        this.pub_date=pubDate;
         this.content=summary;
         this.place=place;
         this.phone=phone;
@@ -64,14 +64,14 @@ public class LostFound implements Serializable {
     public LostFound(String title, String img, Date pub_date, String content, String place, String phone, String state, Integer stick, Integer lostfoundtypeId, Integer user_id) {
         this.title = title;
         this.img = img;
-        this.pubDate = pub_date;
+        this.pub_date = pub_date;
         this.content = content;
         this.place = place;
         this.phone = phone;
         this.state = state;
         this.stick = stick;
-        this.userId = user_id;
-        this.lostfoundtypeId = lostfoundtypeId;
+        this.user_id = user_id;
+        this.lostfoundtype_id = lostfoundtypeId;
     }
 
 
@@ -135,12 +135,12 @@ public class LostFound implements Serializable {
 
 
     public Date getPubDate() {
-        return pubDate;
+        return pub_date;
     }
 
 
     public void setPubDate(Date pubDate) {
-        this.pubDate = pubDate;
+        this.pub_date = pubDate;
     }
 
 
@@ -195,22 +195,22 @@ public class LostFound implements Serializable {
 
 
     public Integer getLostfoundtypeId() {
-        return lostfoundtypeId;
+        return lostfoundtype_id;
     }
 
 
     public void setLostfoundtypeId(Integer lostfoundtype_id) {
-        this.lostfoundtypeId = lostfoundtype_id;
+        this.lostfoundtype_id = lostfoundtype_id;
     }
 
 
     public Integer getUserId() {
-        return userId;
+        return user_id;
     }
 
 
     public void setUserId(Integer user_id) {
-        this.userId = user_id;
+        this.user_id = user_id;
     }
 
     @Override
@@ -219,14 +219,14 @@ public class LostFound implements Serializable {
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", img='" + img + '\'' +
-                ", pubDate=" + pubDate +
+                ", pub_date=" + pub_date +
                 ", content='" + content + '\'' +
                 ", place='" + place + '\'' +
                 ", phone='" + phone + '\'' +
                 ", state='" + state + '\'' +
                 ", stick=" + stick +
-                ", lostfoundtypeId=" + lostfoundtypeId +
-                ", userId=" + userId +
+                ", lostfoundtypeId=" + lostfoundtype_id +
+                ", user_id=" + user_id +
                 ", nickname='" + nickname + '\'' +
                 ", type='" + type + '\'' +
                 ", lostfoundtype=" + lostfoundtype +

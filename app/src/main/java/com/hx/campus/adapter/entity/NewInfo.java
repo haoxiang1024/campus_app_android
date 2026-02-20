@@ -2,61 +2,54 @@
 
 package com.hx.campus.adapter.entity;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.Date;
 
 
 public class NewInfo {
 
-    /**
-     * 用户名
-     */
-    private String UserName = "xuexiangjys";
-    /**
-     * 标签
-     */
+
+    private String UserName ;
+
     private String Tag;
-    /**
-     * 标题
-     */
+
     private String Title;
-    /**
-     * 摘要
-     */
+
     private String Summary;
 
-    /**
-     * 图片
-     */
-    private String ImageUrl;
-    /**
-     * 点赞数
-     */
-    private int Praise;
-    /**
-     * 评论数
-     */
-    private int Comment;
-    /**
-     * 阅读量
-     */
-    private int Read;
-    /**
-     * 新闻的详情地址
-     */
-    private String DetailUrl;
 
+    private String ImageUrl;
+
+    private int Praise;
+
+    private int Comment;
+
+    private int Read;
+    private String DetailUrl;
+    private Integer user_id;
     private String uniquekey;//新闻唯一码用于获取新闻内容
     private String State;//状态
     private String Phone;//联系方式
     private String Place;//地点
-    private Date Pub_Date;//时间
+    @SerializedName("pubDate")
+    private Date pub_date;
 
     public Date getPub_Date() {
-        return Pub_Date;
+        return pub_date;
+    }
+
+    public Integer getUser_id() {
+        return user_id;
+    }
+
+    public NewInfo setUser_id(Integer user_id) {
+        this.user_id = user_id;
+        return this;
     }
 
     public NewInfo setPub_Date(Date pub_Date) {
-        Pub_Date = pub_Date;
+        this.pub_date = pub_Date;
         return this;
     }
 
@@ -226,7 +219,7 @@ public class NewInfo {
                 ", State='" + State + '\'' +
                 ", Phone='" + Phone + '\'' +
                 ", Place='" + Place + '\'' +
-                ", Pub_Date=" + Pub_Date +
+                ", pub_date=" + pub_date +
                 '}';
     }
 }

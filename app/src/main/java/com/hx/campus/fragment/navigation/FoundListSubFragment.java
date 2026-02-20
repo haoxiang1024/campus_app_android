@@ -1,6 +1,7 @@
 package com.hx.campus.fragment.navigation;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -57,6 +58,7 @@ public class FoundListSubFragment extends BaseFragment<LayoutCommonListBinding> 
                     public void onResponse(Call<Result<List<LostFound>>> call, Response<Result<List<LostFound>>> response) {
                         if (response.body() != null && response.body().isSuccess()) {
                             mAdapter.setData(response.body().getData());
+                            Log.e( "onResponse: ",response.body().getData().toString() );
                         }
                     }
                     @Override public void onFailure(Call<Result<List<LostFound>>> call, Throwable t) {}

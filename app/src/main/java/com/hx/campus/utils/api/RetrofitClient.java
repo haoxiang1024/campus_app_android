@@ -14,7 +14,6 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitClient {
-    // 确保这里的 IP 地址与你当前后端服务的 IP 一致
     private static final String BASE_URL = "http://192.168.229.122:8081/school/";
     private static volatile RetrofitClient mInstance;
     private Retrofit retrofit;
@@ -25,7 +24,6 @@ public class RetrofitClient {
                     try {
                         if (json.isJsonPrimitive()) {
                             JsonPrimitive primitive = json.getAsJsonPrimitive();
-
                             // 处理数字时间戳
                             if (primitive.isNumber()) {
                                 long timestamp = primitive.getAsLong();
@@ -39,26 +37,16 @@ public class RetrofitClient {
                             // 处理字符串时间
                             if (primitive.isString()) {
                                 String dateStr = primitive.getAsString();
-
-                                // 优先处理你的格式
-                                if (dateStr.contains("CST") && dateStr.contains("Dec")) {
-                                    SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US);
-                                    return sdf.parse(dateStr);
-                                }
-
-                                // 尝试自动解析
                                 return parseDateString(dateStr);
                             }
                         }
-                        return null;
                     } catch (Exception e) {
                         e.printStackTrace();
-                        return null;
                     }
+                    return null;
                 })
                 .create();
 
-        // 初始化 Retrofit 并关联自定义的 Gson
         retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create(gson))
@@ -79,24 +67,34 @@ public class RetrofitClient {
     public ApiService getApi() {
         return retrofit.create(ApiService.class);
     }
+
     private Date parseDateString(String dateStr) {
+        if (dateStr.contains("CST")) {
+            try {
+                SimpleDateFormat cstSdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss 'CST' yyyy", Locale.US);
+                cstSdf.setTimeZone(java.util.TimeZone.getTimeZone("GMT+8"));
+                return cstSdf.parse(dateStr);
+            } catch (ParseException e) {
+                android.util.Log.e("RetrofitClient", "CST格式解析失败: " + dateStr);
+            }
+        }
+
+        // 备用格式
         String[] formats = {
-                "EEE MMM dd HH:mm:ss zzz yyyy",  // Tue Dec 30 11:25:22 CST 2025
+                "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
                 "yyyy-MM-dd HH:mm:ss",
                 "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
-                "yyyy-MM-dd'T'HH:mm:ss'Z'",
-                "yyyy/MM/dd HH:mm:ss",
-                "MM/dd/yyyy HH:mm:ss"
+                "yyyy-MM-dd'T'HH:mm:ss'Z'"
         };
 
         for (String format : formats) {
             try {
                 SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.US);
                 return sdf.parse(dateStr);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+            } catch (ParseException ignored) { }
         }
+
+        android.util.Log.e("RetrofitClient", "所有时间格式匹配失败: " + dateStr);
         return null;
     }
 }

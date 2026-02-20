@@ -55,8 +55,6 @@ public class MyApp extends Application {
         Boolean enablePush = true;
         RongIM.init(this, appKey, enablePush);
         RouteUtils.registerActivity(RouteUtils.RongActivityType.ConversationActivity, ConversationActivity.class);
-        // 设置用户信息提供者
-        RongUserInfoManager.getInstance().setUserInfoProvider(null, true);
     }
 
     /**

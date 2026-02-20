@@ -2,6 +2,7 @@
 
 package com.hx.campus.activity;
 
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -50,7 +51,9 @@ import com.xuexiang.xutil.common.CollectionUtils;
 import com.xuexiang.xutil.display.Colors;
 
 import io.rong.imkit.IMCenter;
+import io.rong.imkit.userinfo.RongUserInfoManager;
 import io.rong.imlib.RongIMClient;
+import io.rong.imlib.model.UserInfo;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> implements View.OnClickListener, BottomNavigationView.OnNavigationItemSelectedListener, ClickUtils.OnClick2ExitListener, Toolbar.OnMenuItemClickListener {
 
@@ -82,7 +85,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
                 RongIMClient.ConnectCallback connectCallback=new RongIMClient.ConnectCallback() {
                     @Override
                     public void onSuccess(String userId) {
-                        Log.e("IM_LOG", "融云连接成功: " + userId);
+                        Log.e("IM_LOG", "融云连接成功 用户id: " + userId);
                     }
 
                     @Override
@@ -131,6 +134,9 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
         //已经登录成功设置token 下次无需重复登录
         TokenUtils.setToken("login_succeed_token");
         XUpdateInit.checkUpdate(this, false);
+        // 设置用户信息提供者
+        User user = Utils.getBeanFromSp(this, "User", "user");
+        RongUserInfoManager.getInstance().setUserInfoProvider(userId -> new UserInfo(String.valueOf(user.getId()), user.getNickname(), Uri.parse(user.getPhoto())), true);
     }
 
 

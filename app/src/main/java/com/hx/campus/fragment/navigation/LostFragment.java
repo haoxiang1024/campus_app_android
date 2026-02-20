@@ -35,14 +35,9 @@ public class LostFragment extends BaseFragment<FragmentLostBinding> {
 
     @Override
     protected void initViews() {
-        // 1. 获取分类标题（卡证、书籍等）
         String[] typeTitles = getResources().getStringArray(R.array.type_titles);
-
-        // 2. 设置适配器
         LostPagerAdapter adapter = new LostPagerAdapter(this, typeTitles);
         binding.viewPager.setAdapter(adapter);
-
-        // 3. 绑定 TabLayout 和 ViewPager2（这是动画的关键）
         new TabLayoutMediator(binding.tabLayout, binding.viewPager, (tab, position) -> {
             tab.setText(typeTitles[position]);
         }).attach();
