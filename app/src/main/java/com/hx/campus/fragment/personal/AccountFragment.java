@@ -3,6 +3,7 @@ package com.hx.campus.fragment.personal;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,6 +27,8 @@ import com.hx.campus.utils.api.Result;
 import com.hx.campus.utils.api.RetrofitClient;
 import com.xuexiang.xpage.annotation.Page;
 
+import io.rong.imkit.userinfo.RongUserInfoManager;
+import io.rong.imlib.model.UserInfo;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -139,6 +142,14 @@ public class AccountFragment extends BaseFragment<FragmentAccountBinding> implem
                     if (result.isSuccess()) {
                         //  使用返回的最新的 User 数据更新本地缓存
                         Utils.doUserData(result.getData());
+                        User user = Utils.getBeanFromSp(getContext(), "User", "user");
+                        //IM刷新
+                        UserInfo userInfo = new UserInfo(
+                                String.valueOf(user.getId()),
+                                user.getNickname(),
+                                Uri.parse(user.getPhoto())
+                        );
+                        RongUserInfoManager.getInstance().refreshUserInfoCache(userInfo);
                         //  提示成功并跳转
                         Utils.showResponse("修改资料成功！");
                         binding.getRoot().postDelayed(() -> {

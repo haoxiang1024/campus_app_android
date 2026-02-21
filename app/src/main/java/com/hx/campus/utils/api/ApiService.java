@@ -96,4 +96,8 @@ public interface ApiService {
             @Query("uid") int uid,
             @Query("nickname") String nickname
     );
+
+    // 根据用户ID获取用户信息
+    @POST("getUserById")
+    Call<User> getUserInfo(@Query("id") int id);
 }

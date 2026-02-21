@@ -31,6 +31,8 @@ import com.xuexiang.xui.widget.toast.XToast;
 
 import java.io.File;
 
+import io.rong.imkit.userinfo.RongUserInfoManager;
+import io.rong.imlib.model.UserInfo;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -115,12 +117,9 @@ public class PhotoFragment extends BaseFragment<FragmentPhotoBinding> {
         User user = Utils.getBeanFromSp(getContext(), "User", "user");
         if (user == null) return;
 
-        // 1. 准备文件 RequestBody
         RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), mFile);
-        // 这里的 "upload_file" 必须与后端接口定义的参数名一致
         MultipartBody.Part body = MultipartBody.Part.createFormData("upload_file", mFileName, requestFile);
 
-        // 2. 调用 Retrofit 上传
         RetrofitClient.getInstance().getApi().updatePhoto(body, user.getId()).enqueue(new Callback<Result<User>>() {
             @Override
             public void onResponse(@NonNull Call<Result<User>> call, @NonNull Response<Result<User>> response) {
@@ -131,7 +130,14 @@ public class PhotoFragment extends BaseFragment<FragmentPhotoBinding> {
                     if (result.isSuccess()) {
                         // 更新本地缓存
                         Utils.doUserData(result.getData());
-
+                        User user = Utils.getBeanFromSp(getContext(), "User", "user");
+                        //IM刷新
+                        UserInfo userInfo = new UserInfo(
+                                String.valueOf(user.getId()),
+                                user.getNickname(),
+                                Uri.parse(user.getPhoto())
+                        );
+                        RongUserInfoManager.getInstance().refreshUserInfoCache(userInfo);
                         // 显示成功提示
                         XToast.success(getContext(), "修改头像成功！").show();
 

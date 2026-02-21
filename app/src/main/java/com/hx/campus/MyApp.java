@@ -12,6 +12,7 @@ import androidx.multidex.MultiDex;
 import com.hx.campus.activity.chat.ConversationActivity;
 import com.hx.campus.adapter.entity.User;
 import com.hx.campus.utils.Utils;
+import com.hx.campus.utils.api.RetrofitClient;
 import com.hx.campus.utils.sdkinit.ANRWatchDogInit;
 import com.hx.campus.utils.sdkinit.UMengInit;
 import com.hx.campus.utils.sdkinit.XBasicLibInit;
@@ -24,6 +25,9 @@ import io.rong.imkit.userinfo.UserDataProvider;
 import io.rong.imkit.utils.RouteUtils;
 import io.rong.imlib.model.InitOption;
 import io.rong.imlib.model.UserInfo;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import com.xuexiang.xui.BuildConfig;
 
@@ -55,6 +59,38 @@ public class MyApp extends Application {
         Boolean enablePush = true;
         RongIM.init(this, appKey, enablePush);
         RouteUtils.registerActivity(RouteUtils.RongActivityType.ConversationActivity, ConversationActivity.class);
+        RongUserInfoManager.getInstance().setUserInfoProvider(userId -> {
+            fetchUserInfoFromServer(userId);
+            return null;
+        }, true);
+    }
+
+    private void fetchUserInfoFromServer(String userId) {
+        RetrofitClient.getInstance().getApi().getUserInfo(Integer.parseInt(userId)).enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    User user = response.body();
+                    String fullAvatarUrl=user.getPhoto();
+                    // 拼接头像全路径
+                    if (!user.getPhoto().startsWith("http")){
+                        fullAvatarUrl= Utils.rebuildUrl("/upload/"+user.getPhoto(),getApplicationContext());
+                    }
+                    UserInfo userInfo = new UserInfo(
+                            userId,
+                            user.getNickname(),
+                            Uri.parse(fullAvatarUrl)
+                    );
+                    RongUserInfoManager.getInstance().refreshUserInfoCache(userInfo);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                Utils.showResponse("用户请求失败: " + t.getMessage());
+
+            }
+        });
     }
 
     /**

@@ -134,9 +134,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
         //已经登录成功设置token 下次无需重复登录
         TokenUtils.setToken("login_succeed_token");
         XUpdateInit.checkUpdate(this, false);
-        // 设置用户信息提供者
-        User user = Utils.getBeanFromSp(this, "User", "user");
-        RongUserInfoManager.getInstance().setUserInfoProvider(userId -> new UserInfo(String.valueOf(user.getId()), user.getNickname(), Uri.parse(user.getPhoto())), true);
     }
 
 
