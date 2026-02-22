@@ -43,7 +43,7 @@
     <string name="lab_privacy_name">《%s隐私权政策》</string>
 
     <!-- 登录   -->
-    <string name="title_login_register">登录/注册</string>
+    <string name="title_login_register">登录</string>
     <string name="action_get_verify_code">获取验证码</string>
     <string name="send_verify_code">验证码发送成功</string>
     <string name="title_login">登录</string>

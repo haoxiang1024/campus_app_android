@@ -2,6 +2,12 @@
 
 package com.hx.campus.activity;
 
+import android.Manifest;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,6 +24,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
 
 import com.bumptech.glide.Glide;
@@ -51,6 +59,8 @@ import com.xuexiang.xutil.common.CollectionUtils;
 import com.xuexiang.xutil.display.Colors;
 
 import io.rong.imkit.IMCenter;
+import io.rong.imkit.config.RongConfigCenter;
+import io.rong.imkit.notification.NotificationConfig;
 import io.rong.imkit.userinfo.RongUserInfoManager;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.UserInfo;
@@ -71,6 +81,20 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
         initData();
         initListeners();
         checkIMStatus();
+        // 检查并申请通知权限
+        checkNotificationPermission();
+    }
+
+    private void checkNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= 33) {
+            if (ContextCompat.checkSelfPermission(this, "android.permission.POST_NOTIFICATIONS")
+                    != PackageManager.PERMISSION_GRANTED) {
+
+                // 向用户发起申请
+                ActivityCompat.requestPermissions(this,
+                        new String[]{"android.permission.POST_NOTIFICATIONS"}, 101);
+            }
+        }
     }
 
     private void checkIMStatus() {
@@ -82,7 +106,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
             // 从本地获取缓存的 Token 进行连接
             String cachedToken = TokenUtils.getImToken();
             if (!TextUtils.isEmpty(cachedToken)) {
-                RongIMClient.ConnectCallback connectCallback=new RongIMClient.ConnectCallback() {
+                RongIMClient.ConnectCallback connectCallback = new RongIMClient.ConnectCallback() {
                     @Override
                     public void onSuccess(String userId) {
                         Log.e("IM_LOG", "融云连接成功 用户id: " + userId);
@@ -101,6 +125,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
                 IMCenter.getInstance().connect(cachedToken, connectCallback);
             }
         }
+
     }
 
 

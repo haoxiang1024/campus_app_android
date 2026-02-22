@@ -3,8 +3,12 @@
 package com.hx.campus;
 
 import android.app.Application;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 
 import androidx.multidex.MultiDex;
@@ -20,6 +24,8 @@ import com.hx.campus.utils.sdkinit.XUpdateInit;
 
 import io.rong.imkit.IMCenter;
 import io.rong.imkit.RongIM;
+import io.rong.imkit.config.RongConfigCenter;
+import io.rong.imkit.notification.NotificationConfig;
 import io.rong.imkit.userinfo.RongUserInfoManager;
 import io.rong.imkit.userinfo.UserDataProvider;
 import io.rong.imkit.utils.RouteUtils;
@@ -63,7 +69,31 @@ public class MyApp extends Application {
             fetchUserInfoFromServer(userId);
             return null;
         }, true);
+        // 通知配置
+        notification();
+
     }
+    private void notification() {
+        String NEW_CHANNEL_ID = "rc_notification_id_v2";
+        NotificationChannel channel = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            channel = new NotificationChannel(
+                    NEW_CHANNEL_ID,
+                    "重要消息通知",
+                    NotificationManager.IMPORTANCE_HIGH
+            );
+            channel.enableLights(true);
+            channel.setShowBadge(true); // 桌面角标
+            // 允许在锁屏显示
+            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+            manager.createNotificationChannel(channel);
+        }
+        NotificationConfig config = RongConfigCenter.notificationConfig();
+        config.setForegroundOtherPageAction(NotificationConfig.ForegroundOtherPageAction.Notification);
+        config.setNotificationChannel(channel);
+    }
+
 
     private void fetchUserInfoFromServer(String userId) {
         RetrofitClient.getInstance().getApi().getUserInfo(Integer.parseInt(userId)).enqueue(new Callback<User>() {
