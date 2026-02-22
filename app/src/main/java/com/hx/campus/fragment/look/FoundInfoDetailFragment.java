@@ -56,6 +56,14 @@ public class FoundInfoDetailFragment extends BaseFragment<FragmentFoundInfoDetai
     protected void initViews() {
         if (found != null) {
             setViews();
+            if (binding.sumbitBtn != null) {
+                binding.sumbitBtn.setOnClickListener(v -> {
+                    String selected = binding.state.getSelectedItem().toString();
+                    submitState(selected);
+                });
+            }
+        } else {
+            Log.e("Check", "错误：found 数据为空");
         }
     }
 
@@ -71,27 +79,13 @@ public class FoundInfoDetailFragment extends BaseFragment<FragmentFoundInfoDetai
         binding.tvAuthor.setText(found.getNickname());
         binding.tvPhonenum.setText(found.getPhone());
         binding.location.setText(found.getPlace());
-
         String[] statuses = {"已认领", "待认领"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_spinner_item, statuses);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         binding.state.setAdapter(adapter);
-
         int position = Arrays.asList(statuses).indexOf(found.getState());
         if (position >= 0) binding.state.setSelection(position);
-
-        binding.state.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selected = (String) parent.getItemAtPosition(position);
-                binding.sumbitBtn.setOnClickListener(v -> submitState(selected));
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
-        });
-
         binding.tvDate.setText(Utils.dateFormat(found.getPubDate()));
     }
 
@@ -102,9 +96,11 @@ public class FoundInfoDetailFragment extends BaseFragment<FragmentFoundInfoDetai
                     @Override
                     public void onResponse(Call<Result<String>> call, Response<Result<String>> response) {
                         if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                            Utils.showResponse(Utils.getString(getContext(), R.string.submit_success));
+                            found.setState(selectedState);
+                            Utils.showResponse("状态已更改");
                         } else {
-                            Utils.showResponse("操作失败");
+                            String errorMsg = (response.body() != null) ? response.body().getMsg() : "返回体为空";
+                            Utils.showResponse("操作失败: " + errorMsg);
                         }
                     }
 
@@ -113,5 +109,4 @@ public class FoundInfoDetailFragment extends BaseFragment<FragmentFoundInfoDetai
                         Utils.showResponse("网络异常");
                     }
                 });
-    }
-}
+}}

@@ -1,6 +1,7 @@
 package com.hx.campus.fragment.look;
 
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,6 +57,14 @@ public class LostInfoDetailFragment extends BaseFragment<FragmentLostInfoDetailB
     protected void initViews() {
         if (lost != null) {
             setViews();
+            if (binding.sumbitBtn != null) {
+                binding.sumbitBtn.setOnClickListener(v -> {
+                    String selected = binding.state.getSelectedItem().toString();
+                    submitState(selected);
+                });
+            }
+        }else {
+            Log.e("Check", "错误：lost 数据为空");
         }
     }
 
@@ -81,19 +90,6 @@ public class LostInfoDetailFragment extends BaseFragment<FragmentLostInfoDetailB
 
         int position = Arrays.asList(statuses).indexOf(lost.getState());
         if (position >= 0) binding.state.setSelection(position);
-
-        binding.state.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selected = (String) parent.getItemAtPosition(position);
-                // 提交按钮
-                binding.sumbitBtn.setOnClickListener(v -> submitState(selected));
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
-        });
-
         binding.tvDate.setText(Utils.dateFormat(lost.getPubDate()));
     }
 
@@ -105,7 +101,8 @@ public class LostInfoDetailFragment extends BaseFragment<FragmentLostInfoDetailB
                     @Override
                     public void onResponse(Call<Result<String>> call, Response<Result<String>> response) {
                         if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                            Utils.showResponse(Utils.getString(getContext(), R.string.submit_success));
+                            lost.setState(selectedState);
+                            Utils.showResponse("状态已更改");
                         } else {
                             Utils.showResponse("操作失败");
                         }
