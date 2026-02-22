@@ -19,6 +19,7 @@ import com.xuexiang.xui.widget.actionbar.TitleBar;
 
 import io.rong.imkit.conversationlist.ConversationListFragment;
 import io.rong.imkit.userinfo.RongUserInfoManager;
+import io.rong.imkit.widget.adapter.ViewHolder;
 import io.rong.imlib.RongCoreClient;
 import io.rong.imlib.model.UserInfo;
 
@@ -29,4 +30,7 @@ public class ChatListFragment extends ConversationListFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
     }
+
+
+
 }
