@@ -19,6 +19,7 @@ import com.xuexiang.xui.widget.actionbar.TitleBar;
 
 import java.util.Objects;
 
+import io.rong.imkit.conversation.ConversationFragment;
 import io.rong.imkit.userinfo.RongUserInfoManager;
 import io.rong.imkit.userinfo.UserDataProvider;
 import io.rong.imkit.userinfo.model.GroupUserInfo;
@@ -33,11 +34,24 @@ public class ConversationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_conversation);
+        //挂载ConversationFragment
+        if (savedInstanceState == null) {
+            ConversationFragment fragment = new ConversationFragment();
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.container, fragment)
+                    .commit();
+        }
+        //设置标题栏
         TitleBar titleBar = findViewById(R.id.title_bar);
         titleBar.setLeftClickListener(v -> finish());
         Bundle bundle = getIntent().getExtras();
         if (bundle == null) return;
         String targetId = bundle.getString("targetId");
+        if (TextUtils.isEmpty(targetId)) {
+            // 如果获取不到 targetId，直接结束页面，防止后续逻辑报空指针
+            finish();
+            return;
+        }
         if (TextUtils.isEmpty(targetId)) return;
         UserInfo userInfo = RongUserInfoManager.getInstance().getUserInfo(targetId);
         if (userInfo != null && !TextUtils.isEmpty(userInfo.getName())) {

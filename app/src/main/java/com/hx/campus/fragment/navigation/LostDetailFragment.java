@@ -1,5 +1,7 @@
 package com.hx.campus.fragment.navigation;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,6 +12,7 @@ import androidx.annotation.NonNull;
 
 import com.bumptech.glide.Glide;
 import com.hx.campus.R;
+import com.hx.campus.activity.chat.ConversationActivity;
 import com.hx.campus.adapter.entity.LostFound;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.databinding.FragmentLostDetailBinding;
@@ -89,5 +92,17 @@ public class LostDetailFragment extends BaseFragment<FragmentLostDetailBinding> 
         //设置发布日期
         String date = Utils.dateFormat(lost.getPubDate());
         binding.tvDate.setText(date);
+        //私信
+        binding.chatBtn.setOnClickListener(v -> {
+            String targetId = String.valueOf(lost.getUserId());
+            if (TextUtils.isEmpty(targetId)) {
+                return;
+            }
+            io.rong.imkit.utils.RouteUtils.routeToConversationActivity(
+                    getContext(),
+                    io.rong.imlib.model.Conversation.ConversationType.PRIVATE,
+                    targetId
+            );
+        });
     }
 }

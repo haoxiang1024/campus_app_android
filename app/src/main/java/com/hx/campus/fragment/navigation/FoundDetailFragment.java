@@ -87,5 +87,17 @@ public class FoundDetailFragment extends BaseFragment<FragmentFoundDetailBinding
         //设置发布日期
         String date = Utils.dateFormat(found.getPubDate());
         binding.tvDate.setText(date);
+        //私信
+        binding.chatBtn.setOnClickListener(v -> {
+            String targetId = String.valueOf(found.getUserId());
+            if (TextUtils.isEmpty(targetId)) {
+                return;
+            }
+            io.rong.imkit.utils.RouteUtils.routeToConversationActivity(
+                    getContext(),
+                    io.rong.imlib.model.Conversation.ConversationType.PRIVATE,
+                    targetId
+            );
+        });
     }
 }

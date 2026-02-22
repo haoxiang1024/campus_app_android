@@ -197,7 +197,6 @@
                 </LinearLayout>
 
                 <Button
-                    android:elevation="10dp"
                     android:id="@+id/sumbit_btn"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"

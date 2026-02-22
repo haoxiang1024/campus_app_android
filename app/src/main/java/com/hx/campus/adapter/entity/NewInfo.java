@@ -215,6 +215,7 @@ public class NewInfo {
                 ", Comment=" + Comment +
                 ", Read=" + Read +
                 ", DetailUrl='" + DetailUrl + '\'' +
+                ", user_id=" + user_id +
                 ", uniquekey='" + uniquekey + '\'' +
                 ", State='" + State + '\'' +
                 ", Phone='" + Phone + '\'' +

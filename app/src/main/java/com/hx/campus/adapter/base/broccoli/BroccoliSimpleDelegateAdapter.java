@@ -47,7 +47,6 @@ public abstract class BroccoliSimpleDelegateAdapter<T> extends SimpleDelegateAda
         }
         if (mHasLoad) {
             broccoli.removeAllPlaceholders();
-
             onBindData(holder, item, position);
         } else {
             onBindBroccoli(holder, broccoli);
