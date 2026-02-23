@@ -183,6 +183,7 @@
     <string name="send_su">发布成功</string>
     <string name="login_fail">登录失败，请检查手机号或密码是否正确</string>
     <string name="chat">私信</string>
+    <string name="update_state">更新状态</string>
 
 
 </resources>
