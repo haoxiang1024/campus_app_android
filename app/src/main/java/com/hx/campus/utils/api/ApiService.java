@@ -1,5 +1,6 @@
 package com.hx.campus.utils.api;
 
+import com.hx.campus.adapter.entity.Comment;
 import com.hx.campus.adapter.entity.LostFound;
 import com.hx.campus.adapter.entity.SearchInfo;
 import com.hx.campus.adapter.entity.User;
@@ -9,6 +10,9 @@ import java.util.List;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
@@ -100,4 +104,23 @@ public interface ApiService {
     // 根据用户ID获取用户信息
     @POST("getUserById")
     Call<User> getUserInfo(@Query("id") int id);
+
+    // 获取评论列表
+    @GET("getCommentsByLostFoundId")
+    Call<Result<List<Comment>>> getComments(@Query("lostfound_id") int lostfoundId);
+
+    // 获取某用户收到的所有评论/回复
+    @GET("getReceivedComments")
+    Call<Result<List<Comment>>> getReceivedComments(@Query("user_id") int user_id);
+
+    // 发布评论
+    @FormUrlEncoded
+    @POST("addComment")
+    Call<Result<String>> addComment(
+            @Field("lostfound_id") int lostfoundId,
+            @Field("user_id") int userId,
+            @Field("content") String content,
+            @Field("parent_id") int parentId,
+            @Field("reply_user_id") int replyUserId
+    );
 }

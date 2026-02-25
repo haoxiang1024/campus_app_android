@@ -1,6 +1,10 @@
 
 package com.hx.campus.utils;
+import android.text.TextUtils;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import static com.hx.campus.core.webview.AgentWebFragment.KEY_URL;
 import static com.hx.campus.fragment.other.ServiceProtocolFragment.KEY_IS_IMMERSIVE;
 import static com.hx.campus.fragment.other.ServiceProtocolFragment.KEY_PROTOCOL_TITLE;
@@ -53,6 +57,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -372,5 +377,69 @@ public final class Utils {
     public static String getString(Context context, int id) {
         return context.getResources().getString(id);
     }
+    public static String getUrlFromAssets(Context context) {
+        Properties properties = new Properties();
+        try {
+            InputStream is = context.getAssets().open("url.properties");
+            properties.load(is);
+            String url = properties.getProperty("url");
+            // 确保以 / 结尾，Retrofit 的 baseUrl 要求必须以斜杠结尾
+            if (url != null && !url.endsWith("/")) {
+                url += "/";
+            }
+            return url;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "http://192.168.254.122:8081/school/"; // 备选默认值
+        }
+    }
+    /**
+     * 智能时间格式化
+     *
+     */
+    public static String formatCommentTime(String timeStr) {
+        if (TextUtils.isEmpty(timeStr)) return "";
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US);
+            Date date = sdf.parse(timeStr);
+            if (date == null) return timeStr;
 
+            long time = date.getTime();
+            long now = System.currentTimeMillis();
+            long diff = now - time;
+
+            if (diff < 60 * 1000) {
+                return "刚刚";
+            } else if (diff < 60 * 60 * 1000) {
+                return (diff / (60 * 1000)) + "分钟前";
+            } else if (diff < 24 * 60 * 60 * 1000) {
+                return (diff / (60 * 60 * 1000)) + "小时前";
+            } else {
+                Calendar commentCal = Calendar.getInstance();
+                commentCal.setTime(date);
+                Calendar nowCal = Calendar.getInstance();
+
+                // 判断是否是昨天
+                nowCal.add(Calendar.DAY_OF_YEAR, -1);
+                if (commentCal.get(Calendar.YEAR) == nowCal.get(Calendar.YEAR) &&
+                        commentCal.get(Calendar.DAY_OF_YEAR) == nowCal.get(Calendar.DAY_OF_YEAR)) {
+                    SimpleDateFormat hourSdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                    return "昨天 " + hourSdf.format(date);
+                }
+
+                // 判断是否在3天内 (包含昨天的话算2天前，这里再看是否是前天)
+                long days = diff / (24 * 60 * 60 * 1000);
+                if (days < 3) {
+                    return days + "天前";
+                } else {
+                    // 超过3天，显示 "MM-dd"
+                    SimpleDateFormat monthDaySdf = new SimpleDateFormat("M-d", Locale.getDefault());
+                    return monthDaySdf.format(date);
+                }
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return timeStr;
+        }
+    }
 }

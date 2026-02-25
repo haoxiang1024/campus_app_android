@@ -1,9 +1,12 @@
 package com.hx.campus.utils.api;
 
+import android.content.Context;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonPrimitive;
+import com.hx.campus.utils.Utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -14,11 +17,10 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitClient {
-    private static final String BASE_URL = "http://192.168.137.81:8081/school/";
     private static volatile RetrofitClient mInstance;
     private Retrofit retrofit;
 
-    private RetrofitClient() {
+    private RetrofitClient(String baseUrl) {
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(Date.class, (JsonDeserializer<Date>) (json, typeOfT, context) -> {
                     try {
@@ -48,22 +50,27 @@ public class RetrofitClient {
                 .create();
 
         retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
+                .baseUrl(baseUrl)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
     }
 
     public static RetrofitClient getInstance() {
         if (mInstance == null) {
-            synchronized (RetrofitClient.class) {
-                if (mInstance == null) {
-                    mInstance = new RetrofitClient();
-                }
-            }
+            throw new RuntimeException("请先调用 init() 初始化 RetrofitClient");
         }
         return mInstance;
     }
-
+    public static void init(Context context) {
+        if (mInstance == null) {
+            synchronized (RetrofitClient.class) {
+                if (mInstance == null) {
+                    String baseUrl = Utils.getUrlFromAssets(context);
+                    mInstance = new RetrofitClient(baseUrl);
+                }
+            }
+        }
+    }
     public ApiService getApi() {
         return retrofit.create(ApiService.class);
     }
@@ -84,7 +91,8 @@ public class RetrofitClient {
                 "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
                 "yyyy-MM-dd HH:mm:ss",
                 "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
-                "yyyy-MM-dd'T'HH:mm:ss'Z'"
+                "yyyy-MM-dd'T'HH:mm:ss'Z'",
+                "yyyy-MM-dd HH:mm"
         };
 
         for (String format : formats) {

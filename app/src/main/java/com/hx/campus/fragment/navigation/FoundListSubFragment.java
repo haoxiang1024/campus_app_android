@@ -3,6 +3,7 @@ package com.hx.campus.fragment.navigation;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -57,12 +58,16 @@ public class FoundListSubFragment extends BaseFragment<LayoutCommonListBinding> 
                     @Override
                     public void onResponse(Call<Result<List<LostFound>>> call, Response<Result<List<LostFound>>> response) {
                         if (response.body() != null && response.body().isSuccess()) {
+                            hideEmptyView();
                             mAdapter.setData(response.body().getData());
-                            Log.e( "onResponse: ",response.body().getData().toString() );
                         }
                     }
                     @Override public void onFailure(Call<Result<List<LostFound>>> call, Throwable t) {}
                 });
+    }
+    private void hideEmptyView() {
+        binding.recyclerView.setVisibility(View.VISIBLE);
+        binding.layoutEmpty.setVisibility(View.GONE);
     }
     @Override
     protected TitleBar initTitle() {

@@ -160,7 +160,8 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
                                     .setPlace(item.getPlace())
                                     .setPub_Date(item.getPubDate())
                                     .setImageUrl(item.getImg())
-                                    .setUser_id(item.getUserId()));
+                                    .setUser_id(item.getUserId())
+                                    .setId(item.getId())    );
                         }
                         // 刷新适配器数据
                         newInfoSimpleDelegateAdapter.refresh(list);
@@ -182,6 +183,7 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
     private void handleItemClick(NewInfo newInfo) {
         LostFound lostFound = new LostFound(newInfo.getTitle(), newInfo.getImageUrl(), newInfo.getPub_Date(), newInfo.getSummary(), newInfo.getPlace(), newInfo.getPhone(), newInfo.getState(), newInfo.getUserName());
         lostFound.setUserId(newInfo.getUser_id());
+        lostFound.setId(newInfo.getId());
         if ("寻找中".equals(newInfo.getState())) {
             openNewPage(LostDetailFragment.class, LostDetailFragment.KEY_LOST, lostFound);
         } else {

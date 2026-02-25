@@ -9,6 +9,16 @@ import java.util.Date;
 
 public class NewInfo {
 
+    private Integer id;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public NewInfo setId(Integer id) {
+        this.id = id;
+        return this;
+    }
 
     private String UserName ;
 

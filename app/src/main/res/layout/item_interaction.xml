@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:paddingTop="12dp">
+    <ImageView
+    android:id="@+id/iv_avatar"
+    android:layout_width="48dp"
+    android:layout_height="48dp"
+    android:layout_marginStart="16dp"
+    android:layout_marginBottom="12dp"
+    android:background="#E0E0E0"
+    android:scaleType="centerCrop" />
+
+    <TextView
+        android:id="@+id/tv_username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/iv_avatar"
+        android:layout_marginStart="12dp"
+        android:layout_toEndOf="@id/iv_avatar"
+        android:text="用户名"
+        android:textColor="#333333"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tv_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/tv_username"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="16dp"
+        android:text="刚刚"
+        android:textColor="#B0B0B0"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/tv_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_username"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="16dp"
+        android:layout_toEndOf="@id/iv_avatar"
+        android:text="这是一条评论内容..."
+        android:textColor="#999999"
+        android:textSize="14sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_below="@id/iv_avatar"
+        android:layout_marginStart="12dp"
+        android:layout_toEndOf="@id/iv_avatar"
+        android:background="#EEEEEE" />
+
+</RelativeLayout>

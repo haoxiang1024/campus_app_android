@@ -57,6 +57,8 @@ public class MyApp extends Application {
         super.onCreate();
         initLibs();
         initIM();
+        //网络请求初始化
+        RetrofitClient.init(this);
     }
 
     private void initIM() {

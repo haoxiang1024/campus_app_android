@@ -1,6 +1,7 @@
 package com.hx.campus.fragment.navigation;
 
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -61,4 +62,5 @@ public class FoundFragment extends BaseFragment<FragmentFoundBinding> {
         titleBar.setTitle("招领");
         return titleBar;
     }
+
 }
