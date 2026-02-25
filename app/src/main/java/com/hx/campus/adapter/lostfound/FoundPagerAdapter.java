@@ -7,9 +7,21 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import com.hx.campus.fragment.navigation.FoundListSubFragment;
 import com.hx.campus.fragment.navigation.LostListSubFragment;
 
+/**
+ * 招领物品ViewPager适配器
+ * 用于管理招领物品分类页面的Fragment切换
+ * 继承FragmentStateAdapter实现页面状态保存
+ */
 public class FoundPagerAdapter extends FragmentStateAdapter {
+    /** 页面标题数组 */
     private final String[] titles;
 
+    /**
+     * 构造函数
+     * 
+     * @param fragment 父Fragment
+     * @param titles 页面标题数组
+     */
     public FoundPagerAdapter(@NonNull Fragment fragment, String[] titles) {
         super(fragment);
         this.titles = titles;

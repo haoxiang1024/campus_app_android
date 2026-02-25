@@ -6,31 +6,49 @@ import java.io.Serializable;
 import java.util.Date;
 
 
+/**
+ * 失物招领实体类
+ * 用于表示校园内的失物和招领信息
+ */
 public class LostFound implements Serializable {
     private static final long serialVersionUID = 1L;
+    /** 失物招领信息唯一标识符 */
     private Integer id;
 
+    /** 标题 */
     private String title;
 
+    /** 图片URL地址 */
     private String img;
     @SerializedName("pubDate")
+    /** 发布日期 */
     private Date pub_date;
 
+    /** 内容描述 */
     private String content;
 
+    /** 地点 */
     private String place;
 
+    /** 联系电话 */
     private String phone;
 
+    /** 状态：寻找中/已找到 */
     private String state;
 
+    /** 是否置顶：0-否，1-是 */
     private Integer stick;
     @SerializedName("lostfoundtypeId")
+    /** 失物招领类型ID */
     private Integer lostfoundtype_id;
     @SerializedName("userId")
+    /** 用户ID */
     private Integer user_id;
+    /** 发布者昵称 */
     private String nickname;
-    private  String type;
+    /** 类型：失物/招领 */
+    private String type;
+    /** 失物招领类型对象 */
     private LostFoundType lostfoundtype;
 
     public LostFound(Integer id, String title, String img, Date pubDate, String content, String place, String phone, String state, Integer stick, Integer lostfoundtype_id, Integer user_id, String nickname, String type, LostFoundType lostfoundtype) {

@@ -302,19 +302,15 @@ public class LostDetailFragment extends BaseFragment<FragmentLostDetailBinding> 
         io.rong.imlib.RongIMClient.setOnReceiveMessageListener(new io.rong.imlib.RongIMClient.OnReceiveMessageWrapperListener() {
             @Override
             public boolean onReceived(io.rong.imlib.model.Message message, int left, boolean hasPackage, boolean offline) {
-                // 1. 判断是否是命令消息
                 if (message.getContent() instanceof io.rong.message.CommandMessage) {
                     io.rong.message.CommandMessage command = (io.rong.message.CommandMessage) message.getContent();
 
-                    // 2. 检查命令名称
                     if ("RefreshComment".equals(command.getName())) {
                         String data = command.getData(); // 拿到 "REFRESH_COMMENT:123"
                         if (data != null && data.contains(":")) {
                             String id = data.split(":")[1];
 
-                            // 3. 切换到主线程刷新 UI
                             getActivity().runOnUiThread(() -> {
-                                // 如果当前详情页的 ID 匹配，则刷新
                                 if (lost != null && String.valueOf(lost.getId()).equals(id)) {
                                     loadComments();
                                     Log.d("IM", "收到远程指令，自动刷新评论区");

@@ -1,10 +1,21 @@
 
+/**
+ * 应用核心工具类
+ * 提供各种常用的工具方法，包括隐私政策处理、页面跳转、颜色处理等
+ * 采用单例模式设计，防止被实例化
+ * 
+ * @author 开发团队
+ * @version 1.0.0
+ * @since 2024
+ */
 package com.hx.campus.utils;
+
 import android.text.TextUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+
 import static com.hx.campus.core.webview.AgentWebFragment.KEY_URL;
 import static com.hx.campus.fragment.other.ServiceProtocolFragment.KEY_IS_IMMERSIVE;
 import static com.hx.campus.fragment.other.ServiceProtocolFragment.KEY_PROTOCOL_TITLE;
@@ -64,108 +75,155 @@ import java.util.Locale;
 import java.util.Properties;
 
 
+/**
+ * 工具类集合，提供应用所需的各类辅助方法
+ * 使用final修饰防止继承，构造函数私有化防止实例化
+ */
 public final class Utils {
 
-    /**
-     * 这里填写你的应用隐私政策网页地址
-     */
+    /** 应用隐私政策网页地址 */
     private static final String PRIVACY_URL = "https://gitee.com/xuexiangjys/TemplateAppProject/raw/master/LICENSE";
 
+    /**
+     * 私有构造函数
+     * 防止工具类被实例化
+     */
     private Utils() {
-        throw new UnsupportedOperationException("u can't instantiate me...");
+        throw new UnsupportedOperationException("工具类不允许被实例化");
     }
 
     /**
-     * 显示隐私政策的提示
-     *
-     * @param context
-     * @param submitListener 同意的监听
-     * @return
+     * 显示隐私政策确认对话框
+     * 实现用户隐私政策同意流程，包含多次确认机制
+     * 
+     * @param context 上下文环境
+     * @param submitListener 用户同意隐私政策的回调监听器
+     * @return 创建的对话框实例
      */
     public static Dialog showPrivacyDialog(Context context, MaterialDialog.SingleButtonCallback submitListener) {
-        MaterialDialog dialog = new MaterialDialog.Builder(context).title(R.string.title_reminder).autoDismiss(false).cancelable(false)
-                .positiveText(R.string.lab_agree).onPositive((dialog1, which) -> {
+        // 构建隐私政策确认对话框
+        MaterialDialog dialog = new MaterialDialog.Builder(context)
+                .title(R.string.title_reminder)
+                .autoDismiss(false)
+                .cancelable(false)
+                .positiveText(R.string.lab_agree)
+                .onPositive((dialog1, which) -> {
                     if (submitListener != null) {
                         submitListener.onClick(dialog1, which);
                     } else {
                         dialog1.dismiss();
                     }
                 })
-                .negativeText(R.string.lab_disagree).onNegative(new MaterialDialog.SingleButtonCallback() {
+                .negativeText(R.string.lab_disagree)
+                .onNegative(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         dialog.dismiss();
-                        DialogLoader.getInstance().showConfirmDialog(context, ResUtils.getString(R.string.title_reminder), String.format(ResUtils.getString(R.string.content_privacy_explain_again), ResUtils.getString(R.string.app_name)), ResUtils.getString(R.string.lab_look_again), new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                                showPrivacyDialog(context, submitListener);
-                            }
-                        }, ResUtils.getString(R.string.lab_still_disagree), new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                                DialogLoader.getInstance().showConfirmDialog(context, ResUtils.getString(R.string.content_think_about_it_again), ResUtils.getString(R.string.lab_look_again), new DialogInterface.OnClickListener() {
+                        // 用户拒绝后再次确认
+                        DialogLoader.getInstance().showConfirmDialog(
+                                context, 
+                                ResUtils.getString(R.string.title_reminder), 
+                                String.format(ResUtils.getString(R.string.content_privacy_explain_again), ResUtils.getString(R.string.app_name)), 
+                                ResUtils.getString(R.string.lab_look_again), 
+                                new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         dialog.dismiss();
+                                        // 重新显示隐私政策对话框
                                         showPrivacyDialog(context, submitListener);
                                     }
-                                }, ResUtils.getString(R.string.lab_exit_app), new DialogInterface.OnClickListener() {
+                                }, 
+                                ResUtils.getString(R.string.lab_still_disagree), 
+                                new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         dialog.dismiss();
-                                        XUtil.exitApp();
+                                        // 最后一次确认机会
+                                        DialogLoader.getInstance().showConfirmDialog(
+                                                context, 
+                                                ResUtils.getString(R.string.content_think_about_it_again), 
+                                                ResUtils.getString(R.string.lab_look_again), 
+                                                new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        dialog.dismiss();
+                                                        showPrivacyDialog(context, submitListener);
+                                                    }
+                                                }, 
+                                                ResUtils.getString(R.string.lab_exit_app), 
+                                                new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        dialog.dismiss();
+                                                        // 用户最终拒绝，退出应用
+                                                        XUtil.exitApp();
+                                                    }
+                                                });
                                     }
                                 });
-                            }
-                        });
                     }
                 }).build();
+        // 设置隐私政策内容
         dialog.setContent(getPrivacyContent(context));
-        //开始响应点击事件
+        // 启用链接点击功能
         dialog.getContentView().setMovementMethod(LinkMovementMethod.getInstance());
         dialog.show();
         return dialog;
     }
 
     /**
-     * @return 隐私政策说明
+     * 构造隐私政策说明文本
+     * 包含可点击的超链接，引导用户查看完整隐私政策
+     * 
+     * @param context 上下文环境
+     * @return 格式化的隐私政策说明文本
      */
     private static SpannableStringBuilder getPrivacyContent(Context context) {
         SpannableStringBuilder stringBuilder = new SpannableStringBuilder()
                 .append("    欢迎来到").append(ResUtils.getString(R.string.app_name)).append("!\n")
                 .append("    我们深知个人信息对你的重要性，也感谢你对我们的信任。\n")
                 .append("    为了更好地保护你的权益，同时遵守相关监管的要求，我们将通过");
+        
+        // 添加可点击的隐私政策链接
         stringBuilder.append(getPrivacyLink(context, PRIVACY_URL))
                 .append("向你说明我们会如何收集、存储、保护、使用及对外提供你的信息，并说明你享有的权利。\n")
                 .append("    更多详情，敬请查阅")
                 .append(getPrivacyLink(context, PRIVACY_URL))
-                .append("全文。");
+                .append("全文。\n");
+        
         return stringBuilder;
     }
 
     /**
-     * @param context 隐私政策的链接
-     * @return
+     * 创建可点击的隐私政策链接文本
+     * 
+     * @param context 上下文环境
+     * @param privacyUrl 隐私政策网页地址
+     * @return 可点击的SpannableString对象
      */
     private static SpannableString getPrivacyLink(Context context, String privacyUrl) {
         String privacyName = String.format(ResUtils.getString(R.string.lab_privacy_name), ResUtils.getString(R.string.app_name));
         SpannableString spannableString = new SpannableString(privacyName);
+        
+        // 设置可点击的链接样式
         spannableString.setSpan(new ClickableSpan() {
             @Override
             public void onClick(@NonNull View widget) {
+                // 点击后跳转到隐私政策网页
                 goWeb(context, privacyUrl);
             }
         }, 0, privacyName.length(), Spanned.SPAN_MARK_MARK);
+        
         return spannableString;
     }
 
 
     /**
-     * 请求浏览器
-     *
-     * @param url
+     * 在内置WebView中打开网页
+     * 使用应用内浏览器而非系统浏览器，提供更好的用户体验
+     * 
+     * @param context 上下文环境
+     * @param url 要打开的网页地址
      */
     public static void goWeb(Context context, final String url) {
         Intent intent = new Intent(context, AgentWebActivity.class);
@@ -175,25 +233,25 @@ public final class Utils {
 
 
     /**
-     * 打开用户协议和隐私协议
-     *
-     * @param fragment
-     * @param isPrivacy   是否是隐私协议
-     * @param isImmersive 是否沉浸式
+     * 跳转到协议页面（用户协议或隐私协议）
+     * 
+     * @param fragment 当前Fragment实例
+     * @param isPrivacy true表示隐私协议，false表示用户协议
+     * @param isImmersive 是否使用沉浸式状态栏
      */
     public static void gotoProtocol(XPageFragment fragment, boolean isPrivacy, boolean isImmersive) {
         PageOption.to(ServiceProtocolFragment.class)
                 .putString(KEY_PROTOCOL_TITLE, isPrivacy ? ResUtils.getString(R.string.title_privacy_protocol) : ResUtils.getString(R.string.title_user_protocol))
                 .putBoolean(KEY_IS_IMMERSIVE, isImmersive)
                 .open(fragment);
-
     }
 
     /**
-     * 是否是深色的颜色
-     *
-     * @param color
-     * @return
+     * 判断颜色是否为深色
+     * 用于自动调整文字颜色以确保良好的对比度
+     * 
+     * @param color 要判断的颜色值
+     * @return true表示深色，false表示浅色
      */
     public static boolean isColorDark(@ColorInt int color) {
         return ColorUtils.isColorDark(color, 0.382);

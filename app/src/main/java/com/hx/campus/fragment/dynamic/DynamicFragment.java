@@ -49,12 +49,22 @@ import retrofit2.Response;
 @Page(anim = CoreAnim.fade)
 public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
 
+    // 新闻信息适配器，用于显示推荐内容列表
     private SimpleDelegateAdapter<NewInfo> newInfoSimpleDelegateAdapter;
+    // 新闻信息数据列表，存储从服务器获取的数据
     private List<NewInfo> list = new ArrayList<>();
 
+    /**
+     * 创建视图绑定对象
+     * @param inflater 布局填充器
+     * @param container 父容器
+     * @param attachToRoot 是否附加到根布局
+     * @return FragmentNewsBinding 视图绑定实例
+     */
     @NonNull
     @Override
     protected FragmentNewsBinding viewBindingInflate(@NonNull LayoutInflater inflater, ViewGroup container, boolean attachToRoot) {
+        // 使用视图绑定inflate方法创建绑定对象
         return FragmentNewsBinding.inflate(inflater, container, attachToRoot);
     }
 

@@ -7,8 +7,18 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import com.hx.campus.fragment.message.ChatListFragment;
 import com.hx.campus.fragment.message.InteractionFragment;
 
+/**
+ * 消息页面ViewPager适配器
+ * 管理消息模块的两个主要页面：私信列表和互动消息
+ * 继承FragmentStateAdapter实现页面状态保存
+ */
 public class MessagePagerAdapter extends FragmentStateAdapter {
 
+    /**
+     * 构造函数
+     * 
+     * @param fragment 父Fragment
+     */
     public MessagePagerAdapter(@NonNull Fragment fragment) {
         super(fragment);
     }

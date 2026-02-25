@@ -15,14 +15,32 @@ import com.hx.campus.databinding.LostItemsBinding;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 失物招领详情适配器
+ * 支持失物和招领两种不同布局类型的列表展示
+ * 使用BaseAdapter实现，通过ViewType区分不同的布局
+ */
 public class LostFoundDetailAdapter extends BaseAdapter {
+    /** 上下文环境 */
     private final Context context;
-    private final List<LostFound> dataList = new ArrayList<>(); // 统一数据源
+    /** 统一数据源，存储失物和招领信息 */
+    private final List<LostFound> dataList = new ArrayList<>();
 
+    /**
+     * 构造函数
+     * 
+     * @param context 上下文环境
+     */
     public LostFoundDetailAdapter(Context context) {
         this.context = context;
     }
 
+    /**
+     * 设置数据源
+     * 
+     * @param data 数据列表
+     * @param pageIndex 页面索引，0表示第一页需要清空旧数据
+     */
     public void setData(List<LostFound> data, int pageIndex) {
         if (pageIndex == 0) {
             dataList.clear();
@@ -100,6 +118,12 @@ public class LostFoundDetailAdapter extends BaseAdapter {
     }
 
     // 提取公共的图片加载逻辑
+    /**
+     * 加载图片到ImageView
+     * 
+     * @param imgUrl 图片URL地址
+     * @param imageView 目标ImageView控件
+     */
     private void loadImage(String imgUrl, android.widget.ImageView imageView) {
         if (TextUtils.isEmpty(imgUrl)) {
             imageView.setVisibility(View.GONE);

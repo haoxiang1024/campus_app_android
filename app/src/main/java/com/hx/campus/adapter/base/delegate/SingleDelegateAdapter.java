@@ -15,10 +15,21 @@ import com.alibaba.android.vlayout.layout.SingleLayoutHelper;
 import com.xuexiang.xui.adapter.recyclerview.RecyclerViewHolder;
 
 
+/**
+ * 单项委托适配器抽象类
+ * 专门用于只需要显示单个项目的场景
+ * 自动使用SingleLayoutHelper，确保只显示一个项目
+ */
 public abstract class SingleDelegateAdapter extends DelegateAdapter.Adapter<RecyclerViewHolder> {
 
+    /** 布局资源ID */
     private final int mLayoutId;
 
+    /**
+     * 构造函数
+     * 
+     * @param layoutId 布局资源ID
+     */
     public SingleDelegateAdapter(int layoutId) {
         mLayoutId = layoutId;
     }

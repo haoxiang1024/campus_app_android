@@ -18,26 +18,48 @@ import java.util.Collection;
 import java.util.List;
 
 
+/**
+ * 通用委托适配器基类
+ * 提供基础的数据管理功能和RecyclerView适配器实现
+ * 支持泛型类型T的数据项和泛型类型V的ViewHolder
+ * 
+ * @param <T> 数据项类型
+ * @param <V> ViewHolder类型，必须继承自RecyclerView.ViewHolder
+ */
 public abstract class XDelegateAdapter<T, V extends RecyclerView.ViewHolder> extends DelegateAdapter.Adapter<V> {
     /**
-     * 数据源
+     * 数据源列表，存储所有适配器数据项
      */
     protected final List<T> mData = new ArrayList<>();
     /**
-     * 当前点击的条目
+     * 当前选中项的位置索引，-1表示未选中任何项
      */
     protected int mSelectPosition = -1;
 
+    /**
+     * 默认构造函数
+     * 初始化空的数据源列表
+     */
     public XDelegateAdapter() {
 
     }
 
+    /**
+     * 带集合数据的构造函数
+     * 
+     * @param list 初始化数据集合，可为null
+     */
     public XDelegateAdapter(Collection<T> list) {
         if (list != null) {
             mData.addAll(list);
         }
     }
 
+    /**
+     * 带数组数据的构造函数
+     * 
+     * @param data 初始化数据数组，可为null或空数组
+     */
     public XDelegateAdapter(T[] data) {
         if (data != null && data.length > 0) {
             mData.addAll(Arrays.asList(data));
@@ -95,10 +117,21 @@ public abstract class XDelegateAdapter<T, V extends RecyclerView.ViewHolder> ext
         return checkPosition(position) ? mData.get(position) : null;
     }
 
+    /**
+     * 检查位置索引是否有效
+     * 
+     * @param position 待检查的位置索引
+     * @return true表示位置有效，false表示位置无效
+     */
     private boolean checkPosition(int position) {
         return position >= 0 && position <= mData.size() - 1;
     }
 
+    /**
+     * 判断数据源是否为空
+     * 
+     * @return true表示数据源为空，false表示有数据
+     */
     public boolean isEmpty() {
         return getItemCount() == 0;
     }

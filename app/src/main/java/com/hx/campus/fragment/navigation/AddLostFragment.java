@@ -8,8 +8,10 @@ import android.content.pm.PackageManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RadioButton;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -30,9 +32,7 @@ import com.xuexiang.xpage.annotation.Page;
 import com.xuexiang.xui.widget.toast.XToast;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -48,14 +48,14 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
     public static final int STORAGE_PERMISSION = 1;
 
     int id = 0; // 分类id
-    private File file = null; // 用于上传图片文件
+    private File file = null;
     private String fileName = "";
-    private String lostJson; // 丢失信息json
-    private String lostTitleEditValue; // 标题
-    private String contentEditValue; // 内容
-    private String locationEditValue; // 地点
+    private String lostJson;
+    private String lostTitleEditValue;
+    private String contentEditValue;
+    private String locationEditValue;
     private String result;
-    LoadingDialog loadingDialog; // 加放动画
+    LoadingDialog loadingDialog;
 
     @NonNull
     @Override
@@ -77,7 +77,6 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
     protected void initListeners() {
         super.initListeners();
 
-        // 图片选择
         binding.chooseImage.setOnClickListener(v -> {
             if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, STORAGE_PERMISSION);
@@ -86,11 +85,9 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
             }
         });
 
-        // 提交逻辑
         binding.btnSubmitLost.setOnClickListener(v -> {
-            // 校验分类 ID 是否获取成功
             if (id == 0) {
-                XToast.warning(getContext(), "请稍后，分类信息正在加载...").show();
+                XToast.warning(getContext(), "请稍后，正在获取分类信息...").show();
                 return;
             }
 
@@ -98,7 +95,7 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
             User user = Utils.getBeanFromSp(getContext(), "User", "user");
 
             Date date = new Date();
-            String state = "待审核"; // 丢失状态默认为寻找中
+            String state = "寻找中";
             int stick = 0;
             Integer userId = user.getId();
             String phone = user.getPhone();
@@ -107,13 +104,11 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
             contentEditValue = binding.addContent.getEditValue();
             locationEditValue = binding.etLocation.getEditValue();
 
-            // 构造对象 (复用 LostFound 实体类)
             LostFound lostFound = new LostFound(lostTitleEditValue, "", date, contentEditValue, locationEditValue, phone, state, stick, id, userId);
             lostFound.setType("失物");
 
             lostJson = JSON.toJSONString(lostFound);
 
-            // 输入校验
             if (file == null) {
                 hideLoadingDialog();
                 showResponse(Utils.getString(getContext(), R.string.no_image_selected_yet));
@@ -126,9 +121,6 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
             } else if (TextUtils.isEmpty(locationEditValue.trim())) {
                 hideLoadingDialog();
                 showResponse(Utils.getString(getContext(), R.string.location_not_empty));
-            } else if (binding.radioGroup.getCheckedRadioButtonId() == -1) {
-                hideLoadingDialog();
-                showResponse(Utils.getString(getContext(), R.string.category_not_selected));
             } else {
                 upload(lostJson);
             }
@@ -141,7 +133,6 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
         startActivityForResult(intent, CHOOSE_PHOTO);
     }
 
-    // 使用 Retrofit 上传
     private void upload(String lostJson) {
         RequestBody requestFile = RequestBody.create(MediaType.parse("image/jpeg"), file);
         MultipartBody.Part filePart = MultipartBody.Part.createFormData("upload_file", file.getName(), requestFile);
@@ -186,13 +177,18 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
         binding.phone.setText(user.getPhone());
 
         String[] types = getResources().getStringArray(R.array.type_titles);
-        setRadioBtn(Arrays.asList(types));
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, types);
+        binding.spinnerCategory.setAdapter(adapter);
 
-        binding.radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            RadioButton radioButton = group.findViewById(checkedId);
-            if (radioButton != null) {
-                String name = radioButton.getText().toString();
-                getIdByName(name);
+        binding.spinnerCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedName = types[position];
+                getIdByName(selectedName);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
             }
         });
     }
@@ -212,15 +208,6 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
                 Log.e("AddLost", "获取分类ID失败", t);
             }
         });
-    }
-
-    private void setRadioBtn(List<String> list) {
-        binding.radioGroup.removeAllViews();
-        for (String typeName : list) {
-            RadioButton radioButton = new RadioButton(getContext());
-            radioButton.setText(typeName);
-            binding.radioGroup.addView(radioButton);
-        }
     }
 
     @Override
@@ -257,18 +244,15 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
             loadingDialog.dismiss();
         }
     }
+
     private void clearUI() {
-        //  清空所有输入框
-        binding.etLostTitle.setText("");    // 标题
-        binding.addContent.setText("");     // 内容
-        binding.etLocation.setText("");    // 地点
+        binding.etLostTitle.setText("");
+        binding.addContent.setText("");
+        binding.etLocation.setText("");
 
-        //  重置单选按钮（分类）
-        binding.radioGroup.clearCheck();
-        this.id = 0; // 记得重置保存的分类ID变量
+        binding.spinnerCategory.setSelection(0);
 
-        // 重置图片预览和文件对象
-        binding.ivImage.setImageDrawable(null);// 替换为你项目的默认占位图
+        binding.ivImage.setImageDrawable(null);
         this.file = null;
         this.fileName = "";
     }

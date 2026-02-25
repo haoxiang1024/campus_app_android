@@ -78,7 +78,6 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements
                 .setImmersive(true);
         titleBar.setBackgroundColor(Color.TRANSPARENT);
         titleBar.setTitle("");
-        //titleBar.setLeftImageDrawable(ResUtils.getVectorDrawable(getContext(), R.drawable.ic_login_close));
         titleBar.setActionTextColor(ThemeUtils.resolveColor(getContext(), R.attr.colorAccent));
         return titleBar;
     }

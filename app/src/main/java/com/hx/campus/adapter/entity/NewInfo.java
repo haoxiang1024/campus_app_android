@@ -7,8 +7,13 @@ import com.google.gson.annotations.SerializedName;
 import java.util.Date;
 
 
+/**
+ * 新闻资讯实体类
+ * 用于表示校园新闻和动态信息
+ */
 public class NewInfo {
 
+    /** 新闻唯一标识符 */
     private Integer id;
 
     public Integer getId() {
@@ -20,28 +25,43 @@ public class NewInfo {
         return this;
     }
 
+    /** 发布者用户名 */
     private String UserName ;
 
+    /** 标签分类 */
     private String Tag;
 
+    /** 新闻标题 */
     private String Title;
 
+    /** 新闻摘要 */
     private String Summary;
 
 
+    /** 图片URL地址 */
     private String ImageUrl;
 
+    /** 点赞数 */
     private int Praise;
 
+    /** 评论数 */
     private int Comment;
 
+    /** 阅读数 */
     private int Read;
+    /** 详情页URL */
     private String DetailUrl;
+    /** 用户ID */
     private Integer user_id;
+    /** 新闻唯一码，用于获取新闻内容 */
     private String uniquekey;//新闻唯一码用于获取新闻内容
+    /** 状态信息 */
     private String State;//状态
+    /** 联系方式 */
     private String Phone;//联系方式
+    /** 地点信息 */
     private String Place;//地点
+    /** 发布日期 */
     @SerializedName("pubDate")
     private Date pub_date;
 

@@ -1,3 +1,12 @@
+/**
+ * 聊天对话Activity
+ * 负责处理用户间的一对一聊天功能
+ * 集成融云IMKit，提供完整的聊天界面和功能
+ * 
+ * @author 开发团队
+ * @version 1.0.0
+ * @since 2024
+ */
 package com.hx.campus.activity.chat;
 
 import android.content.Intent;
@@ -26,42 +35,62 @@ import io.rong.imkit.userinfo.model.GroupUserInfo;
 import io.rong.imlib.model.Group;
 import io.rong.imlib.model.UserInfo;
 
+/**
+ * 聊天对话页面Activity
+ * 继承自AppCompatActivity，提供完整的聊天体验
+ */
 public class ConversationActivity extends AppCompatActivity {
 
+    /** 用户信息观察者，用于监听用户信息变化 */
     private RongUserInfoManager.UserDataObserver userDataObserver;
 
+    /**
+     * Activity创建时的初始化方法
+     * 设置布局、挂载聊天Fragment、配置标题栏和用户信息监听
+     * 
+     * @param savedInstanceState 保存的状态数据
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_conversation);
-        //挂载ConversationFragment
+        
+        // 挂载聊天Fragment
         if (savedInstanceState == null) {
             ConversationFragment fragment = new ConversationFragment();
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, fragment)
                     .commit();
         }
-        //设置标题栏
+        
+        // 配置标题栏
         TitleBar titleBar = findViewById(R.id.title_bar);
         titleBar.setLeftClickListener(v -> finish());
+        
+        // 获取目标用户ID
         Bundle bundle = getIntent().getExtras();
         if (bundle == null) return;
         String targetId = bundle.getString("targetId");
+        
+        // 验证目标ID的有效性
         if (TextUtils.isEmpty(targetId)) {
-            // 如果获取不到 targetId，直接结束页面，防止后续逻辑报空指针
+            // 目标ID无效，关闭页面避免空指针异常
             finish();
             return;
         }
-        if (TextUtils.isEmpty(targetId)) return;
+        
+        // 设置初始标题
         UserInfo userInfo = RongUserInfoManager.getInstance().getUserInfo(targetId);
         if (userInfo != null && !TextUtils.isEmpty(userInfo.getName())) {
             titleBar.setTitle(userInfo.getName());
         } else {
             titleBar.setTitle("对话");
         }
+        // 创建用户信息观察者
         userDataObserver = new RongUserInfoManager.UserDataObserver() {
             @Override
             public void onUserUpdate(UserInfo info) {
+                // 当目标用户信息更新时，刷新标题栏
                 if (info != null && info.getUserId().equals(targetId)) {
                     runOnUiThread(() -> {
                         if (titleBar != null) {
@@ -72,37 +101,53 @@ public class ConversationActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onGroupUpdate(Group group) {}
+            public void onGroupUpdate(Group group) {
+            }
 
             @Override
-            public void onGroupUserInfoUpdate(GroupUserInfo groupUserInfo) {}
+            public void onGroupUserInfoUpdate(GroupUserInfo groupUserInfo) {
+            }
         };
+        
+        // 注册用户信息观察者
         RongUserInfoManager.getInstance().addUserDataObserver(userDataObserver);
-        //修改发送按钮样式
+        
+        // 自定义发送按钮样式
         setBtn();
     }
 
+    /**
+     * 自定义发送按钮样式
+     * 通过监听布局变化来动态调整发送按钮的外观
+     */
     private void setBtn() {
         View root = findViewById(android.R.id.content);
         root.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
             View sendBtn = findViewById(R.id.input_panel_send_btn);
-                if (sendBtn != null && sendBtn.getVisibility() == View.VISIBLE) {
-                    if (sendBtn.getLayoutParams() instanceof LinearLayout.LayoutParams) {
-                        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) sendBtn.getLayoutParams();
-                        params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 56, getResources().getDisplayMetrics());
-                        params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 32, getResources().getDisplayMetrics());
-                        params.gravity = Gravity.BOTTOM;
-                        params.bottomMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, getResources().getDisplayMetrics());
-                        params.rightMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics());
-                        sendBtn.setLayoutParams(params);
-                    }
-                    sendBtn.setPadding(0, 0, 0, 0); // 清除内边距
-                    sendBtn.setMinimumHeight(0);   // 解决 XUI 带来的高度限制
-                    sendBtn.setMinimumWidth(0);
+            if (sendBtn != null && sendBtn.getVisibility() == View.VISIBLE) {
+                if (sendBtn.getLayoutParams() instanceof LinearLayout.LayoutParams) {
+                    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) sendBtn.getLayoutParams();
+                    // 设置按钮尺寸
+                    params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 56, getResources().getDisplayMetrics());
+                    params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 32, getResources().getDisplayMetrics());
+                    params.gravity = Gravity.BOTTOM;
+                    // 设置边距
+                    params.bottomMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, getResources().getDisplayMetrics());
+                    params.rightMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics());
+                    sendBtn.setLayoutParams(params);
+                }
+                // 清除内边距和最小尺寸限制
+                sendBtn.setPadding(0, 0, 0, 0);
+                sendBtn.setMinimumHeight(0);
+                sendBtn.setMinimumWidth(0);
             }
         });
     }
 
+    /**
+     * Activity销毁时的清理工作
+     * 移除用户信息观察者，避免内存泄漏
+     */
     @Override
     protected void onDestroy() {
         super.onDestroy();

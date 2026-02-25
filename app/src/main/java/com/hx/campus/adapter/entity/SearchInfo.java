@@ -3,32 +3,49 @@ package com.hx.campus.adapter.entity;
 import java.util.Date;
 import java.util.Objects;
 
+/**
+ * 搜索信息实体类
+ * 用于封装搜索结果的信息
+ */
 public class SearchInfo {
 
+    /** 失物招领信息唯一标识符 */
     private Integer id;
 
+    /** 标题 */
     private String title;
 
+    /** 图片URL地址 */
     private String img;
 
+    /** 发布日期 */
     private Date pub_date;
 
+    /** 内容描述 */
     private String content;
 
+    /** 地点 */
     private String place;
 
+    /** 联系电话 */
     private String phone;
 
+    /** 状态：寻找中/已找到 */
     private String state;
 
+    /** 是否置顶：0-否，1-是 */
     private Integer stick;
 
+    /** 失物招领类型ID */
     private Integer lostfoundtype_id;
 
+    /** 失物招领类型对象 */
     private LostFoundType lostfoundtype;
 
+    /** 用户ID */
     private Integer user_id;
 
+    /** 发布者昵称 */
     private String nickname;
 
     public SearchInfo() {

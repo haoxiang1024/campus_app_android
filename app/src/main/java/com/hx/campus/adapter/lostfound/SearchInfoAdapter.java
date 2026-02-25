@@ -14,10 +14,23 @@ import com.hx.campus.databinding.SearchInfoBinding;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 搜索信息适配器
+ * 用于展示搜索结果列表
+ * 使用BaseAdapter实现，支持分页加载数据
+ */
 public class SearchInfoAdapter extends BaseAdapter {
-    private final Context context;//上下文
-    private final List<SearchInfo> searchInfoList = new ArrayList<>();//数据源
+    /** 上下文环境 */
+    private final Context context;
+    /** 搜索信息数据源 */
+    private final List<SearchInfo> searchInfoList = new ArrayList<>();
 
+    /**
+     * 设置数据源
+     * 
+     * @param data 数据列表
+     * @param pageIndex 页面索引，0表示第一页需要清空旧数据
+     */
     public void setData(List<SearchInfo> data, int pageIndex) {
         if (pageIndex == 0) {
             data.clear();
@@ -26,6 +39,11 @@ public class SearchInfoAdapter extends BaseAdapter {
         notifyDataSetChanged();//刷新界面
     }
 
+    /**
+     * 构造函数
+     * 
+     * @param context 上下文环境
+     */
     public SearchInfoAdapter(Context context) {
         this.context = context;
     }

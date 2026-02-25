@@ -70,20 +70,17 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
         String email = binding.inputEmail.getEditValue();
         String code = binding.inputCode.getEditValue();
 
-        // 1. 空值校验
         if (TextUtils.isEmpty(phone) || TextUtils.isEmpty(password) ||
                 TextUtils.isEmpty(rePassword) || TextUtils.isEmpty(email) || TextUtils.isEmpty(code)) {
             Utils.showResponse("请填写完整注册信息");
             return;
         }
 
-        // 2. 两次密码一致性校验
         if (!password.equals(rePassword)) {
             Utils.showResponse("两次输入的密码不一致");
             return;
         }
 
-        // 3. 校验验证码逻辑（先校验验证码，成功后再执行注册）
         verifyCodeAndRegister(phone, password, email, code);
     }
 
