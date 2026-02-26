@@ -43,10 +43,7 @@ public class LostFoundType implements Serializable {
 
     @Override
     public String toString() {
-        return "LostFoundTypeService{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                '}';
+        return name;
     }
 }
 

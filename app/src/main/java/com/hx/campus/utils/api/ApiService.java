@@ -2,6 +2,7 @@ package com.hx.campus.utils.api;
 
 import com.hx.campus.adapter.entity.Comment;
 import com.hx.campus.adapter.entity.LostFound;
+import com.hx.campus.adapter.entity.LostFoundType;
 import com.hx.campus.adapter.entity.SearchInfo;
 import com.hx.campus.adapter.entity.User;
 
@@ -123,4 +124,9 @@ public interface ApiService {
             @Field("parent_id") int parentId,
             @Field("reply_user_id") int replyUserId
     );
+
+    //获取所有分类
+    @GET("getAllType")
+    Call<Result<List<LostFoundType>>> getAllType();
+
 }
