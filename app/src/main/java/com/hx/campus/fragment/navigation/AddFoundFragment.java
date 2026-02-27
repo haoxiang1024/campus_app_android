@@ -188,11 +188,12 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
                     public void onResponse(retrofit2.Call<Result<String>> call, retrofit2.Response<Result<String>> response) {
                         hideLoadingDialog();
                         if (response.isSuccessful() && response.body() != null) {
-                            if (response.body().isSuccess()) {
-                                showResponse(Utils.getString(getContext(), R.string.send_su));
+                            if (response.body().getStatus() == 0) {
+                                showResponse(response.body().getMsg());
                                 runOnUiThread(() -> clearUI());
                             } else {
-                                showResponse("提交失败：" + response.body().getMsg());
+                                showResponse( response.body().getMsg());
+                                runOnUiThread(() -> clearUI());
                             }
                         }
                     }

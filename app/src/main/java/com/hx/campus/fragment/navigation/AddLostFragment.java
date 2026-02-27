@@ -192,6 +192,7 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
                                 runOnUiThread(() -> clearUI());
                             } else {
                                 showResponse( response.body().getMsg());
+                                runOnUiThread(() -> clearUI());
                             }
                         }
                     }
