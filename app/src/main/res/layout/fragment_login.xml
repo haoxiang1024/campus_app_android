@@ -1,174 +1,191 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#F5F5F5"
     android:orientation="vertical">
 
-
-
+    <!-- 顶部logo -->
     <androidx.appcompat.widget.AppCompatImageView
         android:layout_width="120dp"
         android:layout_height="120dp"
         android:layout_gravity="center_horizontal"
+        android:layout_marginTop="24dp"
         app:srcCompat="@drawable/school_assistant" />
 
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="24dp"
-        android:orientation="vertical">
-
-
-        <com.xuexiang.xui.widget.layout.XUIFrameLayout
-            style="@style/XUILayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp">
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="start|center_vertical"
-                android:tint="?attr/colorAccent"
-                app:srcCompat="@drawable/ic_phone" />
-
-            <com.xuexiang.xui.widget.edittext.materialedittext.MaterialEditText
-                android:id="@+id/et_phone_number"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="36dp"
-                android:hint="@string/inputnum"
-                android:inputType="number"
-                app:met_clearButton="true"
-                app:met_errorMessage="@string/tip_phone_number_error"
-                app:met_floatingLabel="normal"
-                app:met_floatingLabelText="@string/title_phone_number"
-                app:met_hideUnderline="true"
-                app:met_maxCharacters="11"
-                app:met_regexp="@string/regex_phone_number" />
-
-
-        </com.xuexiang.xui.widget.layout.XUIFrameLayout>
-
-
-        <com.xuexiang.xui.widget.layout.XUIFrameLayout
-            android:id="@+id/fl_verify_code"
-            style="@style/XUILayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="36dp">
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="start|center_vertical"
-                android:tint="?attr/colorAccent"
-                app:srcCompat="@drawable/yanzhengma" />
-            <com.xuexiang.xui.widget.edittext.materialedittext.MaterialEditText
-                android:id="@+id/et_password"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="36dp"
-                android:hint="@string/please_input_pwd"
-                android:inputType="textPassword"
-                app:met_clearButton="true"
-                app:met_errorMessage="@string/tip_password_error"
-                app:met_floatingLabel="normal"
-                app:met_floatingLabelText="@string/please_input_pwd"
-                app:met_hideUnderline="true"
-                app:met_maxCharacters="18"
-                app:met_passWordButton="true"
-                app:met_regexp="@string/regex_password" />
-
-
-
-        </com.xuexiang.xui.widget.layout.XUIFrameLayout>
-
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp">
-
-            <com.xuexiang.xui.widget.alpha.XUIAlphaTextView
-                android:id="@+id/tv_reg"
-                style="@style/TextStyle.Explain"
-                android:layout_alignParentStart="true"
-                android:padding="5dp"
-                android:text="我要注册"
-                android:textColor="@color/xui_config_color_primary_text" />
-
-            <com.xuexiang.xui.widget.alpha.XUIAlphaTextView
-                android:id="@+id/tv_forget_password"
-                style="@style/TextStyle.Explain"
-                android:layout_alignParentEnd="true"
-                android:padding="5dp"
-                android:text="忘记密码"
-                android:textColor="@color/xui_config_color_primary_text" />
-
-        </RelativeLayout>
-
-    </LinearLayout>
-
-    <com.xuexiang.xui.widget.textview.supertextview.SuperButton
-        android:id="@+id/btn_login"
-        style="@style/SuperButton.Primary.Login"
-        android:layout_marginTop="25dp"
-        android:text="@string/title_login_register" />
-
-    <FrameLayout
+    <!-- 核心表单区域 - 增加下拉刷新+嵌套滚动，卡片化包装 -->
+    <com.scwang.smart.refresh.layout.SmartRefreshLayout
+        style="@style/PullDownStyle"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
+        <androidx.core.widget.NestedScrollView
+            style="@style/ScrollViewStyle"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_marginBottom="20dp"
-            android:gravity="center"
-            android:orientation="horizontal">
+            android:layout_height="match_parent">
 
-            <CheckBox
-                android:id="@+id/cb_protocol"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:scaleX="0.7"
-                android:scaleY="0.7" />
+                android:orientation="vertical"
+                android:padding="16dp">
 
-            <TextView
-                style="@style/TextStyle.Explain"
-                android:layout_width="wrap_content"
-                android:text="@string/agree_protocol"
-                android:textColor="@color/xui_config_color_primary_text" />
+                <!-- 表单卡片 -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardBackgroundColor="@android:color/white"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="1dp"
+                    app:cardUseCompatPadding="true">
 
-            <com.xuexiang.xui.widget.alpha.XUIAlphaTextView
-                android:id="@+id/tv_user_protocol"
-                style="@style/TextStyle.Explain"
-                android:layout_width="wrap_content"
-                android:text="@string/title_user_protocol"
-                android:textColor="?attr/colorAccent" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
 
-            <TextView
-                style="@style/TextStyle.Explain"
-                android:layout_width="wrap_content"
-                android:text="@string/lab_and"
-                android:textColor="@color/xui_config_color_primary_text" />
+                        <!-- 手机号输入框 -->
+                        <com.xuexiang.xui.widget.layout.XUIFrameLayout
+                            style="@style/XUILayout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
 
-            <com.xuexiang.xui.widget.alpha.XUIAlphaTextView
-                android:id="@+id/tv_privacy_protocol"
-                style="@style/TextStyle.Explain"
-                android:layout_width="wrap_content"
-                android:text="@string/title_privacy_protocol"
-                android:textColor="?attr/colorAccent" />
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="start|center_vertical"
+                                android:tint="?attr/colorAccent"
+                                app:srcCompat="@drawable/ic_phone" />
 
-        </LinearLayout>
+                            <com.xuexiang.xui.widget.edittext.materialedittext.MaterialEditText
+                                android:id="@+id/et_phone_number"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="36dp"
+                                android:hint="@string/inputnum"
+                                android:inputType="number"
+                                app:met_clearButton="true"
+                                app:met_errorMessage="@string/tip_phone_number_error"
+                                app:met_floatingLabel="normal"
+                                app:met_floatingLabelText="@string/title_phone_number"
+                                app:met_hideUnderline="true"
+                                app:met_maxCharacters="11"
+                                app:met_regexp="@string/regex_phone_number" />
+                        </com.xuexiang.xui.widget.layout.XUIFrameLayout>
 
-    </FrameLayout>
+                        <!-- 密码输入框 -->
+                        <com.xuexiang.xui.widget.layout.XUIFrameLayout
+                            android:id="@+id/fl_verify_code"
+                            style="@style/XUILayout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="36dp">
 
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="start|center_vertical"
+                                android:tint="?attr/colorAccent"
+                                app:srcCompat="@drawable/yanzhengma" />
+
+                            <com.xuexiang.xui.widget.edittext.materialedittext.MaterialEditText
+                                android:id="@+id/et_password"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="36dp"
+                                android:hint="@string/please_input_pwd"
+                                android:inputType="textPassword"
+                                app:met_clearButton="true"
+                                app:met_errorMessage="@string/tip_password_error"
+                                app:met_floatingLabel="normal"
+                                app:met_floatingLabelText="@string/please_input_pwd"
+                                app:met_hideUnderline="true"
+                                app:met_maxCharacters="18"
+                                app:met_passWordButton="true"
+                                app:met_regexp="@string/regex_password" />
+                        </com.xuexiang.xui.widget.layout.XUIFrameLayout>
+
+                        <!-- 注册/忘记密码 -->
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp">
+
+                            <com.xuexiang.xui.widget.alpha.XUIAlphaTextView
+                                android:id="@+id/tv_reg"
+                                style="@style/TextStyle.Explain"
+                                android:layout_alignParentStart="true"
+                                android:padding="5dp"
+                                android:text="我要注册"
+                                android:textColor="@color/xui_config_color_primary_text" />
+
+                            <com.xuexiang.xui.widget.alpha.XUIAlphaTextView
+                                android:id="@+id/tv_forget_password"
+                                style="@style/TextStyle.Explain"
+                                android:layout_alignParentEnd="true"
+                                android:padding="5dp"
+                                android:text="忘记密码"
+                                android:textColor="@color/xui_config_color_primary_text" />
+                        </RelativeLayout>
+
+                        <!-- 登录按钮 -->
+                        <com.xuexiang.xui.widget.textview.supertextview.SuperButton
+                            android:id="@+id/btn_login"
+                            style="@style/SuperButton.Primary.Login"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="25dp"
+                            android:text="@string/title_login_register" />
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- 协议勾选区域 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <CheckBox
+                        android:id="@+id/cb_protocol"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:scaleX="0.7"
+                        android:scaleY="0.7" />
+
+                    <TextView
+                        style="@style/TextStyle.Explain"
+                        android:layout_width="wrap_content"
+                        android:text="@string/agree_protocol"
+                        android:textColor="@color/xui_config_color_primary_text" />
+
+                    <com.xuexiang.xui.widget.alpha.XUIAlphaTextView
+                        android:id="@+id/tv_user_protocol"
+                        style="@style/TextStyle.Explain"
+                        android:layout_width="wrap_content"
+                        android:text="@string/title_user_protocol"
+                        android:textColor="?attr/colorAccent" />
+
+                    <TextView
+                        style="@style/TextStyle.Explain"
+                        android:layout_width="wrap_content"
+                        android:text="@string/lab_and"
+                        android:textColor="@color/xui_config_color_primary_text" />
+
+                    <com.xuexiang.xui.widget.alpha.XUIAlphaTextView
+                        android:id="@+id/tv_privacy_protocol"
+                        style="@style/TextStyle.Explain"
+                        android:layout_width="wrap_content"
+                        android:text="@string/title_privacy_protocol"
+                        android:textColor="?attr/colorAccent" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+    </com.scwang.smart.refresh.layout.SmartRefreshLayout>
 
 </LinearLayout>

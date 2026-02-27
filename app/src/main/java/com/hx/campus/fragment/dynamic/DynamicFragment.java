@@ -204,8 +204,15 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
 
     private SingleDelegateAdapter createBannerAdapter() {
         return new SingleDelegateAdapter(R.layout.include_head_view_banner) {
+
             @Override
             public void onBindViewHolder(@NonNull RecyclerViewHolder holder, int position) {
+                ViewGroup.LayoutParams layoutParams = holder.itemView.getLayoutParams();
+                if (layoutParams != null) {
+                    layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                    holder.itemView.setLayoutParams(layoutParams);
+                }
+
                 SimpleImageBanner banner = holder.findViewById(R.id.sib_simple_usage);
                 banner.setSource(DemoDataProvider.getBannerList())
                         .setOnItemClickListener((view, item, pos) -> {

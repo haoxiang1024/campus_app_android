@@ -3,49 +3,75 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/xui_config_color_background"
+    android:background="#F5F5F5"
     android:orientation="vertical">
 
-    <com.scwang.smart.refresh.layout.SmartRefreshLayout style="@style/PullDownStyle">
+    <com.scwang.smart.refresh.layout.SmartRefreshLayout
+        style="@style/PullDownStyle"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <androidx.core.widget.NestedScrollView style="@style/ScrollViewStyle">
+        <androidx.core.widget.NestedScrollView
+            style="@style/ScrollViewStyle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingTop="20dp">
+                android:padding="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/hot" />
+                    android:layout_marginStart="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="@string/hot"
+                    android:textColor="?android:textColorSecondary"
+                    android:textSize="14sp" />
 
-                <com.xuexiang.xui.widget.textview.supertextview.SuperTextView
-                    android:id="@+id/hot1"
-                    style="@style/InfoItem.hot"
-                    app:sLeftTextString="@string/crash" />
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="1dp"
+                    app:cardBackgroundColor="@android:color/white"
+                    app:cardUseCompatPadding="true">
 
-                <com.xuexiang.xui.widget.textview.supertextview.SuperTextView
-                    android:id="@+id/hot2"
-                    style="@style/InfoItem.hot"
-                    app:sLeftTextString="@string/ac_problem" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
 
-                <com.xuexiang.xui.widget.textview.supertextview.SuperTextView
-                    android:id="@+id/hot3"
-                    style="@style/InfoItem.hot"
-                    app:sLeftTextString="@string/how_protect" />
+                        <com.xuexiang.xui.widget.textview.supertextview.SuperTextView
+                            android:id="@+id/hot1"
+                            style="@style/InfoItem.hot"
+                            app:sLeftTextString="@string/crash" />
+
+                        <com.xuexiang.xui.widget.textview.supertextview.SuperTextView
+                            android:id="@+id/hot2"
+                            style="@style/InfoItem.hot"
+                            app:sLeftTextString="@string/ac_problem" />
+
+                        <com.xuexiang.xui.widget.textview.supertextview.SuperTextView
+                            android:id="@+id/hot3"
+                            style="@style/InfoItem.hot"
+                            app:sDividerLineType="none"
+                            app:sLeftTextString="@string/how_protect" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
 
                 <Button
                     android:id="@+id/su_btn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="140dp"
-                    android:layout_marginTop="420dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginHorizontal="20dp"
+                    android:layout_marginTop="40dp"
                     android:background="@drawable/button_bg"
-                    android:text="@string/suggestion" />
+                    android:text="@string/suggestion"
+                    android:textColor="#FFFFFF" />
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
     </com.scwang.smart.refresh.layout.SmartRefreshLayout>
-
 </LinearLayout>
