@@ -35,6 +35,8 @@ import retrofit2.Response;
 
 @Page
 public class AccountFragment extends BaseFragment<FragmentAccountBinding> implements View.OnClickListener {
+    ImageView imgView;//头像组件
+
 
     @NonNull
     @Override
@@ -45,6 +47,7 @@ public class AccountFragment extends BaseFragment<FragmentAccountBinding> implem
     @Override
     protected void initViews() {
         initData(); // 初始化账户数据
+        imgView = binding.rivHeadPic;
     }
 
     @Override
@@ -52,6 +55,7 @@ public class AccountFragment extends BaseFragment<FragmentAccountBinding> implem
         super.initListeners();
         binding.tvResetPwd.setOnClickListener(this); // 重置密码
         binding.btnSubmit.setOnClickListener(this); // 提交
+        imgView.setOnClickListener( this);
     }
 
     @SuppressLint({"ClickableViewAccessibility", "InflateParams"})
@@ -122,6 +126,9 @@ public class AccountFragment extends BaseFragment<FragmentAccountBinding> implem
             openNewPage(ResetPwdFragment.class);
         } else if (id == R.id.btn_submit) {
             update();
+        } else if (id == R.id.riv_head_pic) {
+            openNewPage(PhotoFragment.class);
+
         }
     }
 

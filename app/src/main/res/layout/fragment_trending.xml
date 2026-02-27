@@ -3,28 +3,50 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/xui_config_color_background"
+    android:background="#F5F5F5"
     android:orientation="vertical">
+    <com.scwang.smart.refresh.layout.SmartRefreshLayout
+        style="@style/PullDownStyle"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <com.scwang.smart.refresh.layout.SmartRefreshLayout style="@style/PullDownStyle">
-
-        <androidx.core.widget.NestedScrollView style="@style/ScrollViewStyle">
+        <androidx.core.widget.NestedScrollView
+            style="@style/ScrollViewStyle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:paddingTop="20dp">
+                android:padding="16dp">
 
-                <com.xuexiang.xui.widget.textview.supertextview.SuperTextView
-                    android:id="@+id/lost"
-                    style="@style/InfoItem.Account"
-                    app:sLeftTextString="@string/lost_info" />
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="1dp"
+                    app:cardBackgroundColor="@android:color/white"
+                    app:cardUseCompatPadding="true">
 
-                <com.xuexiang.xui.widget.textview.supertextview.SuperTextView
-                    android:id="@+id/found"
-                    style="@style/InfoItem.Account"
-                    app:sLeftTextString="@string/found_info" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <com.xuexiang.xui.widget.textview.supertextview.SuperTextView
+                            android:id="@+id/lost"
+                            style="@style/InfoItem.Account"
+                            app:sLeftTextString="@string/lost_info" />
+
+                        <com.xuexiang.xui.widget.textview.supertextview.SuperTextView
+                            android:id="@+id/found"
+                            style="@style/InfoItem.Account"
+                            app:sDividerLineType="none"
+                            app:sLeftTextString="@string/found_info" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
     </com.scwang.smart.refresh.layout.SmartRefreshLayout>
