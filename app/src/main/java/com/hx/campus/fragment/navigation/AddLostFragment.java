@@ -125,9 +125,8 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
 
             showLoadingDialog();
             User user = Utils.getBeanFromSp(getContext(), "User", "user");
-
             Date date = new Date();
-            String state = "寻找中";
+            String state = "待审核";
             int stick = 0;
             Integer userId = user.getId();
             String phone = user.getPhone();
@@ -138,7 +137,6 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
 
             LostFound lostFound = new LostFound(lostTitleEditValue, "", date, contentEditValue, locationEditValue, phone, state, stick, id, userId);
             lostFound.setType("失物");
-
             lostJson = JSON.toJSONString(lostFound);
 
             if (file == null) {
@@ -189,11 +187,11 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
                     public void onResponse(Call<Result<String>> call, Response<Result<String>> response) {
                         hideLoadingDialog();
                         if (response.isSuccessful() && response.body() != null) {
-                            if (response.body().isSuccess()) {
-                                showResponse(Utils.getString(getContext(), R.string.send_su));
+                            if (response.body().getStatus() == 0) {
+                                showResponse(response.body().getMsg());
                                 runOnUiThread(() -> clearUI());
                             } else {
-                                showResponse("提交失败：" + response.body().getMsg());
+                                showResponse( response.body().getMsg());
                             }
                         }
                     }
@@ -201,7 +199,6 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
                     @Override
                     public void onFailure(Call<Result<String>> call, Throwable t) {
                         hideLoadingDialog();
-                        Log.e("AddLost", "网络异常", t);
                         showResponse("网络异常，请稍后再试");
                     }
                 });

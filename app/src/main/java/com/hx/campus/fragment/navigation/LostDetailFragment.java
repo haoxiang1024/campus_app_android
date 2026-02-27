@@ -247,7 +247,7 @@ public class LostDetailFragment extends BaseFragment<FragmentLostDetailBinding> 
                         // 重新加载评论列表刷新 UI
                         loadComments();
                     } else {
-                        Utils.showResponse("评论发布失败");
+                        Utils.showResponse(response.body().getMsg());
                     }
                 }
             }
