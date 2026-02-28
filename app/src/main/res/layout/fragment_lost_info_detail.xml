@@ -261,6 +261,14 @@
                 android:textColor="#333333"
                 android:textColorHint="#999999"
                 android:textSize="14sp" />
+            <ImageView
+                android:id="@+id/btn_emoji"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="12dp"
+                android:gravity="center"
+                android:src="@drawable/emoji"
+                android:textSize="22sp" />
 
             <Button
                 android:id="@+id/btn_send_comment"

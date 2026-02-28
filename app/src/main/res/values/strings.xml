@@ -185,6 +185,7 @@
     <string name="chat">私信</string>
     <string name="update_state">更新状态</string>
     <string name="type">选择分类</string>
+    <string name="send">发送</string>
 
 
 </resources>

@@ -180,19 +180,22 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements
                         TokenUtils.setToken(RandomUtils.getRandomLetters(6));
                         fetchIMTokenAndConnect(user);
                     } else {
+                        hideLoadingDialog();
                         Utils.showResponse(result.getMsg());
                     }
                 } else {
+                    hideLoadingDialog();
                     Utils.showResponse("服务器响应为空");
                 }
             }
 
             @Override
             public void onFailure(retrofit2.Call<Result<User>> call, Throwable t) {
-                Log.e("LOGIN_ERROR", "失败详情: ", t);
+                hideLoadingDialog();
                 Utils.showResponse("网络请求失败");
             }
         });
+
     }
     /**
      * 获取 IM Token 并根据本地状态选择连接方式

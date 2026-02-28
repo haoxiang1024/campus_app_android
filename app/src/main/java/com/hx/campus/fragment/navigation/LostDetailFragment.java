@@ -206,6 +206,7 @@ public class LostDetailFragment extends BaseFragment<FragmentLostDetailBinding> 
         binding.btnSendComment.setOnClickListener(v -> {
             String content = binding.etCommentInput.getText().toString().trim();
             if (TextUtils.isEmpty(content)) {
+                Utils.showResponse("评论内容不能为空");
                 return;
             }
 

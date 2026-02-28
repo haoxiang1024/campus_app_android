@@ -3,18 +3,24 @@ package com.hx.campus.fragment.message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.hx.campus.R;
+import com.hx.campus.adapter.entity.Comment;
+import com.hx.campus.adapter.entity.LostFound;
+import com.hx.campus.adapter.entity.User;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.databinding.LayoutCommonListBinding;
+import com.hx.campus.fragment.navigation.FoundDetailFragment;
+import com.hx.campus.fragment.navigation.LostDetailFragment;
+import com.hx.campus.utils.Utils;
+import com.hx.campus.utils.api.Result;
 import com.hx.campus.utils.api.RetrofitClient;
 import com.xuexiang.xpage.annotation.Page;
 import com.xuexiang.xui.adapter.recyclerview.RecyclerViewHolder;
-import com.xuexiang.xui.adapter.simple.XUISimpleAdapter;
-import com.xuexiang.xui.adapter.simple.XUISimpleAdapter;
 import com.xuexiang.xui.adapter.recyclerview.BaseRecyclerAdapter;
 import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog;
 import com.xuexiang.xui.utils.WidgetUtils;
@@ -22,19 +28,16 @@ import com.xuexiang.xui.utils.WidgetUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 @Page(name = "我的评论")
 public class MyCommentsFragment extends BaseFragment<LayoutCommonListBinding> {
 
-    public static class CommentEntity {
-        public String id;
-        public String postTitle;
-        public String content;
-        public String time;
-        public boolean isLostPost; // 标记是失物贴还是招领贴
-    }
-
-    private BaseRecyclerAdapter<CommentEntity> mAdapter;
-    private List<CommentEntity> mDataList = new ArrayList<>();
+    private BaseRecyclerAdapter<Comment> mAdapter;
+    private List<Comment> mDataList = new ArrayList<>();
+    private User user;
 
     @NonNull
     @Override
@@ -46,20 +49,27 @@ public class MyCommentsFragment extends BaseFragment<LayoutCommonListBinding> {
     protected void initViews() {
         // 设置 RecyclerView 布局管理器
         WidgetUtils.initRecyclerView(binding.recyclerView);
-
+        user = Utils.getBeanFromSp(getContext(), "User", "user");
+        binding.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         // 初始化适配器
-        mAdapter = new BaseRecyclerAdapter<CommentEntity>(mDataList) {
+        mAdapter = new BaseRecyclerAdapter<Comment>(mDataList) {
             @Override
             protected int getItemLayoutId(int viewType) {
-                // 这里绑定单条评论的 XML 布局（需要在 res/layout 创建，代码见第4步）
                 return R.layout.adapter_my_comment_item;
             }
 
             @Override
-            protected void bindData(@NonNull RecyclerViewHolder holder, int position, CommentEntity item) {
-                holder.text(R.id.tv_post_title, "回复帖子: " + item.postTitle);
-                holder.text(R.id.tv_comment_content, item.content);
-                holder.text(R.id.tv_time, item.time);
+            protected void bindData(@NonNull RecyclerViewHolder holder, int position, Comment item) {
+                if (user != null) {
+                    holder.text(R.id.tv_nickname, user.getNickname() != null ? user.getNickname() : "校友");
+                    com.bumptech.glide.Glide.with(getContext())
+                            .load(user.getPhoto())
+                            .placeholder(R.drawable.default_avatar) // 默认占位图
+                            .circleCrop()
+                            .into((android.widget.ImageView) holder.findViewById(R.id.iv_avatar));
+                }
+                holder.text(R.id.tv_comment_content, item.getContent() != null ? item.getContent() : "");
+                holder.text(R.id.tv_time, item.getCreate_time() != null ? Utils.formatCommentTime(String.valueOf(item.getCreate_time())) : "");
             }
         };
 
@@ -73,12 +83,7 @@ public class MyCommentsFragment extends BaseFragment<LayoutCommonListBinding> {
     protected void initListeners() {
         mAdapter.setOnItemClickListener((itemView, item, position) -> {
             // TODO: 构建传参用的实体对象，跳转到详情页
-            // 示例伪代码：
-            // if (item.isLostPost) {
-            //     openNewPage(LostDetailFragment.class, "key", item.id);
-            // } else {
-            //     openNewPage(FoundDetailFragment.class, "key", item.id);
-            // }
+            jumpDetail(item);
         });
 
         // 【长按】删除该评论
@@ -89,20 +94,109 @@ public class MyCommentsFragment extends BaseFragment<LayoutCommonListBinding> {
                     .positiveText("确定")
                     .negativeText("取消")
                     .onPositive((dialog, which) -> {
-                        // deleteCommentApi(item.id);
-                        //mAdapter.remove(position);
+                        // 调用删除接口
+                        deleteCommentApi(item.getId(), position);
                         checkEmptyState(); // 重新检查空状态
                     })
                     .show();
-            
         });
     }
 
-    private void loadData() {
-        mDataList.clear();
+    private void jumpDetail(Comment comment) {
+        if (comment== null){
+            return;
+        }
+    RetrofitClient.getInstance().getApi().getLostFoundById(comment.getLostfound_id()).enqueue(new Callback<Result<LostFound>>() {
+        @Override
+        public void onResponse(Call<Result<LostFound>> call, Response<Result<LostFound>> response) {
+            if (response.isSuccessful() && response.body() != null){
+                LostFound lostFound=response.body().getData();
+                if (lostFound.getType().equals("失物")){
+                    openNewPage(LostDetailFragment.class, LostDetailFragment.KEY_LOST, lostFound);
+                }else {
+                    openNewPage(FoundDetailFragment.class, FoundDetailFragment.KEY_FOUND, lostFound);
+                }
+            }
+        }
 
+        @Override
+        public void onFailure(Call<Result<LostFound>> call, Throwable t) {
+            Utils.showResponse("网络异常");
+        }
+    });
+
+    }
+
+    private void loadData() {
+        // 清空原有数据并刷新（避免数据残留）
+        mDataList.clear();
         mAdapter.refresh(mDataList);
         checkEmptyState();
+        if (user == null || user.getId() == null) {
+            Utils.showResponse("用户数据为空");
+            return;
+        }
+
+        // 网络请求加载评论
+        RetrofitClient.getInstance().getApi().getCommentsByUserId(user.getId()).enqueue(new Callback<Result<List<Comment>>>() {
+            @Override
+            public void onResponse(Call<Result<List<Comment>>> call, Response<Result<List<Comment>>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Comment> newData = response.body().getData();
+                    if (newData != null && !newData.isEmpty()) {
+                        mDataList.addAll(newData);
+                        mAdapter.refresh(mDataList); // 刷新适配器
+                    } else {
+                        Utils.showResponse("暂无评论");
+                    }
+                } else {
+                    Utils.showResponse("请求失败");
+                }
+                checkEmptyState();
+            }
+
+            @Override
+            public void onFailure(Call<Result<List<Comment>>> call, Throwable t) {
+                Utils.showResponse("网络请求失败");
+                t.printStackTrace(); // 打印异常日志，方便调试
+                checkEmptyState();
+            }
+        });
+    }
+
+    /**
+     * 删除评论接口调用
+     * @param commentId 评论ID
+     * @param position 列表位置
+     */
+    private void deleteCommentApi(Integer commentId, int position) {
+        if (commentId == null) {
+            Utils.showResponse("出错了");
+            return;
+        }
+        // 调用删除接口
+        RetrofitClient.getInstance().getApi().deleteComment(commentId).enqueue(new Callback<Result<String>>() {
+            @Override
+            public void onResponse(Call<Result<String>> call, Response<Result<String>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    // 删除成功，更新列表
+                    mDataList.remove(position);
+                    mAdapter.refresh(mDataList);
+                    Utils.showResponse("删除成功");
+                } else {
+                    Utils.showResponse("删除失败");
+                }
+                checkEmptyState();
+            }
+
+            @Override
+            public void onFailure(Call<Result<String>> call, Throwable t) {
+                Utils.showResponse("网络请求失败");
+
+            }
+
+
+        });
     }
 
     /**
