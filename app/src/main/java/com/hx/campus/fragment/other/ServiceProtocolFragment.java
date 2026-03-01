@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 import com.hx.campus.R;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.databinding.FragmentServiceProtocolBinding;
-import com.xuexiang.xaop.annotation.MemoryCache;
 import com.xuexiang.xpage.annotation.Page;
 import com.xuexiang.xrouter.annotation.AutoWired;
 import com.xuexiang.xrouter.launcher.XRouter;
@@ -66,12 +65,10 @@ public class ServiceProtocolFragment extends BaseFragment<FragmentServiceProtoco
         }
     }
 
-    @MemoryCache("account_protocol")
     private String getAccountProtocol() {
         return ResourceUtils.readStringFromAssert(ACCOUNT_PROTOCOL_ASSET_PATH);
     }
 
-    @MemoryCache("privacy_protocol")
     private String getPrivacyProtocol() {
         return ResourceUtils.readStringFromAssert(PRIVACY_PROTOCOL_ASSET_PATH);
     }

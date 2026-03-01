@@ -1,6 +1,5 @@
 package com.hx.campus.fragment.look;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,9 +8,9 @@ import android.widget.AdapterView;
 import androidx.annotation.NonNull;
 
 import com.hx.campus.R;
-import com.hx.campus.adapter.lostfound.LostFoundDetailAdapter;
 import com.hx.campus.adapter.entity.LostFound;
 import com.hx.campus.adapter.entity.User;
+import com.hx.campus.adapter.lostfound.LostFoundDetailAdapter;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.databinding.FragmentFoundInfoBinding;
 import com.hx.campus.utils.Utils;

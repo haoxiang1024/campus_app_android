@@ -1,6 +1,5 @@
 package com.hx.campus.fragment.dynamic;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 

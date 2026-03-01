@@ -1,13 +1,11 @@
 package com.hx.campus.utils.common;
 
 
-
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 
 import com.hx.campus.R;
 import com.hx.campus.adapter.entity.NewInfo;
-import com.xuexiang.xaop.annotation.MemoryCache;
 import com.xuexiang.xui.adapter.simple.AdapterItem;
 import com.xuexiang.xui.utils.ResUtils;
 import com.xuexiang.xui.widget.banner.widget.banner.BannerItem;
@@ -41,7 +39,7 @@ public class DemoDataProvider {
             "https://demons.yirendai.com/introductionPages/image/privacy-icon.png",//隐私
     };
 
-    @MemoryCache
+
     public static List<BannerItem> getBannerList() {
         List<BannerItem> list = new ArrayList<>();
         for (int i = 0; i < urls.length; i++) {
@@ -58,7 +56,7 @@ public class DemoDataProvider {
      *
      * @return
      */
-    @MemoryCache
+    
     public static List<NewInfo> getDemoNewInfos() {
         //定义一个空列表，用于存储解析出来的新闻对象
         final List<NewInfo> list = new ArrayList<>();
@@ -115,7 +113,7 @@ public class DemoDataProvider {
      *
      * @return
      */
-    @MemoryCache
+    
     public static List<NewInfo> getEmptyNewInfo() {
         List<NewInfo> list = new ArrayList<>();
         for (int i = 0; i < 5; i++) {

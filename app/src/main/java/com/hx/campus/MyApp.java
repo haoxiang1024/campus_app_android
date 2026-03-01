@@ -17,7 +17,6 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
-import android.util.Log;
 
 import androidx.multidex.MultiDex;
 
@@ -29,21 +28,17 @@ import com.hx.campus.utils.sdkinit.ANRWatchDogInit;
 import com.hx.campus.utils.sdkinit.UMengInit;
 import com.hx.campus.utils.sdkinit.XBasicLibInit;
 import com.hx.campus.utils.sdkinit.XUpdateInit;
+import com.xuexiang.xui.BuildConfig;
 
-import io.rong.imkit.IMCenter;
 import io.rong.imkit.RongIM;
 import io.rong.imkit.config.RongConfigCenter;
 import io.rong.imkit.notification.NotificationConfig;
 import io.rong.imkit.userinfo.RongUserInfoManager;
-import io.rong.imkit.userinfo.UserDataProvider;
 import io.rong.imkit.utils.RouteUtils;
-import io.rong.imlib.model.InitOption;
 import io.rong.imlib.model.UserInfo;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
-import com.xuexiang.xui.BuildConfig;
 
 /**
  * 应用程序主类，继承自Application

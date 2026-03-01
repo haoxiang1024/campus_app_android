@@ -54,7 +54,6 @@ import com.just.agentweb.download.DefaultDownloadImpl;
 import com.just.agentweb.download.DownloadListenerAdapter;
 import com.just.agentweb.download.DownloadingService;
 import com.just.agentweb.widget.IWebLayout;
-import com.xuexiang.xaop.annotation.SingleClick;
 import com.xuexiang.xpage.annotation.Page;
 import com.xuexiang.xpage.base.XPageActivity;
 import com.xuexiang.xpage.base.XPageFragment;
@@ -429,7 +428,7 @@ public class XPageWebViewFragment extends BaseFragment<FragmentAgentwebBinding> 
         binding.includeTitle.viewLine.setVisibility(tag);
     }
 
-    @SingleClick
+
     @Override
     public void onClick(View view) {
         int id = view.getId();

@@ -5,7 +5,6 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.hx.campus.fragment.navigation.FoundListSubFragment;
-import com.hx.campus.fragment.navigation.LostListSubFragment;
 
 /**
  * 招领物品ViewPager适配器

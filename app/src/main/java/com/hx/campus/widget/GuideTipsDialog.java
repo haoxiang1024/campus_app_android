@@ -15,7 +15,6 @@ import com.hx.campus.core.http.callback.NoTipCallBack;
 import com.hx.campus.core.http.entity.TipInfo;
 import com.hx.campus.utils.common.MMKVUtils;
 import com.xuexiang.constant.TimeConstants;
-import com.xuexiang.xaop.annotation.SingleClick;
 import com.xuexiang.xhttp2.XHttp;
 import com.xuexiang.xhttp2.cache.model.CacheMode;
 import com.xuexiang.xhttp2.request.CustomRequest;
@@ -156,7 +155,7 @@ public class GuideTipsDialog extends BaseDialog implements View.OnClickListener,
                 .into(mTvContent);
     }
 
-    @SingleClick(300)
+
     @Override
     public void onClick(View view) {
         int id = view.getId();

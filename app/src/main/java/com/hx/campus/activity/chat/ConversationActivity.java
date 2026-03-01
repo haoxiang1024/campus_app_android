@@ -9,16 +9,11 @@
  */
 package com.hx.campus.activity.chat;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,11 +21,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.hx.campus.R;
 import com.xuexiang.xui.widget.actionbar.TitleBar;
 
-import java.util.Objects;
-
 import io.rong.imkit.conversation.ConversationFragment;
 import io.rong.imkit.userinfo.RongUserInfoManager;
-import io.rong.imkit.userinfo.UserDataProvider;
 import io.rong.imkit.userinfo.model.GroupUserInfo;
 import io.rong.imlib.model.Group;
 import io.rong.imlib.model.UserInfo;

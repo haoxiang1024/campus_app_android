@@ -26,7 +26,6 @@ import com.hx.campus.utils.common.ResponseMsg;
 import com.hx.campus.utils.common.SettingUtils;
 import com.hx.campus.utils.common.TokenUtils;
 import com.hx.campus.utils.sdkinit.UMengInit;
-import com.xuexiang.xaop.annotation.SingleClick;
 import com.xuexiang.xpage.annotation.Page;
 import com.xuexiang.xpage.enums.CoreAnim;
 import com.xuexiang.xui.utils.ThemeUtils;
@@ -113,7 +112,6 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements
 
     //控件点击事件
     @SuppressLint("NonConstantResourceId")
-    @SingleClick
     @Override
     public void onClick(View v) {
         int id = v.getId();

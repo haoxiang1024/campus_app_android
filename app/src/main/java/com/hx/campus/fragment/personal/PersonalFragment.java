@@ -18,7 +18,6 @@ import com.hx.campus.databinding.FragmentProfileBinding;
 import com.hx.campus.fragment.other.AboutFragment;
 import com.hx.campus.fragment.settings.SettingsFragment;
 import com.hx.campus.utils.Utils;
-import com.xuexiang.xaop.annotation.SingleClick;
 import com.xuexiang.xpage.annotation.Page;
 import com.xuexiang.xpage.enums.CoreAnim;
 import com.xuexiang.xui.widget.actionbar.TitleBar;
@@ -116,7 +115,7 @@ public class PersonalFragment extends BaseFragment<FragmentProfileBinding> imple
      * @param view 被点击的SuperTextView控件
      */
     @SuppressLint("NonConstantResourceId")
-    @SingleClick
+ 
     @Override
     public void onClick(SuperTextView view) {
         // 获取被点击控件的ID

@@ -10,7 +10,6 @@ import androidx.annotation.NonNull;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.databinding.FragmentTrendingBinding;
 import com.hx.campus.fragment.message.MyCommentsFragment;
-import com.xuexiang.xaop.annotation.SingleClick;
 import com.xuexiang.xpage.annotation.Page;
 import com.xuexiang.xpage.enums.CoreAnim;
 import com.xuexiang.xui.widget.actionbar.TitleBar;
@@ -75,7 +74,6 @@ public class LookFragment extends BaseFragment<FragmentTrendingBinding> implemen
      * @param view 被点击的SuperTextView控件
      */
     @SuppressLint("NonConstantResourceId")
-    @SingleClick
     @Override
     public void onClick(SuperTextView view) {
         // 判断点击的是失物按钮

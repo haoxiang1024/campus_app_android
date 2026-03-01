@@ -1,6 +1,5 @@
 package com.hx.campus.adapter.entity;
 
-import java.util.Date;
 /**
  * 互动消息实体类
  * 用于表示用户间的互动评论消息

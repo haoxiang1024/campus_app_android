@@ -3,8 +3,6 @@ package com.hx.campus.fragment.navigation;
 import static com.xuexiang.xutil.XUtil.runOnUiThread;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.text.TextUtils;
@@ -226,21 +224,12 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
     private void showMatchDialog(List<LostFound> matchList, String msg) {
         List<String> displayItems = new ArrayList<>();
         for (LostFound item : matchList) {
-            // 招领用绿色，寻物用橙色/红色
-            String typeColor = "招领".equals(item.getType()) ? "#4CAF50" : "#FF9800";
-            // 使用 HTML 拼装：加粗标题，地点换行并变成灰色小字
-            String htmlText = String.format(
-                    "<font color='%s'><b>[%s]</b></font> <b>%s</b> <br>" +
-                            "<small><font color='#757575'>📍 丢失/拾取地点: %s</font></small>",
-                    typeColor, item.getType(), item.getTitle(), item.getPlace()
-            );
-
-            // 兼容不同 Android 版本的 Html 解析
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                displayItems.add(String.valueOf(android.text.Html.fromHtml(htmlText, android.text.Html.FROM_HTML_MODE_COMPACT)));
-            } else {
-                displayItems.add(String.valueOf(android.text.Html.fromHtml(htmlText)));
-            }        }
+            // 根据类型分配不同的 Emoji
+            String typeIcon = "招领".equals(item.getType()) ? "🎁" : "🔍";
+            // 优化排版：图标 [类型] 标题 | 📍地点
+            String formattedText = String.format("%s [%s] %s    📍 %s",
+                    typeIcon, item.getType(), item.getTitle(), item.getPlace());
+            displayItems.add(formattedText);        }
         new MaterialDialog.Builder(getContext())
                 .title("🤖 智能匹配助手")
                 .content("发布成功！系统为您匹配到了以下疑似物品，点击即可查看详情：")

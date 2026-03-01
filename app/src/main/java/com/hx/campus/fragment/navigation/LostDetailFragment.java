@@ -1,10 +1,8 @@
 package com.hx.campus.fragment.navigation;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,11 +18,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
 import com.hx.campus.R;
-import com.hx.campus.activity.chat.ConversationActivity;
 import com.hx.campus.adapter.comment.CommentAdapter;
 import com.hx.campus.adapter.entity.Comment;
 import com.hx.campus.adapter.entity.LostFound;
-
 import com.hx.campus.adapter.entity.User;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.databinding.FragmentLostDetailBinding;
@@ -32,10 +28,6 @@ import com.hx.campus.utils.Utils;
 import com.hx.campus.utils.api.Result;
 import com.hx.campus.utils.api.RetrofitClient;
 import com.xuexiang.xpage.annotation.Page;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
 

@@ -16,8 +16,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 
 import com.hx.campus.R;
-import com.hx.campus.adapter.lostfound.SearchInfoAdapter;
 import com.hx.campus.adapter.entity.SearchInfo;
+import com.hx.campus.adapter.lostfound.SearchInfoAdapter;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.databinding.FragmentSearchBinding;
 import com.hx.campus.utils.Utils;

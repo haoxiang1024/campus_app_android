@@ -6,7 +6,6 @@ import android.app.Application;
 import com.hx.campus.MyApp;
 import com.hx.campus.core.BaseActivity;
 import com.hx.campus.utils.common.TokenUtils;
-import com.xuexiang.xaop.XAOP;
 import com.xuexiang.xhttp2.XHttpSDK;
 import com.xuexiang.xpage.PageConfig;
 import com.xuexiang.xrouter.launcher.XRouter;
@@ -36,7 +35,7 @@ public final class XBasicLibInit {
         initXPage(application);
 
         //切片框架
-        initXAOP(application);
+        //initXAOP(application);
 
         //UI框架
         initXUI(application);
@@ -86,12 +85,12 @@ public final class XBasicLibInit {
     /**
      * 初始化XAOP
      */
-    private static void initXAOP(Application application) {
-        XAOP.init(application);
-        XAOP.debug(MyApp.isDebug());
-        //设置动态申请权限切片 申请权限被拒绝的事件响应监听
-        XAOP.setOnPermissionDeniedListener(permissionsDenied -> XToastUtils.error("权限申请被拒绝:" + StringUtils.listToString(permissionsDenied, ",")));
-    }
+//    private static void initXAOP(Application application) {
+//        XAOP.init(application);
+//        XAOP.debug(MyApp.isDebug());
+//        //设置动态申请权限切片 申请权限被拒绝的事件响应监听
+//        XAOP.setOnPermissionDeniedListener(permissionsDenied -> XToastUtils.error("权限申请被拒绝:" + StringUtils.listToString(permissionsDenied, ",")));
+//    }
 
     /**
      * 初始化XUI框架

@@ -12,7 +12,6 @@ import android.widget.AdapterView;
 import androidx.annotation.NonNull;
 
 import com.umeng.analytics.MobclickAgent;
-import com.xuexiang.xaop.annotation.SingleClick;
 import com.xuexiang.xpage.base.XPageContainerListFragment;
 import com.xuexiang.xui.widget.actionbar.TitleBar;
 import com.xuexiang.xui.widget.actionbar.TitleUtils;
@@ -63,7 +62,7 @@ public abstract class BaseContainerFragment extends XPageContainerListFragment {
         onItemClick(view, position);
     }
 
-    @SingleClick
+
     private void onItemClick(View view, int position) {
         onItemClick(position);
     }

@@ -12,7 +12,6 @@ package com.hx.campus.adapter.comment;
 import android.content.Context;
 import android.text.Html;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.Gravity;
 import android.view.LayoutInflater;

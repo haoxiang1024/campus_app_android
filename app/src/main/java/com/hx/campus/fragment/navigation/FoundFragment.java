@@ -1,7 +1,6 @@
 package com.hx.campus.fragment.navigation;
 
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;

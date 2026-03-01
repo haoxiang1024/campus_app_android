@@ -1,4 +1,4 @@
-apply plugin: 'com.xuexiang.xaop' //引用XAOP插件
+//apply plugin: 'com.xuexiang.xaop' //引用XAOP插件
 apply plugin: 'com.xuexiang.xrouter' //引用XRouter-plugin插件实现自动注册
 
 //自动添加依赖
@@ -15,7 +15,7 @@ configurations.each { configuration ->
         //XUtil工具类
         configuration.dependencies.add(dependencies.create(deps.xlibrary.xutil_core))
         //XAOP切片
-        configuration.dependencies.add(dependencies.create(deps.xlibrary.xaop_runtime))
+//        configuration.dependencies.add(dependencies.create(deps.xlibrary.xaop_runtime))
         //XUpdate版本更新
         configuration.dependencies.add(dependencies.create(deps.xlibrary.xupdate))
         //XHttp2

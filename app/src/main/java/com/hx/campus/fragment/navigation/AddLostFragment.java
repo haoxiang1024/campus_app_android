@@ -6,7 +6,6 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +24,6 @@ import com.hx.campus.adapter.entity.LostFoundType;
 import com.hx.campus.adapter.entity.User;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.databinding.FragmentAddLostBinding;
-import com.hx.campus.fragment.look.FoundInfoDetailFragment;
 import com.hx.campus.utils.Utils;
 import com.hx.campus.utils.api.Result;
 import com.hx.campus.utils.api.RetrofitClient;
@@ -228,7 +226,7 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
 // 根据类型分配不同的 Emoji
             String typeIcon = "招领".equals(item.getType()) ? "🎁" : "🔍";
             // 优化排版：图标 [类型] 标题 | 📍地点
-            String formattedText = String.format("%s [%s] %s  |  📍 %s",
+            String formattedText = String.format("%s [%s] %s    📍 %s",
                     typeIcon, item.getType(), item.getTitle(), item.getPlace());
             displayItems.add(formattedText);        }
         new MaterialDialog.Builder(getContext())

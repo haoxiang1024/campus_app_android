@@ -2,13 +2,7 @@
 
 package com.hx.campus.activity;
 
-import android.Manifest;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.content.Context;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -46,7 +40,6 @@ import com.hx.campus.fragment.settings.SettingsFragment;
 import com.hx.campus.utils.Utils;
 import com.hx.campus.utils.common.TokenUtils;
 import com.hx.campus.utils.sdkinit.XUpdateInit;
-import com.xuexiang.xaop.annotation.SingleClick;
 import com.xuexiang.xui.adapter.FragmentAdapter;
 import com.xuexiang.xui.utils.ResUtils;
 import com.xuexiang.xui.utils.ThemeUtils;
@@ -59,11 +52,7 @@ import com.xuexiang.xutil.common.CollectionUtils;
 import com.xuexiang.xutil.display.Colors;
 
 import io.rong.imkit.IMCenter;
-import io.rong.imkit.config.RongConfigCenter;
-import io.rong.imkit.notification.NotificationConfig;
-import io.rong.imkit.userinfo.RongUserInfoManager;
 import io.rong.imlib.RongIMClient;
-import io.rong.imlib.model.UserInfo;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> implements View.OnClickListener, BottomNavigationView.OnNavigationItemSelectedListener, ClickUtils.OnClick2ExitListener, Toolbar.OnMenuItemClickListener {
 
@@ -293,7 +282,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
         return false;
     }
 
-    @SingleClick
+
     @Override
     public void onClick(View v) {
         int id = v.getId();
