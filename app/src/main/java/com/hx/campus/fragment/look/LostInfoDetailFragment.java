@@ -1,6 +1,7 @@
 package com.hx.campus.fragment.look;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.text.TextUtils;
@@ -10,11 +11,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 import android.widget.GridLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
@@ -46,10 +49,10 @@ public class LostInfoDetailFragment extends BaseFragment<FragmentLostInfoDetailB
     private CommentAdapter commentAdapter;
     private int currentParentId = 0;      // 0 代表直接评论失物招领帖子
     private int currentReplyUserId = 0;   // 0 代表没有回复特定的人
+
     @Override
     protected void initArgs() {
         super.initArgs();
-       // XRouter.getInstance().inject(this);
         if (getArguments() != null) {
             lost = (LostFound) getArguments().getSerializable(KEY_LOST);
         }
@@ -62,7 +65,7 @@ public class LostInfoDetailFragment extends BaseFragment<FragmentLostInfoDetailB
 
     @NonNull
     @Override
-    protected FragmentLostInfoDetailBinding viewBindingInflate(@NonNull LayoutInflater inflater, ViewGroup container, boolean attachToRoot)  {
+    protected FragmentLostInfoDetailBinding viewBindingInflate(@NonNull LayoutInflater inflater, ViewGroup container, boolean attachToRoot) {
         return FragmentLostInfoDetailBinding.inflate(inflater, container, attachToRoot);
     }
 
@@ -70,18 +73,67 @@ public class LostInfoDetailFragment extends BaseFragment<FragmentLostInfoDetailB
     protected void initViews() {
         if (lost != null) {
             setViews();
+            // 初始化Spinner监听器
+            initSpinnerListener();
+            // 初始化时同步按钮状态
+            updateSubmitBtnStatus(binding.state.getSelectedItem().toString());
+
             if (binding.sumbitBtn != null) {
                 binding.sumbitBtn.setOnClickListener(v -> {
                     String selected = binding.state.getSelectedItem().toString();
                     submitState(selected);
                 });
             }
-        }else {
+        } else {
             Log.e("Check", "错误：lost 数据为空");
         }
         initCommentList();  // 初始化评论列表
         initCommentEvent(); // 初始化发送评论事件
         initEmojiPanel();
+    }
+
+    /**
+     * 初始化Spinner选中状态监听器
+     */
+    private void initSpinnerListener() {
+        binding.state.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // 获取选中的状态文本
+                String selectedState = parent.getItemAtPosition(position).toString();
+                // 更新按钮状态
+                updateSubmitBtnStatus(selectedState);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // 未选中任何项时，默认禁用按钮
+                if (binding.sumbitBtn != null) {
+                    binding.sumbitBtn.setEnabled(false);
+                    binding.sumbitBtn.setBackgroundColor(Color.parseColor("#CCCCCC")); // 置灰背景
+                }
+            }
+        });
+    }
+
+    /**
+     * 根据选中状态更新按钮可用状态
+     * @param selectedState 选中的状态文本
+     */
+    private void updateSubmitBtnStatus(String selectedState) {
+        if (binding.sumbitBtn == null) return;
+
+        boolean isDisabled = "待审核".equals(selectedState) || "已驳回".equals(selectedState);
+
+        // 设置按钮可用状态
+        binding.sumbitBtn.setEnabled(!isDisabled);
+
+        // 视觉区分：设置按钮背景色
+        if (isDisabled) {
+            binding.sumbitBtn.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#CCCCCC")));        } else {
+            int primaryColor = ContextCompat.getColor(requireContext(), R.color.colorPrimary);
+            binding.sumbitBtn.setBackgroundTintList(ColorStateList.valueOf(primaryColor));
+        }
     }
 
     /**
@@ -151,6 +203,7 @@ public class LostInfoDetailFragment extends BaseFragment<FragmentLostInfoDetailB
             submitComment(lost.getId(), currentUserId, content, currentParentId, currentReplyUserId);
         });
     }
+
     /**
      * 提交评论到后端
      */
@@ -189,6 +242,7 @@ public class LostInfoDetailFragment extends BaseFragment<FragmentLostInfoDetailB
             }
         });
     }
+
     private void initEmojiPanel() {
         // 常用的自带 Emoji 列表
         String[] emojis = {
@@ -257,7 +311,7 @@ public class LostInfoDetailFragment extends BaseFragment<FragmentLostInfoDetailB
         binding.location.setText(lost.getPlace());
 
         // 设置状态
-        String[] statuses = {"已找到", "寻找中"};
+        String[] statuses = {"待审核","已驳回","已认领", "待认领"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_spinner_item, statuses);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

@@ -174,6 +174,11 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements
                     Result<User> result = response.body();
                     if (result.isSuccess()) {
                         User user = response.body().getData();
+                        if(user.getstate()==0){
+                            //用户状态为0，被封禁
+                            Utils.showResponse("用户被禁用!");
+                            return;
+                        }
                         Utils.doUserData(user);
                         TokenUtils.setToken(RandomUtils.getRandomLetters(6));
                         fetchIMTokenAndConnect(user);
