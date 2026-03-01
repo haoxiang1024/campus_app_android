@@ -6,6 +6,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,7 @@ import com.hx.campus.utils.api.Result;
 import com.hx.campus.utils.api.RetrofitClient;
 import com.hx.campus.utils.common.LoadingDialog;
 import com.xuexiang.xpage.annotation.Page;
+import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog;
 import com.xuexiang.xui.widget.toast.XToast;
 
 import java.io.File;
@@ -182,14 +184,14 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
         RetrofitClient.getInstance()
                 .getApi()
                 .addLostFound(filePart, lostJsonPart, foundJsonPart, opPart)
-                .enqueue(new retrofit2.Callback<Result<String>>() {
+                .enqueue(new retrofit2.Callback<Result<List<LostFound>>>() {
                     @Override
-                    public void onResponse(Call<Result<String>> call, Response<Result<String>> response) {
+                    public void onResponse(Call<Result<List<LostFound>>> call, Response<Result<List<LostFound>>> response) {
                         hideLoadingDialog();
                         if (response.isSuccessful() && response.body() != null) {
                             if (response.body().getStatus() == 0) {
                                 showResponse(response.body().getMsg());
-                                Object matchData = response.body().getData();
+                                List<LostFound> matchData = response.body().getData();
                                 if (matchData != null && !matchData.toString().equals("[]")) {
                                     // 发现匹配，弹出提示框
                                     List<LostFound> matchList = JSON.parseArray(JSON.toJSONString(matchData), LostFound.class);
@@ -213,7 +215,7 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
                     }
 
                     @Override
-                    public void onFailure(Call<Result<String>> call, Throwable t) {
+                    public void onFailure(Call<Result<List<LostFound>>> call, Throwable t) {
                         hideLoadingDialog();
                         showResponse("网络异常，请稍后再试");
                     }
@@ -223,9 +225,13 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
     private void showMatchDialog(List<LostFound> matchList, String msg) {
         List<String> displayItems = new ArrayList<>();
         for (LostFound item : matchList) {
-            displayItems.add("【" + item.getType() + "】" + item.getTitle() + " - " + item.getPlace());
-        }
-        new com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog.Builder(getContext())
+// 根据类型分配不同的 Emoji
+            String typeIcon = "招领".equals(item.getType()) ? "🎁" : "🔍";
+            // 优化排版：图标 [类型] 标题 | 📍地点
+            String formattedText = String.format("%s [%s] %s  |  📍 %s",
+                    typeIcon, item.getType(), item.getTitle(), item.getPlace());
+            displayItems.add(formattedText);        }
+        new MaterialDialog.Builder(getContext())
                 .title("🤖 智能匹配助手")
                 .content("发布成功！系统为您匹配到了以下疑似物品，点击即可查看详情：")
                 .items(displayItems) // 设置列表项

@@ -45,7 +45,7 @@ public interface ApiService {
     //添加物品信息
     @Multipart
     @POST("addLostFound")
-    Call<Result<String>> addLostFound(
+    Call<Result<List<LostFound>>> addLostFound(
             @Part MultipartBody.Part file,
             @Part("lostJson") RequestBody lostJson,
             @Part("foundJson") RequestBody foundJson,
