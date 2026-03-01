@@ -6,7 +6,6 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +24,7 @@ import com.hx.campus.adapter.entity.LostFoundType;
 import com.hx.campus.adapter.entity.User;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.databinding.FragmentAddLostBinding;
+import com.hx.campus.fragment.look.FoundInfoDetailFragment;
 import com.hx.campus.utils.Utils;
 import com.hx.campus.utils.api.Result;
 import com.hx.campus.utils.api.RetrofitClient;
@@ -189,7 +189,22 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
                         if (response.isSuccessful() && response.body() != null) {
                             if (response.body().getStatus() == 0) {
                                 showResponse(response.body().getMsg());
-                                runOnUiThread(() -> clearUI());
+                                Object matchData = response.body().getData();
+                                if (matchData != null && !matchData.toString().equals("[]")) {
+                                    // 发现匹配，弹出提示框
+                                    List<LostFound> matchList = JSON.parseArray(JSON.toJSONString(matchData), LostFound.class);
+                                    if (matchList != null && !matchList.isEmpty()) {
+                                        // 发现匹配，弹出列表提示框
+                                        runOnUiThread(() -> showMatchDialog(matchList, response.body().getMsg()));
+                                    } else {
+                                        showResponse(response.body().getMsg());
+                                        runOnUiThread(() -> clearUI());
+                                    }
+                                } else {
+                                    // 没有匹配，走正常逻辑
+                                    showResponse(response.body().getMsg());
+                                    runOnUiThread(() -> clearUI());
+                                }
                             } else {
                                 showResponse( response.body().getMsg());
                                 runOnUiThread(() -> clearUI());
@@ -205,6 +220,33 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
                 });
     }
 
+    private void showMatchDialog(List<LostFound> matchList, String msg) {
+        List<String> displayItems = new ArrayList<>();
+        for (LostFound item : matchList) {
+            displayItems.add("【" + item.getType() + "】" + item.getTitle() + " - " + item.getPlace());
+        }
+        new com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog.Builder(getContext())
+                .title("🤖 智能匹配助手")
+                .content("发布成功！系统为您匹配到了以下疑似物品，点击即可查看详情：")
+                .items(displayItems) // 设置列表项
+                .itemsCallback((dialog, itemView, position, text) -> {
+                    // 点击列表项的回调
+                    LostFound selectedItem = matchList.get(position);
+                    if ("招领".equals(selectedItem.getType())) {
+                        openPage(FoundDetailFragment.class, FoundDetailFragment.KEY_FOUND, selectedItem);
+                    } else {
+                        openPage(LostDetailFragment.class, LostDetailFragment.KEY_LOST, selectedItem);
+                    }
+                    clearUI();
+                })
+                .positiveText("暂不需要")
+                .onPositive((dialog, which) -> {
+                    // 用户点击暂不需要，直接清空界面
+                    clearUI();
+                })
+                .cancelable(false)
+                .show();
+    }
     /**
      * 在主线程中显示响应结果。
      *
