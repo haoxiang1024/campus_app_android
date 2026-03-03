@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 
 import com.hx.campus.R;
 import com.hx.campus.activity.MainActivity;
+import com.hx.campus.adapter.entity.LoginResponseDTO;
 import com.hx.campus.adapter.entity.User;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.databinding.FragmentLoginBinding;
@@ -167,20 +168,22 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements
 
     private void login(String phone, String password) {
         showLoadingDialog();
-        RetrofitClient.getInstance().getApi().login(phone, password).enqueue(new retrofit2.Callback<Result<User>>() {
+        RetrofitClient.getInstance().getApi().login(phone, password).enqueue(new retrofit2.Callback<Result<LoginResponseDTO>>() {
             @Override
-            public void onResponse(retrofit2.Call<Result<User>> call, retrofit2.Response<Result<User>> response) {
+            public void onResponse(retrofit2.Call<Result<LoginResponseDTO>> call, retrofit2.Response<Result<LoginResponseDTO>> response) {
                 if (response.body() != null) {
-                    Result<User> result = response.body();
+                    Result<LoginResponseDTO> result = response.body();
                     if (result.isSuccess()) {
-                        User user = response.body().getData();
+                        LoginResponseDTO loginData = response.body().getData();
+                        User user = loginData.getUserInfo();
                         if(user.getstate()==0){
                             //用户状态为0，被封禁
                             Utils.showResponse("用户被禁用!");
                             return;
                         }
                         Utils.doUserData(user);
-                        TokenUtils.setToken(RandomUtils.getRandomLetters(6));
+                        String token = loginData.getToken();
+                        TokenUtils.handleLoginSuccess(token);
                         fetchIMTokenAndConnect(user);
                     } else {
                         hideLoadingDialog();
@@ -193,7 +196,7 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements
             }
 
             @Override
-            public void onFailure(retrofit2.Call<Result<User>> call, Throwable t) {
+            public void onFailure(retrofit2.Call<Result<LoginResponseDTO>> call, Throwable t) {
                 hideLoadingDialog();
                 Utils.showResponse("网络请求失败");
             }

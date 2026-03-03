@@ -15,27 +15,41 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.multidex.MultiDex;
 
+import com.hx.campus.activity.LoginActivity;
 import com.hx.campus.activity.chat.ConversationActivity;
 import com.hx.campus.adapter.entity.User;
 import com.hx.campus.utils.Utils;
 import com.hx.campus.utils.api.RetrofitClient;
+import com.hx.campus.utils.common.TokenUtils;
 import com.hx.campus.utils.sdkinit.ANRWatchDogInit;
 import com.hx.campus.utils.sdkinit.UMengInit;
 import com.hx.campus.utils.sdkinit.XBasicLibInit;
 import com.hx.campus.utils.sdkinit.XUpdateInit;
 import com.xuexiang.xui.BuildConfig;
+import com.xuexiang.xutil.XUtil;
 
+import io.rong.imkit.IMCenter;
 import io.rong.imkit.RongIM;
 import io.rong.imkit.config.RongConfigCenter;
 import io.rong.imkit.notification.NotificationConfig;
 import io.rong.imkit.userinfo.RongUserInfoManager;
 import io.rong.imkit.utils.RouteUtils;
+import io.rong.imlib.IRongCoreListener;
+import io.rong.imlib.listener.OnReceiveMessageWrapperListener;
+import io.rong.imlib.RongCoreClient;
+import io.rong.imlib.RongIMClient;
+import io.rong.imlib.model.Message;
+import io.rong.imlib.model.ReceivedProfile;
 import io.rong.imlib.model.UserInfo;
+import io.rong.message.CommandMessage;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -45,6 +59,7 @@ import retrofit2.Response;
  * 处理应用启动时的各项初始化工作
  */
 public class MyApp extends Application {
+    private static Context mContext; // 保存 context 用于跳转
 
     /**
      * 检查当前是否为调试模式
@@ -78,6 +93,50 @@ public class MyApp extends Application {
         initIM();
         // 初始化网络请求客户端
         RetrofitClient.init(this);
+        //消息监听
+        //initMsgListener();
+    }
+    /**
+     * 初始化全局的消息监听
+     */
+    public static void initMsgListener() {
+        RongCoreClient.setConnectionStatusListener(status -> {
+            // 如果状态是：用户被封禁 (CONN_USER_BLOCKED)
+            // 或者：在其他设备登录被踢下线 (KICKED_OFFLINE_BY_OTHER_CLIENT)
+            if (status == IRongCoreListener.ConnectionStatusListener.ConnectionStatus.CONN_USER_BLOCKED ||
+                    status == IRongCoreListener.ConnectionStatusListener.ConnectionStatus.KICKED_OFFLINE_BY_OTHER_CLIENT) {
+                IMCenter.getInstance().logout();
+                // 必须切换到主线程执行 UI 和 跳转逻辑
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    Utils.showResponse("您的账号已被管理员禁用或在其他设备登录");
+                    logout();
+                });
+            }
+        });
+// 注册消息监听
+        RongCoreClient.addOnReceiveMessageListener(new OnReceiveMessageWrapperListener() {
+            @Override
+            public void onReceivedMessage(Message message, ReceivedProfile profile) {
+                if (message.getObjectName().equals("App:ForceOffline")) {
+                    // 执行登出操作
+                    IMCenter.getInstance().logout();
+                    logout();
+                }
+            }
+
+        });
+    }
+
+    private static void logout() {
+        //  断开融云连接
+        IMCenter.getInstance().disconnect();
+        //  清除本地 Token 缓存
+        TokenUtils.handleLogoutSuccess();
+        //  退出所有 Activity 并跳转 Login
+        XUtil.getActivityLifecycleHelper().exit();
+        Intent intent = new Intent(mContext, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        mContext.startActivity(intent);
     }
 
     /**
