@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.hx.campus.R;
 import com.hx.campus.adapter.entity.LostFound;
 import com.hx.campus.adapter.lostfound.LostFoundRecyclerAdapter;
 import com.hx.campus.core.BaseFragment;
@@ -56,12 +57,23 @@ public class LostListSubFragment extends BaseFragment<LayoutCommonListBinding> {
                     @Override
                     public void onResponse(Call<Result<List<LostFound>>> call, Response<Result<List<LostFound>>> response) {
                         if (response.body() != null && response.body().isSuccess()) {
-                            hideEmptyView();
-                            mAdapter.setData(response.body().getData());
+                            List<LostFound> lostFoundList = response.body().getData();
+                            if(!lostFoundList.isEmpty()){
+                                hideEmptyView();
+                                mAdapter.setData(lostFoundList);
+                            }else {
+                                noData();
+                            }
                         }
                     }
                     @Override public void onFailure(Call<Result<List<LostFound>>> call, Throwable t) {}
                 });
+    }
+
+    private void noData() {
+        binding.icon.setImageResource(R.drawable.no_dada);
+        binding.tvApp.setTextSize(16);
+        binding.tvApp.setText("暂无数据");
     }
 
     private void hideEmptyView() {

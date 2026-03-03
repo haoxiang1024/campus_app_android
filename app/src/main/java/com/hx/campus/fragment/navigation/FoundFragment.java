@@ -7,13 +7,25 @@ import androidx.annotation.NonNull;
 
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.hx.campus.R;
+import com.hx.campus.adapter.entity.LostFoundType;
 import com.hx.campus.adapter.lostfound.FoundPagerAdapter;
+import com.hx.campus.adapter.lostfound.LostPagerAdapter;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.databinding.FragmentFoundBinding;
+import com.hx.campus.utils.Utils;
+import com.hx.campus.utils.api.Result;
+import com.hx.campus.utils.api.RetrofitClient;
+import com.hx.campus.utils.common.LoadingDialog;
 import com.xuexiang.xpage.annotation.Page;
 import com.xuexiang.xrouter.annotation.AutoWired;
 import com.xuexiang.xrouter.launcher.XRouter;
 import com.xuexiang.xui.widget.actionbar.TitleBar;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 @Page
 public class FoundFragment extends BaseFragment<FragmentFoundBinding> {
@@ -23,6 +35,7 @@ public class FoundFragment extends BaseFragment<FragmentFoundBinding> {
     String title;
     // 标题参数键名常量
     public static final String KEY_TITLE_NAME = "title_name";
+    LoadingDialog loadingDialog;
 
     /**
      * 初始化参数
@@ -54,21 +67,49 @@ public class FoundFragment extends BaseFragment<FragmentFoundBinding> {
      */
     @Override
     protected void initViews() {
-        // 从资源文件获取分类标题数组
-        String[] typeTitles = getResources().getStringArray(R.array.type_titles);
+        showLoading();
+        RetrofitClient.getInstance().getApi().getAllType().enqueue(new Callback<Result<List<LostFoundType>>>() {
+            @Override
+            public void onResponse(Call<Result<List<LostFoundType>>> call, Response<Result<List<LostFoundType>>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    List<LostFoundType> types = response.body().getData();
+                    setupViewPager(types);
+                } else {
+                    Utils.showResponse("获取分类失败");
+                }
+            }
 
-        // 创建招领页面适配器
-        FoundPagerAdapter adapter = new FoundPagerAdapter(this, typeTitles);
-        // 为ViewPager设置适配器
+            @Override
+            public void onFailure(Call<Result<List<LostFoundType>>> call, Throwable t) {
+                Utils.showResponse("网络错误: " + t.getMessage());
+            }
+        });
+    }
+    private void setupViewPager(List<LostFoundType> types) {
+        String[] titles = new String[types.size()];
+        for (int i = 0; i < types.size(); i++) {
+            titles[i] = types.get(i).getName();
+        }
+
+        FoundPagerAdapter adapter = new FoundPagerAdapter(this, titles);
         binding.viewPager.setAdapter(adapter);
 
-        // 使用TabLayoutMediator绑定TabLayout和ViewPager2，实现滑动动画效果
         new TabLayoutMediator(binding.tabLayout, binding.viewPager, (tab, position) -> {
-            // 设置每个标签的文本内容
-            tab.setText(typeTitles[position]);
+            tab.setText(titles[position]);
         }).attach();
+        hideLoadingDialog();
     }
-
+    private void showLoading() {
+        if (loadingDialog == null) {
+            loadingDialog = new LoadingDialog(getContext());
+        }
+        loadingDialog.show();
+    }
+    private void hideLoadingDialog() {
+        if (loadingDialog != null && loadingDialog.isShowing()) {
+            loadingDialog.dismiss();
+        }
+    }
     /**
      * 初始化标题栏
      * 添加发布按钮和设置标题
