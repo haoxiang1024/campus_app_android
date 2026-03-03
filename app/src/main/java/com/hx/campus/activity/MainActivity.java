@@ -146,7 +146,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
 
     private void initData() {
         //已经登录成功设置token 下次无需重复登录
-        TokenUtils.setToken("login_succeed_token");
+        TokenUtils.setToken(TokenUtils.getToken());
         XUpdateInit.checkUpdate(this, false);
     }
 

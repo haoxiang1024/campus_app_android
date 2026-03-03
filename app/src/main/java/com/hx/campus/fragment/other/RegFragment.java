@@ -1,6 +1,7 @@
 package com.hx.campus.fragment.other;
 
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,14 +9,22 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.hx.campus.activity.MainActivity;
+import com.hx.campus.adapter.entity.LoginResponseDTO;
+import com.hx.campus.adapter.entity.User;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.databinding.FragmentRegBinding;
 import com.hx.campus.utils.Utils;
 import com.hx.campus.utils.api.Result;
 import com.hx.campus.utils.api.RetrofitClient;
+import com.hx.campus.utils.common.LoadingDialog;
+import com.hx.campus.utils.common.TokenUtils;
 import com.xuexiang.xpage.annotation.Page;
 import com.xuexiang.xui.utils.CountDownButtonHelper;
+import com.xuexiang.xutil.app.ActivityUtils;
 
+import io.rong.imkit.IMCenter;
+import io.rong.imlib.RongIMClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -25,7 +34,9 @@ import retrofit2.Response;
 public class RegFragment extends BaseFragment<FragmentRegBinding> implements View.OnClickListener {
 
     private CountDownButtonHelper mCountDownHelper;
-
+    LoadingDialog loadingDialog;//加载动画
+    // 设置连接超时时间
+    private final int timeLimit = 10;
     @NonNull
     @Override
     protected FragmentRegBinding viewBindingInflate(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, boolean attachToRoot) {
@@ -114,24 +125,98 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
      * 最终提交注册请求
      */
     private void doRegisterRequest(String phone, String email, String password) {
-        RetrofitClient.getInstance().getApi().register(phone, email, password).enqueue(new Callback<Result<Object>>() {
+        RetrofitClient.getInstance().getApi().register(phone, email, password).enqueue(new Callback<Result<LoginResponseDTO>>() {
             @Override
-            public void onResponse(@NonNull Call<Result<Object>> call, @NonNull Response<Result<Object>> response) {
+            public void onResponse(@NonNull Call<Result<LoginResponseDTO>> call, @NonNull Response<Result<LoginResponseDTO>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     Utils.showResponse(response.body().getMsg());
                     if (response.body().isSuccess()) {
-                        // 注册成功，跳转回登录页或销毁当前页
-                        Utils.showResponse("注册成功！请登录");
-                        popToBack();
+                        // 注册成功，直接跳转主页
+                        LoginResponseDTO loginData = response.body().getData();
+                        User user = loginData.getUserInfo();
+                        Utils.doUserData(user);
+                        String token = loginData.getToken();
+                        TokenUtils.handleLoginSuccess(token);
+                        fetchIMTokenAndConnect(user);
                     }
                 }
             }
 
             @Override
-            public void onFailure(@NonNull Call<Result<Object>> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<Result<LoginResponseDTO>> call, @NonNull Throwable t) {
                 Utils.showResponse("注册请求失败: " + t.getMessage());
             }
         });
+    }
+    /**
+     * 获取 IM Token 并根据本地状态选择连接方式
+     */
+    private void fetchIMTokenAndConnect(User user) {
+        RetrofitClient.getInstance().getApi().getIMUserToken(user.getId(),user.getNickname()).enqueue(new retrofit2.Callback<Result<String>>() {
+            @Override
+            public void onResponse(retrofit2.Call<Result<String>> call, retrofit2.Response<Result<String>> response) {
+                if (response.body() != null && response.body().isSuccess()) {
+                    String imToken = response.body().getData();
+                    // 执行连接逻辑
+                    performIMConnect(imToken);
+                    // 登录全流程完成，跳转主页
+                    hideLoadingDialog();
+                    ActivityUtils.startActivity(MainActivity.class);
+                } else {
+                    hideLoadingDialog();
+                    Utils.showResponse("IM授权获取失败");
+                    ActivityUtils.startActivity(MainActivity.class);
+                }
+            }
+            /**
+             * 融云连接核心逻辑
+             */
+            private void performIMConnect(String token) {
+                // 从本地存储获取旧 Token
+                String localToken = TokenUtils.getImToken();
+                RongIMClient.ConnectCallback connectCallback=new RongIMClient.ConnectCallback() {
+                    @Override
+                    public void onSuccess(String userId) {
+                        Log.e("IM_LOG", "融云连接成功: " + userId);
+                        // 连接成功后，持久化新的 Token 到 MMKV
+                        TokenUtils.setImToken(token);
+                    }
+
+                    @Override
+                    public void onError(RongIMClient.ConnectionErrorCode e) {
+                        Log.e("IM_LOG", "连接失败码: " + e.getValue());
+                    }
+
+                    @Override
+                    public void onDatabaseOpened(RongIMClient.DatabaseOpenStatus code) {
+
+                    }
+                };
+
+                if (token.equals(localToken)) {
+                    // 非首次连接：不传超时参数
+                    Log.e("IM_LOG", "Token一致，执行快速连接...");
+                    IMCenter.getInstance().connect(token, connectCallback);
+                } else {
+                    // 首次连接：传入超时时间（例如 10 秒）
+                    Log.e("IM_LOG", "Token变更，执行带超时的首次连接...");
+                    IMCenter.getInstance().connect(token, timeLimit, connectCallback);
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<Result<String>> call, Throwable t) {
+                hideLoadingDialog();
+                Log.e("IM_ERROR", "获取IM Token网络失败", t);
+                ActivityUtils.startActivity(MainActivity.class);
+            }
+        });
+    }
+
+    private void hideLoadingDialog() {
+        if (loadingDialog != null && loadingDialog.isShowing()) {
+            loadingDialog.dismiss();
+        }
     }
 
     /**
