@@ -6,6 +6,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.alibaba.fastjson.JSON;
+import com.baidu.location.BDAbstractLocationListener;
+import com.baidu.location.BDLocation;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
 import com.hx.campus.R;
 import com.hx.campus.adapter.entity.LostFound;
 import com.hx.campus.adapter.entity.LostFoundType;
@@ -44,12 +49,12 @@ import retrofit2.Callback;
 
 /**
  * AddFoundFragment 类用于处理用户发布招领信息的功能。
- * 该类继承自 BaseFragment，负责初始化界面、监听事件、上传图片和提交招领信息。
  */
 @Page
 public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
     public static final int CHOOSE_PHOTO = 1;
     public static final int STORAGE_PERMISSION = 1;
+    private static final int LOCATION_PERMISSION = 100; // 新增定位权限码
 
     int id = 0; // 分类id
     private File file = null;
@@ -64,42 +69,26 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
     private List<LostFoundType> categoryList = new ArrayList<>();
     private ArrayAdapter<LostFoundType> categoryAdapter;
 
-    /**
-     * 创建并返回 FragmentAddFoundBinding 实例。
-     *
-     * @param inflater     LayoutInflater 对象，用于解析布局文件
-     * @param container    ViewGroup 容器，用于承载视图
-     * @param attachToRoot 是否将视图附加到根容器
-     * @return FragmentAddFoundBinding 绑定对象
-     */
+    private LocationClient mLocationClient;
+    private final MyLocationListener mListener = new MyLocationListener();
+
+
     @NonNull
     @Override
     protected FragmentAddFoundBinding viewBindingInflate(@NonNull LayoutInflater inflater, ViewGroup container, boolean attachToRoot)  {
         return FragmentAddFoundBinding.inflate(inflater, container, attachToRoot);
     }
 
-    /**
-     * 初始化视图组件。
-     */
     @Override
     protected void initViews() {
         initData();
     }
 
-    /**
-     * 获取页面标题。
-     *
-     * @return 页面标题字符串
-     */
     @Override
     protected String getPageTitle() {
         return getResources().getString(R.string.send_found_info);
     }
 
-    /**
-     * 初始化事件监听器。
-     * 包括选择图片按钮点击事件和提交按钮点击事件。
-     */
     @Override
     protected void initListeners() {
         super.initListeners();
@@ -156,6 +145,94 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
                 upload(foundJson);
             }
         });
+
+        binding.btnGetLocation.setOnClickListener(v -> {
+            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(getActivity(),
+                        new String[]{
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.READ_PHONE_STATE
+                        },
+                        LOCATION_PERMISSION);
+            } else {
+                startLocation();
+            }
+        });
+    }
+
+    private void startLocation() {
+        showLoadingDialog();
+        try {
+            mLocationClient = new LocationClient(requireContext().getApplicationContext());
+            mLocationClient.registerLocationListener(mListener);
+
+            LocationClientOption option = new LocationClientOption();
+            option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
+            option.setCoorType("bd09ll");
+            option.setScanSpan(0);         // 只定位一次
+            option.setIsNeedAddress(true); // 需要地址
+            option.setIsNeedLocationPoiList(true); // 允许获取周边兴趣点
+            option.setOpenGps(true);
+            option.setIgnoreKillProcess(false);
+
+            mLocationClient.setLocOption(option);
+            mLocationClient.start();
+
+        } catch (Exception e) {
+            hideLoadingDialog();
+            e.printStackTrace();
+            XToast.error(getContext(), "定位初始化失败：" + e.getMessage()).show();
+        }
+    }
+
+    // 百度定位回调
+    private class MyLocationListener extends BDAbstractLocationListener {
+        @Override
+        public void onReceiveLocation(BDLocation bdLocation) {
+            hideLoadingDialog();
+
+            if (bdLocation == null) {
+                XToast.error(getContext(), "定位失败：返回数据为空").show();
+                return;
+            }
+
+            int code = bdLocation.getLocType();
+            if (code == BDLocation.TypeGpsLocation || code == BDLocation.TypeNetWorkLocation) {
+                // 定位成功
+                String addr = bdLocation.getAddrStr();
+                // 获取周边 POI 列表
+                List<com.baidu.location.Poi> poiList = bdLocation.getPoiList();
+                if (poiList != null && !poiList.isEmpty()) {
+                    // 如果有周边建筑，弹出列表让用户选一个更准的
+                    List<String> poiNames = new ArrayList<>();
+                    for (com.baidu.location.Poi p : poiList) {
+                        poiNames.add(p.getName());
+                    }
+                    new MaterialDialog.Builder(getContext())
+                            .title("请选择具体位置")
+                            .items(poiNames)
+                            .itemsCallback((dialog, itemView, position, text) -> {
+                                // 将“大地址 + 具体建筑”合并填入
+                                binding.etLocation.setText(addr + "（" + text + "）");
+                            })
+                            .positiveText("就用当前位置")
+                            .onPositive((dialog, which) -> binding.etLocation.setText(addr))
+                            .show();
+                } else {
+                    // 没有周边信息时直接填入基础地址
+                    binding.etLocation.setText(addr);
+                }
+            } else {
+                XToast.error(getContext(), "定位失败，错误码：" + code).show();
+                Log.e("百度定位", "错误码：" + code + " 信息：" + bdLocation.getLocTypeDescription());
+            }
+
+            // 定位一次就停止
+            if (mLocationClient != null) {
+                mLocationClient.stop();
+            }
+        }
     }
 
     /**
@@ -318,10 +395,6 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
 
     /**
      * 处理权限请求的结果。
-     *
-     * @param requestCode  请求码
-     * @param permissions  权限数组
-     * @param grantResults 授权结果数组
      */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -330,17 +403,19 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 chooseImage();
             } else {
-                XToast.error(getContext(), "你还没有申请权限");
+                XToast.error(getContext(), "存储权限被拒绝").show();
+            }
+        } else if (requestCode == LOCATION_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                startLocation();
+            } else {
+                XToast.error(getContext(), "定位权限被拒绝").show();
             }
         }
     }
 
     /**
      * 处理活动结果，主要用于获取选择的图片路径。
-     *
-     * @param requestCode 请求码
-     * @param resultCode  结果码
-     * @param data        返回的数据
      */
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -356,9 +431,6 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
         }
     }
 
-    /**
-     * 显示加载对话框。
-     */
     private void showLoadingDialog() {
         if (loadingDialog == null) {
             loadingDialog = new LoadingDialog(getContext());
@@ -366,18 +438,12 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
         loadingDialog.show();
     }
 
-    /**
-     * 隐藏加载对话框。
-     */
     private void hideLoadingDialog() {
         if (loadingDialog != null && loadingDialog.isShowing()) {
             loadingDialog.dismiss();
         }
     }
 
-    /**
-     * 清除界面中的输入内容和图片。
-     */
     private void clearUI() {
         binding.etLostTitle.setText("");
         binding.addContent.setText("");
@@ -390,5 +456,14 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
         binding.ivImage.setImageDrawable(null);
         this.file = null;
         this.fileName = "";
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mLocationClient != null) {
+            mLocationClient.stop();
+            mLocationClient.unRegisterLocationListener(mListener);
+        }
     }
 }

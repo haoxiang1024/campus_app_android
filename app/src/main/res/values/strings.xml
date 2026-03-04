@@ -98,6 +98,7 @@
     <string name="regdate">注册时间:</string>
     <string name="sumbit">提交</string>
     <string name="choose">选择图片</string>
+    <string name="location">获取定位</string>
     <string name="title">标题</string>
     <string name="recommendation">推荐</string>
     <string name="content">内容</string>

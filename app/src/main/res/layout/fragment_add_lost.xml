@@ -110,10 +110,13 @@
                     style="@style/XUILayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/loation"
+                    android:hint="请点击获取定位或手动输入详细地址"
                     android:textSize="15sp"
+                    android:minLines="2"
+                    android:maxLines="5"
                     app:met_clearButton="true"
                     app:met_hideUnderline="true" />
+
 
                 <View
                     android:layout_width="match_parent"
@@ -121,7 +124,14 @@
                     android:background="#E0E0E0"
                     android:layout_marginTop="4dp"
                     android:layout_marginBottom="12dp"/>
-
+                <Button
+                    android:id="@+id/btnGetLocation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="#0099FF"
+                    android:textColor="@color/white"
+                    android:text="@string/location"
+                    app:cornerRadius="6dp" />
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -138,6 +148,7 @@
                         android:id="@+id/spinner_category"
                         android:layout_width="150dp"
                         android:layout_height="40dp"
+                        android:layout_marginStart="20dp"
                         android:backgroundTint="#0099FF" />
                 </LinearLayout>
 
