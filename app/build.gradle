@@ -162,6 +162,8 @@ dependencies {
 
     // 即时通讯 UI 基础组件
     implementation 'cn.rongcloud.sdk:im_kit:5.21.1'
+    //高德
+    implementation 'com.amap.api:location:6.4.1'
 
 
 
