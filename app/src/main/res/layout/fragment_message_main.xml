@@ -9,7 +9,7 @@
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#FFFFFF"
+        android:background="?android:attr/windowBackground"
         app:tabIndicatorAnimationMode="elastic"
         app:tabIndicatorFullWidth="false"
         app:tabIndicatorHeight="3dp"
@@ -22,7 +22,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#EEEEEE" />
+        android:background="?android:attr/windowBackground" />
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"

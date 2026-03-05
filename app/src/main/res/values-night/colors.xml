@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <color name="colorPrimary">#1A75AD</color>
+    <color name="colorPrimaryDark">#121212</color>
+    <color name="colorAccent">#1A75AD</color>
+    
+    <color name="config_color_select_bg">#2C2C2C</color>
+
+    <color name="toast_default_text_color">#E0E0E0</color>
+    <color name="toast_normal_tint_color">#1F1F1F</color>
+
+    <color name="app_color_theme_1">#AF3C48</color> <color name="app_color_theme_2">#B84F36</color> <color name="app_color_theme_3">#BFA035</color> <color name="app_color_theme_4">#759E47</color> <color name="app_color_theme_5">#2E997F</color> <color name="app_color_theme_6">#1F8BB2</color> <color name="app_color_theme_7">#4271B0</color> <color name="app_color_theme_8">#7E69B0</color> <color name="app_color_theme_9">#AF618E</color> <color name="blue">#1A75AD</color>
+    <color name="red">#A34F56</color>
+<style name="AppTheme" parent="XUITheme.Phone">
+    <item name="colorPrimary">@color/colorPrimary</item> <item name="colorSurface">#2C2C2C</item> <item name="android:windowBackground">#121212</item> </style>
+
+</resources>
