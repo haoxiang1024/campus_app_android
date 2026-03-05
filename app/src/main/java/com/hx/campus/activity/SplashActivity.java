@@ -19,19 +19,11 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         loginOrGoMainPage();
-        darkMOde();
+
 
     }
 
-    private void darkMOde() {
-        SharedPreferences sp = getSharedPreferences("config_settings", Context.MODE_PRIVATE);
-        boolean isFollow = sp.getBoolean("is_follow_system", true);
-        if (isFollow) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-        }
-    }
+
 
     private void loginOrGoMainPage() {
         //通过用户令牌的操作

@@ -75,18 +75,10 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
         checkIMStatus();
         // 检查并申请通知权限
         checkNotificationPermission();
-        darkMOde();
+
     }
 
-    private void darkMOde() {
-        SharedPreferences sp = getSharedPreferences("config_settings", Context.MODE_PRIVATE);
-        boolean isFollow = sp.getBoolean("is_follow_system", true);
-        if (isFollow) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-        }
-    }
+
 
     private void checkNotificationPermission() {
         if (Build.VERSION.SDK_INT >= 33) {

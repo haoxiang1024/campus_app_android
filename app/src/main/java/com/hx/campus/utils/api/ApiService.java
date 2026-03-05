@@ -150,4 +150,9 @@ public interface ApiService {
     @POST("updateEmail")
     @FormUrlEncoded
     Call<Result<User>> updateEmail(@Field("id") int id, @Field("newEmail") String newEmail, @Field("code") String code);
+
+    // 删除用户
+    @FormUrlEncoded
+    @POST("deleteAccount")
+    Call<Result<String>> deleteAccount(@Field("id") int id);
 }

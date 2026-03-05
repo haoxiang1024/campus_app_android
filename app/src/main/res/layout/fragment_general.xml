@@ -33,18 +33,20 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
 
-                        <com.xuexiang.xui.widget.textview.supertextview.SuperTextView
-                            android:id="@+id/menu_dark_mode"
-                            style="@style/InfoItem.Account"
-                            app:sLeftTextString="夜间模式"
-                            app:sRightTextString="去设置"
-                            app:sDividerLineType="bottom" />
+
 
                         <com.xuexiang.xui.widget.textview.supertextview.SuperTextView
                             android:id="@+id/menu_cache"
                             style="@style/InfoItem.Account"
                             app:sDividerLineType="none"
                             app:sLeftTextString="@string/clear_cache" />
+
+                        <com.xuexiang.xui.widget.textview.supertextview.SuperTextView
+                            android:id="@+id/menu_delete_account"
+                            style="@style/InfoItem.Account"
+                            app:sDividerLineType="none"
+                            app:sLeftTextColor="@color/xui_config_color_red"
+                            app:sLeftTextString="注销账号" />
 
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
