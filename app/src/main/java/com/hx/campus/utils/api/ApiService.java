@@ -141,5 +141,13 @@ public interface ApiService {
     //根据Id获取失物招领信息
     @GET("/school/admin/getLostFoundById")
     Call<Result<LostFound>>getLostFoundById(@Query("lostFoundId") int lostFoundId);
+    // 修改手机号
+    @POST("updatePhone")
+    @FormUrlEncoded
+    Call<Result<User>> updatePhone(@Field("id") int id, @Field("newPhone") String newPhone, @Field("code") String code);
 
+    //  修改邮箱
+    @POST("updateEmail")
+    @FormUrlEncoded
+    Call<Result<User>> updateEmail(@Field("id") int id, @Field("newEmail") String newEmail, @Field("code") String code);
 }

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5"
+    android:background="?android:attr/windowBackground"
     android:orientation="vertical">
     <com.scwang.smart.refresh.layout.SmartRefreshLayout
         style="@style/PullDownStyle"
@@ -26,19 +26,26 @@
                     android:layout_height="wrap_content"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="1dp"
-                    app:cardBackgroundColor="@android:color/white"
+                    app:cardBackgroundColor="?attr/colorSurface"
                     app:cardUseCompatPadding="true">
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
 
                         <com.xuexiang.xui.widget.textview.supertextview.SuperTextView
+                            android:id="@+id/menu_dark_mode"
+                            style="@style/InfoItem.Account"
+                            app:sLeftTextString="夜间模式"
+                            app:sRightTextString="去设置"
+                            app:sDividerLineType="bottom" />
+
+                        <com.xuexiang.xui.widget.textview.supertextview.SuperTextView
                             android:id="@+id/menu_cache"
                             style="@style/InfoItem.Account"
                             app:sDividerLineType="none"
                             app:sLeftTextString="@string/clear_cache" />
+
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 

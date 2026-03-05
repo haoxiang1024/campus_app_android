@@ -1,9 +1,12 @@
 package com.hx.campus.activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import com.hx.campus.utils.common.LanguageUtil;
 import com.hx.campus.utils.common.TokenUtils;
@@ -16,6 +19,18 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         loginOrGoMainPage();
+        darkMOde();
+
+    }
+
+    private void darkMOde() {
+        SharedPreferences sp = getSharedPreferences("config_settings", Context.MODE_PRIVATE);
+        boolean isFollow = sp.getBoolean("is_follow_system", true);
+        if (isFollow) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
     }
 
     private void loginOrGoMainPage() {

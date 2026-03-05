@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F6F9"
+    android:background="?android:attr/windowBackground"
     style="@style/PullDownStyle">
 
     <androidx.core.widget.NestedScrollView
@@ -32,7 +32,7 @@
                     android:id="@+id/iv_image"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
-                    android:background="#E0E0E0"
+                    android:background="?android:attr/windowBackground"
                     android:scaleType="centerCrop"
                     android:contentDescription="@string/todo" />
 

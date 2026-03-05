@@ -18,7 +18,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/xui_config_color_white"
+    android:background="?android:attr/windowBackground"
     android:orientation="vertical">
 
     <androidx.core.widget.NestedScrollView
@@ -26,6 +26,7 @@
         android:layout_marginTop="@dimen/config_margin_10dp">
 
         <LinearLayout
+
             style="@style/Container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

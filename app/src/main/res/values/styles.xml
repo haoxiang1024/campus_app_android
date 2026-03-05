@@ -28,6 +28,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="xui_actionbar_height">?actionBarSize</item>
+        <item name="colorSurface">@android:color/white</item>
         <!-- 用于应用程序的背景色 -->
         <item name="android:windowBackground">#F2F7FA</item>
     </style>

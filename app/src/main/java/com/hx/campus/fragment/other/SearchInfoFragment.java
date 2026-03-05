@@ -285,5 +285,17 @@ public class SearchInfoFragment extends BaseFragment<FragmentSearchInfoBinding> 
         //设置发布日期
         String date = Utils.dateFormat(searchInfo.getPub_date());
         binding.tvDate.setText(date);
+        //私信
+        binding.chatBtn.setOnClickListener(v -> {
+            String targetId = String.valueOf(searchInfo.getUser_id());
+            if (TextUtils.isEmpty(targetId)) {
+                return;
+            }
+            io.rong.imkit.utils.RouteUtils.routeToConversationActivity(
+                    getContext(),
+                    io.rong.imlib.model.Conversation.ConversationType.PRIVATE,
+                    targetId
+            );
+        });
     }
 }

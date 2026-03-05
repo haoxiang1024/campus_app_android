@@ -2,6 +2,8 @@
 
 package com.hx.campus.activity;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,6 +19,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -72,6 +75,17 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
         checkIMStatus();
         // 检查并申请通知权限
         checkNotificationPermission();
+        darkMOde();
+    }
+
+    private void darkMOde() {
+        SharedPreferences sp = getSharedPreferences("config_settings", Context.MODE_PRIVATE);
+        boolean isFollow = sp.getBoolean("is_follow_system", true);
+        if (isFollow) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
     }
 
     private void checkNotificationPermission() {
