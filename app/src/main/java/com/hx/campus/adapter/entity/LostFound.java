@@ -50,7 +50,27 @@ public class LostFound implements Serializable {
     private String type;
     /** 失物招领类型对象 */
     private LostFoundType lostfoundtype;
+    //纬度
+    private double longitude;
 
+    //经度
+    private double latitude;
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
     public LostFound(Integer id, String title, String img, Date pubDate, String content, String place, String phone, String state, Integer stick, Integer lostfoundtype_id, Integer user_id, String nickname, String type, LostFoundType lostfoundtype) {
         this.id = id;
         this.title = title;
@@ -243,11 +263,13 @@ public class LostFound implements Serializable {
                 ", phone='" + phone + '\'' +
                 ", state='" + state + '\'' +
                 ", stick=" + stick +
-                ", lostfoundtypeId=" + lostfoundtype_id +
+                ", lostfoundtype_id=" + lostfoundtype_id +
                 ", user_id=" + user_id +
                 ", nickname='" + nickname + '\'' +
                 ", type='" + type + '\'' +
                 ", lostfoundtype=" + lostfoundtype +
+                ", longitude=" + longitude +
+                ", latitude=" + latitude +
                 '}';
     }
 }

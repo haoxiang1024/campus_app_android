@@ -1,6 +1,10 @@
 package com.hx.campus.fragment.dynamic;
 
+import android.content.Context;
+import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -10,6 +14,13 @@ import com.alibaba.android.vlayout.DelegateAdapter;
 import com.alibaba.android.vlayout.VirtualLayoutManager;
 import com.alibaba.android.vlayout.layout.GridLayoutHelper;
 import com.alibaba.android.vlayout.layout.LinearLayoutHelper;
+import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.BitmapDescriptor;
+import com.baidu.mapapi.map.BitmapDescriptorFactory;
+import com.baidu.mapapi.map.Marker;
+import com.baidu.mapapi.map.MarkerOptions;
+import com.baidu.mapapi.map.OverlayOptions;
+import com.baidu.mapapi.model.LatLng;
 import com.hx.campus.R;
 import com.hx.campus.adapter.base.broccoli.BroccoliSimpleDelegateAdapter;
 import com.hx.campus.adapter.base.delegate.SimpleDelegateAdapter;
@@ -52,6 +63,10 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
     private SimpleDelegateAdapter<NewInfo> newInfoSimpleDelegateAdapter;
     // 新闻信息数据列表，存储从服务器获取的数据
     private List<NewInfo> list = new ArrayList<>();
+    // 地图相关变量
+    private com.baidu.mapapi.map.MapView mMapView;
+    private BaiduMap mBaiduMap;
+    private boolean isMapMode = false; // 当前是否处于地图模式
 
     /**
      * 创建视图绑定对象
@@ -132,8 +147,108 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
         delegateAdapter.addAdapter(newInfoSimpleDelegateAdapter);
         binding.recyclerView.setAdapter(delegateAdapter);
 
+        mMapView = binding.bmapView;
+
+
+        // 点击右下角按钮：进入地图模式
+        binding.fabSwitchMode.setOnClickListener(v -> {
+            isMapMode = true;
+            binding.refreshLayout.setVisibility(View.GONE);
+            mMapView.setVisibility(View.VISIBLE);
+
+            // 显示左上角返回按钮，隐藏右下角按钮
+            binding.fabMapBack.setVisibility(View.VISIBLE);
+            binding.fabSwitchMode.setVisibility(View.GONE);
+        });
+
+        // 点击左上角返回按钮：退出地图模式
+        binding.fabMapBack.setOnClickListener(v -> {
+            isMapMode = false;
+            binding.refreshLayout.setVisibility(View.VISIBLE);
+            mMapView.setVisibility(View.GONE);
+
+            // 隐藏返回按钮，恢复显示右下角按钮
+            binding.fabMapBack.setVisibility(View.GONE);
+            binding.fabSwitchMode.setVisibility(View.VISIBLE);
+        });
+
         // 初始自动刷新数据
         binding.refreshLayout.autoRefresh();
+    }
+
+    /**
+     * DP 转 PX 工具方法 (增加了判空保护)
+     */
+    private int dpToPx(Context context, float dp) {
+        if (context == null) return 0;
+        float density = context.getResources().getDisplayMetrics().density;
+        return (int) (dp * density + 0.5f);
+    }
+
+    /**
+     * 在地图上绘制标记点
+     */
+    private void showMarkersOnMap(List<LostFound> dataList) {
+        if (mBaiduMap == null) return;
+        mBaiduMap.clear(); // 刷新时清除旧点
+        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher);
+        boolean isFirstPoint = true; // 用于记录是否是第一个有效点，用来移动地图视角
+        for (LostFound item : dataList) {
+            double lat = item.getLatitude();
+            double lng = item.getLongitude();
+            // 获取经纬度
+            if (item.getLatitude() == 0 && item.getLongitude() == 0) {
+                continue;
+            }
+            if (lat > 90 || lat < -90) {
+                Utils.showResponse("经纬度错误");
+                // 如果真的反了，可以尝试在这两行纠正，或者修改后端数据：
+                continue; // 遇到非法坐标直接跳过，防止地图崩溃
+            }
+            LatLng point = new LatLng(item.getLatitude(), item.getLongitude());
+
+            OverlayOptions option = new MarkerOptions()
+                    .position(point)
+                    .icon(icon)
+                    .title(item.getTitle());
+
+            Marker marker = (Marker) mBaiduMap.addOverlay(option);
+
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("info", item);
+            marker.setExtraInfo(bundle);
+            if (isFirstPoint) {
+                // 15.0f 是缩放级别，越大看街道越清楚
+                com.baidu.mapapi.map.MapStatusUpdate msu =
+                        com.baidu.mapapi.map.MapStatusUpdateFactory.newLatLngZoom(point, 16.0f);
+                mBaiduMap.animateMapStatus(msu); // 移动镜头
+                isFirstPoint = false;
+            }
+        }
+
+        // 设置地图 Marker 的点击事件
+        mBaiduMap.setOnMarkerClickListener(marker -> {
+            Bundle bundle = marker.getExtraInfo();
+            if (bundle != null) {
+                LostFound clickedItem = (LostFound) bundle.getSerializable("info");
+                if (clickedItem != null) {
+                    // 构建一个 NewInfo 以便调用已有的 handleItemClick
+                    NewInfo tempInfo = new NewInfo(clickedItem.getType(), clickedItem.getTitle())
+                            .setSummary(clickedItem.getContent())
+                            .setUserName(clickedItem.getNickname())
+                            .setState(clickedItem.getState())
+                            .setPhone(clickedItem.getPhone())
+                            .setPlace(clickedItem.getPlace())
+                            .setPub_Date(clickedItem.getPubDate())
+                            .setImageUrl(clickedItem.getImg())
+                            .setUser_id(clickedItem.getUserId())
+                            .setId(clickedItem.getId());
+
+                    handleItemClick(tempInfo);
+                }
+            }
+            return true;
+        });
     }
 
     @Override
@@ -174,6 +289,9 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
                         }
                         // 刷新适配器数据
                         newInfoSimpleDelegateAdapter.refresh(list);
+                        // 在地图上绘制标记点
+                        showMarkersOnMap(dataList);
+                        Log.e( "onResponse: ", dataList.toString());
                     }
                 } else {
                     Utils.showResponse("数据加载失败");
@@ -199,7 +317,6 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
             openNewPage(FoundDetailFragment.class, FoundDetailFragment.KEY_FOUND, lostFound);
         }
     }
-
 
     private SingleDelegateAdapter createBannerAdapter() {
         return new SingleDelegateAdapter(R.layout.include_head_view_banner) {
@@ -265,6 +382,25 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
     @Override
     public void onResume() {
         super.onResume();
+        if (mMapView != null) {
+            mMapView.onResume();
+        }
         if (binding.refreshLayout != null) binding.refreshLayout.autoRefresh(50);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mMapView != null) {
+            mMapView.onPause();
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (mMapView != null) {
+            mMapView.onDestroy();
+        }
     }
 }

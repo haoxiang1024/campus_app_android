@@ -24,6 +24,7 @@ import android.os.Looper;
 import androidx.multidex.MultiDex;
 
 import com.baidu.location.LocationClient;
+import com.baidu.mapapi.SDKInitializer;
 import com.hx.campus.activity.LoginActivity;
 import com.hx.campus.activity.chat.ConversationActivity;
 import com.hx.campus.adapter.entity.User;
@@ -90,6 +91,8 @@ public class MyApp extends Application {
         super.onCreate();
         // 百度地图/定位 隐私合规检查
         LocationClient.setAgreePrivacy(true);
+        SDKInitializer.setAgreePrivacy(this, true);
+        SDKInitializer.initialize(this);
         // 初始化基础功能库
         initLibs();
         // 初始化即时通讯服务

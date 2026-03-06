@@ -65,7 +65,9 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
     private String locationEditValue;
     private String result;
     LoadingDialog loadingDialog;
-
+    //经纬度
+    private double currentLat = 0.0;
+    private double currentLng = 0.0;
     private List<LostFoundType> categoryList = new ArrayList<>();
     private ArrayAdapter<LostFoundType> categoryAdapter;
 
@@ -123,6 +125,9 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
 
             LostFound lostFound=new LostFound(foundTitleEditValue, "", date, contentEditValue, locationEditValue, phone, state, stick, id, userId);
             lostFound.setType("招领");
+            //添加经纬度
+            lostFound.setLatitude(currentLat);
+            lostFound.setLongitude(currentLng);
             foundJson = JSON.toJSONString(lostFound);
 
             if (file == null) {
@@ -199,6 +204,9 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
 
             int code = bdLocation.getLocType();
             if (code == BDLocation.TypeGpsLocation || code == BDLocation.TypeNetWorkLocation) {
+                // 获取并保存经纬度
+                currentLat = bdLocation.getLatitude();
+                currentLng = bdLocation.getLongitude();
                 // 定位成功
                 String addr = bdLocation.getAddrStr();
                 // 获取周边 POI 列表
