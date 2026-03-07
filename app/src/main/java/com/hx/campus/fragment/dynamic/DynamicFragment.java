@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.android.vlayout.DelegateAdapter;
@@ -58,6 +59,7 @@ import com.xuexiang.xui.widget.imageview.RadiusImageView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import me.samlss.broccoli.Broccoli;
 import retrofit2.Call;
@@ -75,10 +77,12 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
     private com.baidu.mapapi.map.MapView mMapView;
     private BaiduMap mBaiduMap;
     private boolean isMapMode = false; // 当前是否处于地图模式
-    // 新闻信息数据列表，存储从服务器获取的数据
-   // private List<NewInfo> list = new ArrayList<>();
-    // 新增：保存当前地图上的所有原始数据，用于点击 Marker 时进行位置聚合筛选
+    // 保存当前地图上的所有原始数据，用于点击 Marker 时进行位置聚合筛选
     private List<LostFound> currentMapDataList = new ArrayList<>();
+
+    // 修复弹窗重叠：保存当前的弹窗实例
+    private MaterialDialog mBottomSheetDialog;
+
     /**
      * 创建视图绑定对象
      * @param inflater 布局填充器
@@ -160,6 +164,19 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
 
         mMapView = binding.bmapView;
         mBaiduMap = mMapView.getMap();
+
+        // 将 Marker 点击事件移到这里，生命周期内只绑定一次
+        mBaiduMap.setOnMarkerClickListener(marker -> {
+            Bundle bundle = marker.getExtraInfo();
+            if (bundle != null) {
+                LostFound clickedItem = (LostFound) bundle.getSerializable("info");
+                if (clickedItem != null) {
+                    showXUIBottomSheet(clickedItem);
+                }
+            }
+            return true;
+        });
+
         // 点击右下角按钮：进入地图模式
         binding.fabSwitchMode.setOnClickListener(v -> {
             isMapMode = true;
@@ -207,18 +224,31 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
         BitmapDescriptor foundIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_location_marker_found);
 
         boolean isFirstPoint = true; // 用于记录是否是第一个有效点，用来移动地图视角
+
+        // 记录已经绘制过 Marker 的位置集合
+        List<String> drawnPoints = new ArrayList<>();
+
         for (LostFound item : dataList) {
             double lat = item.getLatitude();
             double lng = item.getLongitude();
-            // 获取经纬度
-            if (item.getLatitude() == 0 && item.getLongitude() == 0) {
+
+            // 获取经纬度验证
+            if (lat == 0 && lng == 0) {
                 continue;
             }
             if (lat > 90 || lat < -90) {
                 Utils.showResponse("经纬度错误");
-                continue; // 遇到非法坐标直接跳过，防止地图崩溃
+                continue;
             }
-            LatLng point = new LatLng(item.getLatitude(), item.getLongitude());
+
+            // 保留 5 位小数精度（约1米左右），防止相同坐标重复添加 Marker
+            String locKey = String.format(Locale.getDefault(), "%.5f,%.5f", lat, lng);
+            if (drawnPoints.contains(locKey)) {
+                continue; // 这个位置已经画过点了，直接跳过，反正弹窗时会聚合显示
+            }
+            drawnPoints.add(locKey);
+
+            LatLng point = new LatLng(lat, lng);
             BitmapDescriptor currentIcon;
             if (item.getType().equals("失物")) {
                 currentIcon = lostIcon;
@@ -236,81 +266,62 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
             bundle.putSerializable("info", item);
             marker.setExtraInfo(bundle);
             if (isFirstPoint) {
-                // 15.0f 是缩放级别，越大看街道越清楚
+                // 16.0f 是缩放级别，越大看街道越清楚
                 com.baidu.mapapi.map.MapStatusUpdate msu =
                         com.baidu.mapapi.map.MapStatusUpdateFactory.newLatLngZoom(point, 16.0f);
                 mBaiduMap.animateMapStatus(msu); // 移动镜头
                 isFirstPoint = false;
             }
         }
-
-        // 设置地图 Marker 的点击事件
-        mBaiduMap.setOnMarkerClickListener(marker -> {
-            Bundle bundle = marker.getExtraInfo();
-            if (bundle != null) {
-                LostFound clickedItem = (LostFound) bundle.getSerializable("info");
-                if (clickedItem != null) {
-                    // 封装数据以便跳转
-                    NewInfo tempInfo = new NewInfo(clickedItem.getType(), clickedItem.getTitle())
-                            .setSummary(clickedItem.getContent())
-                            .setUserName(clickedItem.getNickname())
-                            .setState(clickedItem.getState())
-                            .setPhone(clickedItem.getPhone())
-                            .setPlace(clickedItem.getPlace())
-                            .setPub_Date(clickedItem.getPubDate())
-                            .setImageUrl(clickedItem.getImg())
-                            .setUser_id(clickedItem.getUserId())
-                            .setId(clickedItem.getId());
-
-                    // 调用 XUI 风格的底部弹窗
-                    showXUIBottomSheet(clickedItem, tempInfo);
-                }
-            }
-            return true;
-        });
     }
-    private void showXUIBottomSheet(LostFound item, NewInfo newInfo) {
-        MaterialDialog dialog = new MaterialDialog.Builder(getContext())
-                .customView(R.layout.dialog_bottom_marker_info, true)
-                .build();
 
-        View view = dialog.getCustomView();
-        if (view != null) {
-            // 绑定数据
-            TextView tvTitle = view.findViewById(R.id.tv_title);
-            TextView tvUserName = view.findViewById(R.id.tv_user_name);
-            TextView tvSummary = view.findViewById(R.id.tv_summary);
-            TextView tvPlace = view.findViewById(R.id.tv_place);
-            RadiusImageView ivImage = view.findViewById(R.id.iv_marker_img);
-            Button btnDetail = view.findViewById(R.id.btn_detail);
-            tvTitle.setText(item.getTitle());
-            tvUserName.setText("发布者：" + item.getNickname());
-            tvSummary.setText(item.getContent());
-            tvPlace.setText("📍 " + item.getPlace());
-            ImageLoader.get().loadImage(ivImage, item.getImg());
+    /**
+     * 弹出位置聚合列表信息
+     */
+    private void showXUIBottomSheet(LostFound clickedItem) {
+        if (getContext() == null) return;
 
-            btnDetail.setOnClickListener(v -> {
-                dialog.dismiss();
-                handleItemClick(newInfo);
-            });
+        // 如果当前已经有弹窗在显示，直接拦截
+        if (mBottomSheetDialog != null && mBottomSheetDialog.isShowing()) {
+            return;
         }
-        Window window = dialog.getWindow();
+
+        // 聚合逻辑：找出地图上所有与当前点击位置相同（或极近）的物品
+        List<LostFound> aggregatedList = new ArrayList<>();
+        for (LostFound item : currentMapDataList) {
+            if (Math.abs(item.getLatitude() - clickedItem.getLatitude()) < 0.00001 &&
+                    Math.abs(item.getLongitude() - clickedItem.getLongitude()) < 0.00001) {
+                aggregatedList.add(item);
+            }
+        }
+
+        // 实例化自定义适配器
+        MapAggregateAdapter adapter = new MapAggregateAdapter(aggregatedList);
+
+        // 创建弹窗并设置 Adapter
+        mBottomSheetDialog = new MaterialDialog.Builder(getContext())
+                .title("📍 位置：详情列表")
+                .content("该地点共有 " + aggregatedList.size() + " 件关联物品：")
+                .adapter(adapter, new LinearLayoutManager(getContext()))
+                .positiveText("关闭")
+                .show();
+
+        // 将弹窗实例传给 Adapter，方便点击条目时关闭弹窗
+        adapter.setDialog(mBottomSheetDialog);
+
+        // 设置底部弹出效果（保持 BottomSheet 体验）
+        Window window = mBottomSheetDialog.getWindow();
         if (window != null) {
-            // 设置从底部弹出
             window.setGravity(Gravity.BOTTOM);
-            // 设置弹出动画
-             window.setWindowAnimations(android.R.style.Animation_InputMethod);
-            // 设置宽度全屏
+            window.setWindowAnimations(android.R.style.Animation_InputMethod);
             WindowManager.LayoutParams lp = window.getAttributes();
             lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-            lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+            // 限制弹窗最大高度，防止列表过长导致界面撑满
+            lp.height = (int) (getResources().getDisplayMetrics().heightPixels * 0.6);
             window.setAttributes(lp);
-
-            window.setBackgroundDrawableResource(android.R.color.transparent);
         }
-
-        dialog.show();
     }
+
     @Override
     protected void initListeners() {
         // 下拉刷新
@@ -335,6 +346,9 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
                     List<LostFound> dataList = response.body().getData();
                     if (dataList != null) {
                         list.clear();
+                        currentMapDataList.clear();
+                        currentMapDataList.addAll(dataList); // 保存完整数据源给地图用
+
                         for (LostFound item : dataList) {
                             list.add(new NewInfo(item.getLostfoundtype().getName(), item.getTitle())
                                     .setSummary(item.getContent())
@@ -370,7 +384,7 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
         LostFound lostFound = new LostFound(newInfo.getTitle(), newInfo.getImageUrl(), newInfo.getPub_Date(), newInfo.getSummary(), newInfo.getPlace(), newInfo.getPhone(), newInfo.getState(), newInfo.getUserName());
         lostFound.setUserId(newInfo.getUser_id());
         lostFound.setId(newInfo.getId());
-        if ("寻找中".equals(newInfo.getState())) {
+        if ("寻找中".equals(newInfo.getState()) ) {
             openNewPage(LostDetailFragment.class, LostDetailFragment.KEY_LOST, lostFound);
         } else {
             openNewPage(FoundDetailFragment.class, FoundDetailFragment.KEY_FOUND, lostFound);
@@ -460,6 +474,165 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
         super.onDestroyView();
         if (mMapView != null) {
             mMapView.onDestroy();
+        }
+    }
+
+    /**
+     * 提取出的公共跳转方法，供 Adapter 使用
+     */
+    private void handleItemClickWrapper(LostFound selectedItem) {
+        NewInfo tempInfo = new NewInfo(selectedItem.getType(), selectedItem.getTitle())
+                .setSummary(selectedItem.getContent())
+                .setUserName(selectedItem.getNickname())
+                .setState(selectedItem.getState())
+                .setPhone(selectedItem.getPhone())
+                .setPlace(selectedItem.getPlace())
+                .setPub_Date(selectedItem.getPubDate())
+                .setImageUrl(selectedItem.getImg())
+                .setUser_id(selectedItem.getUserId())
+                .setId(selectedItem.getId());
+
+        handleItemClick(tempInfo);
+    }
+
+    /**
+     * 显示图片放大预览弹窗
+     */
+
+    private void showImagePreviewDialog(String imageUrl) {
+        if (getContext() == null || imageUrl == null || imageUrl.isEmpty()) return;
+
+        // 创建一个全屏无标题栏的 Dialog
+        android.app.Dialog previewDialog = new android.app.Dialog(getContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+
+        // 改用系统原生的 ImageView，完美支持 FIT_CENTER
+        android.widget.ImageView fullImageView = new android.widget.ImageView(getContext());
+        fullImageView.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+
+        // FIT_CENTER 会保证图片完整显示在屏幕内，且比例不变
+        fullImageView.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
+        fullImageView.setBackgroundColor(0xFF000000); // 黑色背景
+
+        // 使用框架的 ImageLoader 加载图片
+        ImageLoader.get().loadImage(fullImageView, imageUrl);
+
+        // 点击大图关闭预览
+        fullImageView.setOnClickListener(v -> previewDialog.dismiss());
+
+        previewDialog.setContentView(fullImageView);
+
+        // 确保 Dialog 的 Window 也是全屏状态
+        Window window = previewDialog.getWindow();
+        if (window != null) {
+            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
+        }
+
+        previewDialog.show();
+    }
+
+    /**
+     * 底部弹窗列表的自定义 Adapter
+     */
+    private class MapAggregateAdapter extends RecyclerView.Adapter<MapAggregateAdapter.ViewHolder> {
+        private List<LostFound> mData;
+        private MaterialDialog mDialog;
+
+        public MapAggregateAdapter(List<LostFound> data) {
+            this.mData = data;
+        }
+
+        public void setDialog(MaterialDialog dialog) {
+            this.mDialog = dialog;
+        }
+
+        @NonNull
+        @Override
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            // 纯代码动态构建子项布局：左侧文字，右侧图片
+            Context context = parent.getContext();
+            android.widget.LinearLayout layout = new android.widget.LinearLayout(context);
+            layout.setOrientation(android.widget.LinearLayout.HORIZONTAL);
+            layout.setLayoutParams(new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT));
+            int padding = dpToPx(context, 16);
+            layout.setPadding(padding, padding, padding, padding);
+            layout.setGravity(Gravity.CENTER_VERTICAL);
+
+            // 左侧文本描述
+            TextView tvDesc = new TextView(context);
+            tvDesc.setTextSize(15);
+            tvDesc.setTextColor(0xFF333333); // 稍微深一点的灰色
+            tvDesc.setLineSpacing(0, 1.2f);
+            android.widget.LinearLayout.LayoutParams tvParams = new android.widget.LinearLayout.LayoutParams(
+                    0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f);
+            tvDesc.setLayoutParams(tvParams);
+
+            // 右侧缩略图
+            com.xuexiang.xui.widget.imageview.RadiusImageView ivThumb = new com.xuexiang.xui.widget.imageview.RadiusImageView(context);
+            int imgSize = dpToPx(context, 60); // 设置图片宽高为 60dp
+            android.widget.LinearLayout.LayoutParams ivParams = new android.widget.LinearLayout.LayoutParams(imgSize, imgSize);
+            ivParams.leftMargin = dpToPx(context, 12); // 文字和图片的间距
+            ivThumb.setLayoutParams(ivParams);
+            ivThumb.setCornerRadius(dpToPx(context, 6)); // 圆角效果
+            ivThumb.setScaleType(android.widget.ImageView.ScaleType.CENTER_CROP);
+            // 增加点击水波纹反馈
+            android.util.TypedValue outValue = new android.util.TypedValue();
+            context.getTheme().resolveAttribute(android.R.attr.selectableItemBackgroundBorderless, outValue, true);
+            ivThumb.setBackgroundResource(outValue.resourceId);
+
+            layout.addView(tvDesc);
+            layout.addView(ivThumb);
+
+            return new ViewHolder(layout, tvDesc, ivThumb);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+            LostFound item = mData.get(position);
+            String typeIcon = "招领".equals(item.getType()) ? "🎁" : "🔍";
+            String formattedText = String.format("%s [%s] %s \n📍 %s",
+                    typeIcon, item.getType(), item.getTitle(), item.getPlace());
+
+            holder.tvDesc.setText(formattedText);
+
+            // 如果有图片链接，加载并显示；否则隐藏 ImageView
+            if (item.getImg() != null && !item.getImg().isEmpty()) {
+                holder.ivThumb.setVisibility(View.VISIBLE);
+                ImageLoader.get().loadImage(holder.ivThumb, item.getImg());
+
+                // 点击图片触发放大效果
+                holder.ivThumb.setOnClickListener(v -> {
+                    showImagePreviewDialog(item.getImg());
+                });
+            } else {
+                holder.ivThumb.setVisibility(View.GONE);
+                holder.ivThumb.setOnClickListener(null);
+            }
+
+            // 点击除了图片以外的区域（整个 Item 行），跳转详情页
+            holder.itemView.setOnClickListener(v -> {
+                if (mDialog != null) mDialog.dismiss();
+                handleItemClickWrapper(item);
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            return mData == null ? 0 : mData.size();
+        }
+
+        class ViewHolder extends RecyclerView.ViewHolder {
+            TextView tvDesc;
+            com.xuexiang.xui.widget.imageview.RadiusImageView ivThumb;
+
+            public ViewHolder(@NonNull View itemView, TextView tvDesc, com.xuexiang.xui.widget.imageview.RadiusImageView ivThumb) {
+                super(itemView);
+                this.tvDesc = tvDesc;
+                this.ivThumb = ivThumb;
+            }
         }
     }
 }
