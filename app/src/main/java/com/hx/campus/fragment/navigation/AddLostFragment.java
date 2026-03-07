@@ -3,20 +3,27 @@ package com.hx.campus.fragment.navigation;
 import static com.xuexiang.xutil.XUtil.runOnUiThread;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.fastjson.JSON;
 import com.baidu.location.BDAbstractLocationListener;
@@ -35,6 +42,7 @@ import com.hx.campus.utils.api.RetrofitClient;
 import com.hx.campus.utils.common.LoadingDialog;
 import com.xuexiang.xpage.annotation.Page;
 import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog;
+import com.xuexiang.xui.widget.imageview.ImageLoader;
 import com.xuexiang.xui.widget.toast.XToast;
 
 import java.io.File;
@@ -211,6 +219,7 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
                     List<String> poiNames = new ArrayList<>();
                     for (com.baidu.location.Poi p : poiList) {
                         poiNames.add(p.getName());
+                        poiNames.add(p.getName());
                     }
                     new MaterialDialog.Builder(getContext())
                             .title("请选择具体位置")
@@ -286,30 +295,28 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
     }
 
     private void showMatchDialog(List<LostFound> matchList, String msg) {
-        List<String> displayItems = new ArrayList<>();
-        for (LostFound item : matchList) {
-            String typeIcon = "招领".equals(item.getType()) ? "🎁" : "🔍";
-            String formattedText = String.format("%s [%s] %s    📍 %s",
-                    typeIcon, item.getType(), item.getTitle(), item.getPlace());
-            displayItems.add(formattedText);
-        }
-        new MaterialDialog.Builder(getContext())
+        if (getContext() == null) return;
+
+        MatchAggregateAdapter adapter = new MatchAggregateAdapter(matchList);
+
+        MaterialDialog dialog = new MaterialDialog.Builder(getContext())
                 .title("🤖 智能匹配助手")
                 .content("发布成功！系统为您匹配到了以下疑似物品，点击即可查看详情：")
-                .items(displayItems)
-                .itemsCallback((dialog, itemView, position, text) -> {
-                    LostFound selected = matchList.get(position);
-                    if ("招领".equals(selected.getType())) {
-                        openPage(FoundDetailFragment.class, FoundDetailFragment.KEY_FOUND, selected);
-                    } else {
-                        openPage(LostDetailFragment.class, LostDetailFragment.KEY_LOST, selected);
-                    }
-                    clearUI();
-                })
+                .adapter(adapter, new LinearLayoutManager(getContext()))
                 .positiveText("暂不需要")
-                .onPositive((dialog, which) -> clearUI())
+                .onPositive((d, which) -> clearUI())
                 .cancelable(false)
                 .show();
+
+        adapter.setDialog(dialog);
+
+        // 限制弹窗高度
+        Window window = dialog.getWindow();
+        if (window != null) {
+            WindowManager.LayoutParams lp = window.getAttributes();
+            lp.height = (int) (getResources().getDisplayMetrics().heightPixels * 0.6);
+            window.setAttributes(lp);
+        }
     }
 
     private void showResponse(final String response) {
@@ -421,6 +428,138 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
         if (mLocationClient != null) {
             mLocationClient.stop();
             mLocationClient.unRegisterLocationListener(mListener);
+        }
+    }
+
+    // ======================================
+    // 弹窗相关辅助方法和适配器
+    // ======================================
+
+    private int dpToPx(Context context, float dp) {
+        if (context == null) return 0;
+        float density = context.getResources().getDisplayMetrics().density;
+        return (int) (dp * density + 0.5f);
+    }
+
+    private void showImagePreviewDialog(String imageUrl) {
+        if (getContext() == null || imageUrl == null || imageUrl.isEmpty()) return;
+
+        android.app.Dialog previewDialog = new android.app.Dialog(getContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+
+        android.widget.ImageView fullImageView = new android.widget.ImageView(getContext());
+        fullImageView.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+        fullImageView.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
+        fullImageView.setBackgroundColor(0xFF000000);
+
+        ImageLoader.get().loadImage(fullImageView, imageUrl);
+        fullImageView.setOnClickListener(v -> previewDialog.dismiss());
+
+        previewDialog.setContentView(fullImageView);
+
+        Window window = previewDialog.getWindow();
+        if (window != null) {
+            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
+        }
+
+        previewDialog.show();
+    }
+
+    private class MatchAggregateAdapter extends RecyclerView.Adapter<MatchAggregateAdapter.ViewHolder> {
+        private List<LostFound> mData;
+        private MaterialDialog mDialog;
+
+        public MatchAggregateAdapter(List<LostFound> data) {
+            this.mData = data;
+        }
+
+        public void setDialog(MaterialDialog dialog) {
+            this.mDialog = dialog;
+        }
+
+        @NonNull
+        @Override
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            Context context = parent.getContext();
+            android.widget.LinearLayout layout = new android.widget.LinearLayout(context);
+            layout.setOrientation(android.widget.LinearLayout.HORIZONTAL);
+            layout.setLayoutParams(new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT));
+            int padding = dpToPx(context, 16);
+            layout.setPadding(padding, padding, padding, padding);
+            layout.setGravity(Gravity.CENTER_VERTICAL);
+
+            TextView tvDesc = new TextView(context);
+            tvDesc.setTextSize(15);
+            tvDesc.setTextColor(0xFF333333);
+            tvDesc.setLineSpacing(0, 1.2f);
+            android.widget.LinearLayout.LayoutParams tvParams = new android.widget.LinearLayout.LayoutParams(
+                    0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f);
+            tvDesc.setLayoutParams(tvParams);
+
+            com.xuexiang.xui.widget.imageview.RadiusImageView ivThumb = new com.xuexiang.xui.widget.imageview.RadiusImageView(context);
+            int imgSize = dpToPx(context, 60);
+            android.widget.LinearLayout.LayoutParams ivParams = new android.widget.LinearLayout.LayoutParams(imgSize, imgSize);
+            ivParams.leftMargin = dpToPx(context, 12);
+            ivThumb.setLayoutParams(ivParams);
+            ivThumb.setCornerRadius(dpToPx(context, 6));
+            ivThumb.setScaleType(android.widget.ImageView.ScaleType.CENTER_CROP);
+
+            android.util.TypedValue outValue = new android.util.TypedValue();
+            context.getTheme().resolveAttribute(android.R.attr.selectableItemBackgroundBorderless, outValue, true);
+            ivThumb.setBackgroundResource(outValue.resourceId);
+
+            layout.addView(tvDesc);
+            layout.addView(ivThumb);
+
+            return new ViewHolder(layout, tvDesc, ivThumb);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+            LostFound item = mData.get(position);
+            String typeIcon = "招领".equals(item.getType()) ? "🎁" : "🔍";
+            String formattedText = String.format("%s [%s] %s \n📍 %s",
+                    typeIcon, item.getType(), item.getTitle(), item.getPlace());
+
+            holder.tvDesc.setText(formattedText);
+
+            if (item.getImg() != null && !item.getImg().isEmpty()) {
+                holder.ivThumb.setVisibility(View.VISIBLE);
+                ImageLoader.get().loadImage(holder.ivThumb, item.getImg());
+                holder.ivThumb.setOnClickListener(v -> showImagePreviewDialog(item.getImg()));
+            } else {
+                holder.ivThumb.setVisibility(View.GONE);
+                holder.ivThumb.setOnClickListener(null);
+            }
+
+            holder.itemView.setOnClickListener(v -> {
+                if (mDialog != null) mDialog.dismiss();
+                if ("招领".equals(item.getType())) {
+                    openPage(FoundDetailFragment.class, FoundDetailFragment.KEY_FOUND, item);
+                } else {
+                    openPage(LostDetailFragment.class, LostDetailFragment.KEY_LOST, item);
+                }
+                clearUI();
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            return mData == null ? 0 : mData.size();
+        }
+
+        class ViewHolder extends RecyclerView.ViewHolder {
+            TextView tvDesc;
+            com.xuexiang.xui.widget.imageview.RadiusImageView ivThumb;
+
+            public ViewHolder(@NonNull View itemView, TextView tvDesc, com.xuexiang.xui.widget.imageview.RadiusImageView ivThumb) {
+                super(itemView);
+                this.tvDesc = tvDesc;
+                this.ivThumb = ivThumb;
+            }
         }
     }
 }
