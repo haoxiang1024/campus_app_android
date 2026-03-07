@@ -274,24 +274,21 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
                         if (response.isSuccessful() && response.body() != null) {
                             if (response.body().getStatus() == 0) {
                                 showResponse(response.body().getMsg());
+
                                 List<LostFound> matchData = response.body().getData();
                                 if (matchData != null && !matchData.toString().equals("[]")) {
-                                    // 发现匹配，弹出提示框
                                     List<LostFound> matchList = JSON.parseArray(JSON.toJSONString(matchData), LostFound.class);
                                     if (matchList != null && !matchList.isEmpty()) {
-                                        // 发现匹配，弹出列表提示框
                                         runOnUiThread(() -> showMatchDialog(matchList, response.body().getMsg()));
                                     } else {
-                                        showResponse(response.body().getMsg());
                                         runOnUiThread(() -> clearUI());
                                     }
                                 } else {
-                                    // 没有匹配，走正常逻辑
-                                    showResponse(response.body().getMsg());
                                     runOnUiThread(() -> clearUI());
                                 }
                             } else {
-                                showResponse( response.body().getMsg());
+                                // 状态码不为0时的错误提示
+                                showResponse(response.body().getMsg());
                                 runOnUiThread(() -> clearUI());
                             }
                         }

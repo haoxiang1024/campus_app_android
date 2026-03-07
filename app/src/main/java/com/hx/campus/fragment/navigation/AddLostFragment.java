@@ -63,7 +63,11 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
     private String lostTitleEditValue;
     private String contentEditValue;
     private String locationEditValue;
+    private String result;
     LoadingDialog loadingDialog;
+
+    private double currentLat = 0.0;
+    private double currentLng = 0.0;
 
     private List<LostFoundType> categoryList = new ArrayList<>();
     private ArrayAdapter<LostFoundType> categoryAdapter;
@@ -122,20 +126,26 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
             LostFound lostFound = new LostFound(lostTitleEditValue, "", date, contentEditValue,
                     locationEditValue, phone, state, stick, id, userId);
             lostFound.setType("失物");
+            lostFound.setLatitude(currentLat);
+            lostFound.setLongitude(currentLng);
             lostJson = JSON.toJSONString(lostFound);
 
             if (file == null) {
                 hideLoadingDialog();
-                showResponse(Utils.getString(getContext(), R.string.no_image_selected_yet));
+                result = Utils.getString(getContext(), R.string.no_image_selected_yet);
+                showResponse(result);
             } else if (TextUtils.isEmpty(lostTitleEditValue.trim())) {
                 hideLoadingDialog();
-                showResponse(Utils.getString(getContext(), R.string.title_not_empty));
+                result = Utils.getString(getContext(), R.string.title_not_empty);
+                showResponse(result);
             } else if (TextUtils.isEmpty(contentEditValue.trim())) {
                 hideLoadingDialog();
-                showResponse(Utils.getString(getContext(), R.string.content_not_empty));
+                result = Utils.getString(getContext(), R.string.content_not_empty);
+                showResponse(result);
             } else if (TextUtils.isEmpty(locationEditValue.trim())) {
                 hideLoadingDialog();
-                showResponse(Utils.getString(getContext(), R.string.location_not_empty));
+                result = Utils.getString(getContext(), R.string.location_not_empty);
+                showResponse(result);
             } else {
                 upload(lostJson);
             }
@@ -165,9 +175,9 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
             LocationClientOption option = new LocationClientOption();
             option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
             option.setCoorType("bd09ll");
-            option.setScanSpan(0);         // 只定位一次
-            option.setIsNeedAddress(true); // 需要地址
-            option.setIsNeedLocationPoiList(true); // 允许获取周边兴趣点
+            option.setScanSpan(0);
+            option.setIsNeedAddress(true);
+            option.setIsNeedLocationPoiList(true);
             option.setOpenGps(true);
             option.setIgnoreKillProcess(false);
 
@@ -181,7 +191,6 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
         }
     }
 
-    // 百度定位回调
     private class MyLocationListener extends BDAbstractLocationListener {
         @Override
         public void onReceiveLocation(BDLocation bdLocation) {
@@ -194,12 +203,11 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
 
             int code = bdLocation.getLocType();
             if (code == BDLocation.TypeGpsLocation || code == BDLocation.TypeNetWorkLocation) {
-                // 定位成功
+                currentLat = bdLocation.getLatitude();
+                currentLng = bdLocation.getLongitude();
                 String addr = bdLocation.getAddrStr();
-                // 获取周边 POI 列表
                 List<com.baidu.location.Poi> poiList = bdLocation.getPoiList();
                 if (poiList != null && !poiList.isEmpty()) {
-                    // 如果有周边建筑，弹出列表让用户选一个更准的
                     List<String> poiNames = new ArrayList<>();
                     for (com.baidu.location.Poi p : poiList) {
                         poiNames.add(p.getName());
@@ -208,14 +216,12 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
                             .title("请选择具体位置")
                             .items(poiNames)
                             .itemsCallback((dialog, itemView, position, text) -> {
-                                // 将“大地址 + 具体建筑”合并填入
                                 binding.etLocation.setText(addr + "（" + text + "）");
                             })
                             .positiveText("就用当前位置")
                             .onPositive((dialog, which) -> binding.etLocation.setText(addr))
                             .show();
                 } else {
-                    // 没有周边信息时直接填入基础地址
                     binding.etLocation.setText(addr);
                 }
             } else {
@@ -223,7 +229,6 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
                 Log.e("百度定位", "错误码：" + code + " 信息：" + bdLocation.getLocTypeDescription());
             }
 
-            // 定位一次就停止
             if (mLocationClient != null) {
                 mLocationClient.stop();
             }
@@ -251,10 +256,17 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
                         hideLoadingDialog();
                         if (response.isSuccessful() && response.body() != null) {
                             if (response.body().getStatus() == 0) {
+                                // 统一在这里提示一次即可
                                 showResponse(response.body().getMsg());
+
                                 List<LostFound> matchData = response.body().getData();
-                                if (matchData != null && !matchData.isEmpty()) {
-                                    runOnUiThread(() -> showMatchDialog(matchData, response.body().getMsg()));
+                                if (matchData != null && !matchData.toString().equals("[]")) {
+                                    List<LostFound> matchList = JSON.parseArray(JSON.toJSONString(matchData), LostFound.class);
+                                    if (matchList != null && !matchList.isEmpty()) {
+                                        runOnUiThread(() -> showMatchDialog(matchList, response.body().getMsg()));
+                                    } else {
+                                        runOnUiThread(AddLostFragment.this::clearUI);
+                                    }
                                 } else {
                                     runOnUiThread(AddLostFragment.this::clearUI);
                                 }
