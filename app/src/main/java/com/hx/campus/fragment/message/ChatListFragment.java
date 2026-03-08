@@ -1,11 +1,13 @@
 package com.hx.campus.fragment.message;
 
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.hx.campus.R;
 import com.xuexiang.xpage.annotation.Page;
 
 import io.rong.imkit.conversationlist.ConversationListFragment;
@@ -23,6 +25,14 @@ public class ChatListFragment extends ConversationListFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         // 调用父类的视图创建方法
         super.onViewCreated(view, savedInstanceState);
-        // 此处可以添加自定义的视图初始化逻辑
+        background(view);
+
+    }
+
+    private void background(@NonNull View view) {
+        TypedValue typedValue = new TypedValue();
+        getContext().getTheme().resolveAttribute(com.xuexiang.xui.R.attr.xui_config_color_background, typedValue, true);
+        int backgroundColor = typedValue.data;
+        view.setBackgroundColor(backgroundColor);
     }
 }

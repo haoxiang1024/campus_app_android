@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:attr/windowBackground"
+   android:background="?attr/xui_config_color_background"
     android:orientation="vertical">
 
     <com.scwang.smart.refresh.layout.SmartRefreshLayout
@@ -44,7 +44,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="220dp"
                             android:scaleType="centerCrop"
-                            android:background="?android:attr/windowBackground"
+
                             android:src="@drawable/ic_default_image" />
                     </androidx.cardview.widget.CardView>
 
@@ -232,7 +232,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?android:attr/colorBackgroundFloating"
         android:elevation="12dp"
         android:orientation="vertical">
 
@@ -254,7 +253,7 @@
                 android:layout_height="42dp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_card_white_radius"
-                android:backgroundTint="?android:attr/windowBackground"
+                android:backgroundTint="@color/white"
                 android:hint="写下你的评论..."
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"

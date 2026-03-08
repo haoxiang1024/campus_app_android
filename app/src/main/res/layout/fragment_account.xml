@@ -3,8 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+   android:background="?attr/xui_config_color_background"
     android:orientation="vertical"
-    android:background="?android:attr/windowBackground">
+    >
 
     <com.scwang.smart.refresh.layout.SmartRefreshLayout
         android:id="@+id/refresh_layout"
@@ -123,7 +124,7 @@
                                 android:textColor="?colorAccent"
                                 android:textSize="14sp"
                                 android:padding="4dp"
-                                android:background="?android:attr/windowBackground"/>
+                                />
                         </LinearLayout>
 
                         <LinearLayout
@@ -148,7 +149,7 @@
                                 android:textColor="?colorAccent"
                                 android:textSize="14sp"
                                 android:padding="4dp"
-                                android:background="?android:attr/windowBackground"/>
+                                />
                         </LinearLayout>
 
                         <LinearLayout
@@ -156,7 +157,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="16dp"
-                            android:background="?android:attr/windowBackground"
+
                             android:orientation="vertical"
                             android:padding="12dp"
                             android:visibility="gone">
@@ -218,7 +219,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
                             android:layout_marginTop="16dp"
-                            android:background="?android:attr/windowBackground" />
+                             />
 
                         <TextView
                             android:id="@+id/reg_date"
@@ -234,7 +235,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:background="?android:attr/windowBackground"
+
                             android:paddingVertical="12dp">
 
                             <TextView
@@ -265,7 +266,7 @@
                         android:layout_marginHorizontal="20dp"
                         android:background="@drawable/button_bg"
                         android:text="保存基础信息"
-                        android:textColor="?android:attr/windowBackground"
+                        android:textColor="@color/white"
                         android:textSize="16sp" />
                 </LinearLayout>
 

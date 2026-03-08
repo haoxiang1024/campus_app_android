@@ -59,6 +59,7 @@ import com.xuexiang.xutil.XUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -495,5 +496,37 @@ public final class Utils {
             e.printStackTrace();
             return timeStr;
         }
+    }
+
+    /**
+     * 判断当前设备是否为模拟器
+     * * @return true: 模拟器, false: 真机
+     */
+    public static boolean isEmulator() {
+        return (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
+                || Build.FINGERPRINT.startsWith("generic")
+                || Build.FINGERPRINT.startsWith("unknown")
+                || Build.HARDWARE.contains("goldfish")
+                || Build.HARDWARE.contains("ranchu")
+                || Build.MODEL.contains("google_sdk")
+                || Build.MODEL.contains("Emulator")
+                || Build.MODEL.contains("Android SDK built for x86")
+                || Build.MANUFACTURER.contains("Genymotion")
+                || Build.PRODUCT.contains("sdk_google")
+                || Build.PRODUCT.contains("google_sdk")
+                || Build.PRODUCT.contains("sdk")
+                || Build.PRODUCT.contains("sdk_x86")
+                || Build.PRODUCT.contains("vbox86p")
+                || Build.PRODUCT.contains("emulator")
+                || Build.PRODUCT.contains("simulator")
+                || isPipeFileExists();
+    }
+
+    /**
+     * 辅助检查：检查是否存在模拟器特有的管道文件
+     */
+    private static boolean isPipeFileExists() {
+        File pipeFile = new File("/dev/socket/qemud");
+        return pipeFile.exists();
     }
 }

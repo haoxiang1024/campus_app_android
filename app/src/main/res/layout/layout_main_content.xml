@@ -35,7 +35,7 @@
         android:layout_width="match_parent"
         android:layout_height="?actionBarSize"
         android:layout_gravity="bottom"
-        android:background="?android:attr/windowBackground"
+        android:background="?attr/xui_config_color_background"
         app:labelVisibilityMode="labeled"
         app:menu="@menu/menu_navigation_bottom" />
 

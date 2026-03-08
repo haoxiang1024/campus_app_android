@@ -93,8 +93,19 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
     @NonNull
     @Override
     protected FragmentNewsBinding viewBindingInflate(@NonNull LayoutInflater inflater, ViewGroup container, boolean attachToRoot) {
-        // 使用视图绑定inflate方法创建绑定对象
-        return FragmentNewsBinding.inflate(inflater, container, attachToRoot);
+        FragmentNewsBinding binding = FragmentNewsBinding.inflate(inflater, container, attachToRoot);
+        if (binding != null && Utils.isEmulator()) {
+            // 关键点：不仅要判断 bmapView，还要确保它有父容器才能 remove
+            if (binding.bmapView != null) {
+                View mapView = binding.bmapView;
+                ViewGroup parent = (ViewGroup) mapView.getParent();
+                if (parent != null) {
+                    parent.removeView(mapView);
+                    Log.d("HX_CAMPUS", "模拟器环境：已安全移除百度地图控件");
+                }
+            }
+        }
+        return binding;
     }
 
     @Override
@@ -109,7 +120,19 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
         RecyclerView.RecycledViewPool viewPool = new RecyclerView.RecycledViewPool();
         binding.recyclerView.setRecycledViewPool(viewPool);
         viewPool.setMaxRecycledViews(0, 10);
+        adapter(virtualLayoutManager);
+        if (Utils.isEmulator()){
+            binding.fabSwitchMode.setVisibility(View.GONE);
+            binding.bmapView.setVisibility(View.GONE);
+            Log.e("HX_CAMPUS", "模拟器环境");
+        }else {
+            baiduMap();
+        }
+        // 初始自动刷新数据
+        binding.refreshLayout.autoRefresh();
+    }
 
+    private void adapter(VirtualLayoutManager virtualLayoutManager) {
         // 轮播条适配器
         SingleDelegateAdapter bannerAdapter = createBannerAdapter();
 
@@ -161,7 +184,9 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
         delegateAdapter.addAdapter(titleAdapter);
         delegateAdapter.addAdapter(newInfoSimpleDelegateAdapter);
         binding.recyclerView.setAdapter(delegateAdapter);
+    }
 
+    private void baiduMap() {
         mMapView = binding.bmapView;
         mBaiduMap = mMapView.getMap();
 
@@ -200,9 +225,6 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
             binding.llMapControls.setVisibility(View.GONE);
             binding.fabSwitchMode.setVisibility(View.VISIBLE);
         });
-
-        // 初始自动刷新数据
-        binding.refreshLayout.autoRefresh();
     }
 
     /**
