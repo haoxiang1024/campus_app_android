@@ -1,6 +1,7 @@
 package com.hx.campus.fragment.dynamic;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -35,6 +36,7 @@ import com.hx.campus.adapter.base.delegate.SimpleDelegateAdapter;
 import com.hx.campus.adapter.base.delegate.SingleDelegateAdapter;
 import com.hx.campus.adapter.entity.LostFound;
 import com.hx.campus.adapter.entity.NewInfo;
+import com.hx.campus.adapter.entity.User;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.core.webview.AgentWebActivity;
 import com.hx.campus.databinding.FragmentNewsBinding;
@@ -94,17 +96,6 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
     @Override
     protected FragmentNewsBinding viewBindingInflate(@NonNull LayoutInflater inflater, ViewGroup container, boolean attachToRoot) {
         FragmentNewsBinding binding = FragmentNewsBinding.inflate(inflater, container, attachToRoot);
-        if (binding != null && Utils.isEmulator()) {
-            // 关键点：不仅要判断 bmapView，还要确保它有父容器才能 remove
-            if (binding.bmapView != null) {
-                View mapView = binding.bmapView;
-                ViewGroup parent = (ViewGroup) mapView.getParent();
-                if (parent != null) {
-                    parent.removeView(mapView);
-                    Log.d("HX_CAMPUS", "模拟器环境：已安全移除百度地图控件");
-                }
-            }
-        }
         return binding;
     }
 
@@ -121,13 +112,7 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
         binding.recyclerView.setRecycledViewPool(viewPool);
         viewPool.setMaxRecycledViews(0, 10);
         adapter(virtualLayoutManager);
-        if (Utils.isEmulator()){
-            binding.fabSwitchMode.setVisibility(View.GONE);
-            binding.bmapView.setVisibility(View.GONE);
-            Log.e("HX_CAMPUS", "模拟器环境");
-        }else {
-            baiduMap();
-        }
+        baiduMap();
         // 初始自动刷新数据
         binding.refreshLayout.autoRefresh();
     }
@@ -468,7 +453,17 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
                     if (title.contains("失物")) openNewPage(LostFragment.class, LostFragment.KEY_TITLE_NAME, title);
                     else if (title.contains("招领")) openNewPage(FoundFragment.class, FoundFragment.KEY_TITLE_NAME, title);
                     else if (title.contains("搜索")) openNewPage(SearchFragment.class);
-                    else if (title.contains("意见")) AgentWebActivity.goWeb(getContext(), Utils.rebuildUrl("/pages/contract.html", getContext()));
+                    else if (title.contains("留言")){
+                        User user = Utils.getBeanFromSp(getContext(), "User", "user");
+                        int userId = user.getId();
+                        Uri uri = Uri.parse("/pages/message_board.html")
+                                .buildUpon()
+                                .appendQueryParameter("userId", String.valueOf(user.getId()))
+                                .build();
+                        String url = Utils.rebuildUrl(uri.toString(), getContext());
+                        AgentWebActivity.goWeb(getContext(), url);
+                    }
+
                 });
             }
         };
