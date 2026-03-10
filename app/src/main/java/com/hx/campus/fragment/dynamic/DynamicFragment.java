@@ -455,7 +455,6 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
                     else if (title.contains("搜索")) openNewPage(SearchFragment.class);
                     else if (title.contains("留言")){
                         User user = Utils.getBeanFromSp(getContext(), "User", "user");
-                        int userId = user.getId();
                         Uri uri = Uri.parse("/pages/message_board.html")
                                 .buildUpon()
                                 .appendQueryParameter("userId", String.valueOf(user.getId()))

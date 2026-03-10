@@ -385,12 +385,18 @@ public class AgentWebFragment extends Fragment implements FragmentKeyDown {
         }
 
         // 得到 AgentWeb 最底层的控件
-        addBackgroundChild(mAgentWeb.getWebCreator().getWebParentLayout());
+        //addBackgroundChild(mAgentWeb.getWebCreator().getWebParentLayout());
 
         initView(view);
 
         // AgentWeb 没有把WebView的功能全面覆盖 ，所以某些设置 AgentWeb 没有提供，请从WebView方面入手设置。
         mAgentWeb.getWebCreator().getWebView().setOverScrollMode(WebView.OVER_SCROLL_NEVER);
+
+        WebView webView = mAgentWeb.getWebCreator().getWebView();
+        webView.setOverScrollMode(WebView.OVER_SCROLL_NEVER);
+        webView.setFocusable(true);
+        webView.setFocusableInTouchMode(true);
+        webView.setNestedScrollingEnabled(true);
     }
 
     //=====================下载============================//
