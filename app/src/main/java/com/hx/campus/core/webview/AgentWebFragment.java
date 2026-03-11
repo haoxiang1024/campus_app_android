@@ -394,9 +394,14 @@ public class AgentWebFragment extends Fragment implements FragmentKeyDown {
 
         WebView webView = mAgentWeb.getWebCreator().getWebView();
         webView.setOverScrollMode(WebView.OVER_SCROLL_NEVER);
+        webView.setVerticalScrollBarEnabled(false); // 隐藏原生滚动条，交给 H5 控制
         webView.setFocusable(true);
+        webView.setNestedScrollingEnabled(false);
         webView.setFocusableInTouchMode(true);
-        webView.setNestedScrollingEnabled(true);
+        android.webkit.WebSettings settings = webView.getSettings();
+        settings.setJavaScriptEnabled(true);
+        settings.setDomStorageEnabled(true); // 必须开启，否则部分 CSS 滚动可能失效
+        settings.setSupportZoom(false);      // 禁用缩放，防止手势冲突
     }
 
     //=====================下载============================//

@@ -4,6 +4,8 @@ import com.hx.campus.adapter.entity.Comment;
 import com.hx.campus.adapter.entity.LoginResponseDTO;
 import com.hx.campus.adapter.entity.LostFound;
 import com.hx.campus.adapter.entity.LostFoundType;
+import com.hx.campus.adapter.entity.Message;
+import com.hx.campus.adapter.entity.MessageVO;
 import com.hx.campus.adapter.entity.SearchInfo;
 import com.hx.campus.adapter.entity.User;
 
@@ -155,4 +157,13 @@ public interface ApiService {
     @FormUrlEncoded
     @POST("deleteAccount")
     Call<Result<String>> deleteAccount(@Field("id") int id);
+
+    //查看用户留言
+    @GET("message/userList")
+    Call<Result<List<MessageVO>>> getMessagesByUserId(@Query("userId") Integer userId);
+
+    //删除用户留言
+    @FormUrlEncoded
+    @POST("deleteMessage")
+    Call<Result<String>> deleteMessage(@Field("id") int id);
 }
