@@ -76,9 +76,10 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements
     protected TitleBar initTitle() {
         TitleBar titleBar = super.initTitle()
                 .setImmersive(true);
-        titleBar.setBackgroundColor(Color.TRANSPARENT);
+        titleBar.setBackgroundColor(Color.parseColor("#eef2f8"));
         titleBar.setTitle("");
         titleBar.setActionTextColor(ThemeUtils.resolveColor(getContext(), R.attr.colorAccent));
+        titleBar.disableLeftView();
         return titleBar;
     }
 
