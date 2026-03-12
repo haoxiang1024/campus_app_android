@@ -59,21 +59,15 @@ public class FoundDetailFragment extends BaseFragment<FragmentFoundDetailBinding
     private CommentAdapter commentAdapter;
     LostFound found;
 
-    private int currentParentId = 0;      // 0 代表直接评论失物招领帖子
-    private int currentReplyUserId = 0;   // 0 代表没有回复特定的人
+    private int currentParentId = 0;
+    private int currentReplyUserId = 0;
 
-    /**
-     * 构建ViewBinding
-     */
     @NonNull
     @Override
     protected FragmentFoundDetailBinding viewBindingInflate(@NonNull LayoutInflater inflater, ViewGroup container, boolean attachToRoot)  {
         return FragmentFoundDetailBinding.inflate(inflater, container, attachToRoot);
     }
 
-    /**
-     * 初始化参数
-     */
     @Override
     protected void initArgs() {
         super.initArgs();
@@ -82,45 +76,35 @@ public class FoundDetailFragment extends BaseFragment<FragmentFoundDetailBinding
         }
     }
 
-    /**
-     * 获取页面标题
-     */
     @Override
     protected String getPageTitle() {
         return getResources().getString(R.string.detail);
     }
 
-    /**
-     * 初始化控件
-     */
     @Override
     protected void initViews() {
-        setViews();         //设置控件
-        initCommentList();  // 初始化评论列表
-        initCommentEvent(); // 初始化发送评论事件
+        setViews();
+        initCommentList();
+        initCommentEvent();
         initEmojiPanel();
 
         if (binding.btnSharePoster != null) {
             binding.btnSharePoster.setOnClickListener(v -> {
-                // 提示用户正在生成
                 Utils.showResponse("正在生成分享海报...");
-                // 调用分享方法
                 sharePoster();
             });
         }
     }
 
     private void initEmojiPanel() {
-        // 常用的自带 Emoji 列表
         String[] emojis = {
                 "😀","😂","🤣","😅","😊","😍","😘","😜",
                 "😝","🤩","😔","😢","😭","😡","🤯","👍",
                 "👎","🙏","🤝","👏","🔥","💯","❤️","💔"
         };
 
-        // 动态创建一个简单的网格布局放表情
         GridLayout gridLayout = new GridLayout(getContext());
-        gridLayout.setColumnCount(8); // 每行8个表情
+        gridLayout.setColumnCount(8);
         gridLayout.setBackgroundColor(Color.parseColor("#F5F6F9"));
         gridLayout.setPadding(16, 16, 16, 16);
 
@@ -130,32 +114,25 @@ public class FoundDetailFragment extends BaseFragment<FragmentFoundDetailBinding
             tv.setTextSize(26);
             tv.setPadding(12, 12, 12, 12);
             tv.setOnClickListener(v -> {
-                // 点击表情，直接插入到输入框当前光标位置
                 int cursor = binding.etCommentInput.getSelectionStart();
                 binding.etCommentInput.getText().insert(cursor, emoji);
             });
             gridLayout.addView(tv);
         }
 
-        // 用 PopupWindow 包装这个面板
         PopupWindow emojiPopup = new PopupWindow(gridLayout,
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT,
-                true); // true 允许点击外部消失
+                true);
         emojiPopup.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         emojiPopup.setOutsideTouchable(true);
 
-        // 点击表情按钮弹出
         binding.btnEmoji.setOnClickListener(v -> {
-            // 隐藏软键盘
             InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
             if (imm != null) imm.hideSoftInputFromWindow(binding.etCommentInput.getWindowToken(), 0);
-
-            // 在输入框上方或下方弹出
             emojiPopup.showAsDropDown(binding.btnEmoji, 0, - (binding.btnEmoji.getHeight() + 400));
         });
 
-        // 当用户点击输入框时，如果表情面板开着就把它关掉
         binding.etCommentInput.setOnClickListener(v -> {
             if (emojiPopup.isShowing()) {
                 emojiPopup.dismiss();
@@ -163,9 +140,6 @@ public class FoundDetailFragment extends BaseFragment<FragmentFoundDetailBinding
         });
     }
 
-    /**
-     * 初始化评论列表和 RecyclerView
-     */
     private void initCommentList() {
         commentAdapter = new CommentAdapter();
         binding.rvComments.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -182,13 +156,9 @@ public class FoundDetailFragment extends BaseFragment<FragmentFoundDetailBinding
             }
         });
 
-        // 加载评论数据
         loadComments();
     }
 
-    /**
-     * 发起网络请求获取评论
-     */
     private void loadComments() {
         if (found == null) return;
 
@@ -210,9 +180,6 @@ public class FoundDetailFragment extends BaseFragment<FragmentFoundDetailBinding
         });
     }
 
-    /**
-     * 初始化发送评论按钮的点击事件
-     */
     private void initCommentEvent() {
         binding.btnSendComment.setOnClickListener(v -> {
             String content = binding.etCommentInput.getText().toString().trim();
@@ -231,11 +198,7 @@ public class FoundDetailFragment extends BaseFragment<FragmentFoundDetailBinding
         });
     }
 
-    /**
-     * 提交评论到后端
-     */
     private void submitComment(int lostfoundId, int userId, String content, int parentId, int replyUserId) {
-        // 禁用按钮防连点
         binding.btnSendComment.setEnabled(false);
         RetrofitClient.getInstance().getApi().addComment(lostfoundId, userId, content, parentId, replyUserId).enqueue(new Callback<Result<String>>() {
             @Override
@@ -248,13 +211,10 @@ public class FoundDetailFragment extends BaseFragment<FragmentFoundDetailBinding
                         binding.etCommentInput.setHint("写下你的评论...");
                         currentParentId = 0;
                         currentReplyUserId = 0;
-                        // 隐藏软键盘
                         InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                         if (imm != null) {
                             imm.hideSoftInputFromWindow(binding.etCommentInput.getWindowToken(), 0);
                         }
-
-                        // 重新加载评论列表刷新 UI
                         loadComments();
                     } else {
                         Utils.showResponse(response.body().getMsg());
@@ -271,29 +231,20 @@ public class FoundDetailFragment extends BaseFragment<FragmentFoundDetailBinding
     }
 
     private void setViews() {
-        //设置标题
         binding.tvLostTitle.setText(found.getTitle());
-        //设置内容
         binding.tvLostContent.setText(found.getContent());
-        //加载图片
         if (TextUtils.isEmpty(found.getImg())) {
             binding.imgLost.setVisibility(View.GONE);
         } else {
             binding.imgLost.setVisibility(View.VISIBLE);
             Glide.with(this).load(found.getImg()).into(binding.imgLost);
         }
-        //设置失主名称
         binding.tvAuthor.setText(found.getNickname());
-        //设置联系方式
         binding.tvPhonenum.setText(found.getPhone());
-        //设置地点
         binding.location.setText(found.getPlace());
-        //设置状态
         binding.state.setText(found.getState());
-        //设置发布日期
         String date = Utils.dateFormat(found.getPubDate());
         binding.tvDate.setText(date);
-        //私信
         binding.chatBtn.setOnClickListener(v -> {
             String targetId = String.valueOf(found.getUserId());
             if (TextUtils.isEmpty(targetId)) {
@@ -313,19 +264,24 @@ public class FoundDetailFragment extends BaseFragment<FragmentFoundDetailBinding
             return;
         }
 
-        // 填充海报数据
         binding.posterTitle.setText(found.getTitle());
         binding.posterContent.setText(found.getContent());
+
+        if (binding.imgLost.getDrawable() != null) {
+            binding.posterItemImage.setImageDrawable(binding.imgLost.getDrawable());
+            binding.posterItemImage.setVisibility(View.VISIBLE);
+        } else {
+            binding.posterItemImage.setVisibility(View.GONE);
+        }
+
         String baseUrl = Utils.getUrlFromAssets(getContext());
         String shareUrl = baseUrl + "share.html?id=" + found.getId() + "&type=found";
 
-        // 生成二维码并贴到海报上
         Bitmap qrBitmap = generateQRCode(shareUrl, 400, 400);
         if (qrBitmap != null) {
             binding.posterQrcode.setImageBitmap(qrBitmap);
         }
 
-        // 延迟一下等待 View 渲染，然后截图分享
         binding.layoutPoster.post(() -> {
             Bitmap posterBitmap = createBitmapFromView(binding.layoutPoster);
             if (posterBitmap != null) {
@@ -336,9 +292,6 @@ public class FoundDetailFragment extends BaseFragment<FragmentFoundDetailBinding
         });
     }
 
-    /**
-     * 使用 ZXing 生成二维码 Bitmap
-     */
     private Bitmap generateQRCode(String text, int width, int height) {
         try {
             Hashtable<EncodeHintType, String> hints = new Hashtable<>();
@@ -359,9 +312,6 @@ public class FoundDetailFragment extends BaseFragment<FragmentFoundDetailBinding
         }
     }
 
-    /**
-     * 将 View 转化为 Bitmap
-     */
     private Bitmap createBitmapFromView(View view) {
         view.measure(View.MeasureSpec.makeMeasureSpec(view.getLayoutParams().width, View.MeasureSpec.EXACTLY),
                 View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
@@ -372,9 +322,6 @@ public class FoundDetailFragment extends BaseFragment<FragmentFoundDetailBinding
         return bitmap;
     }
 
-    /**
-     * 保存图片并调用系统分享
-     */
     private void saveAndShareImage(Bitmap bitmap) {
         if (bitmap == null) {
             Utils.showResponse("图片生成异常，请重试");
@@ -400,13 +347,11 @@ public class FoundDetailFragment extends BaseFragment<FragmentFoundDetailBinding
                 File galleryFile = new File(imagesDir, fileName);
                 galleryStream = new FileOutputStream(galleryFile);
 
-                // 通知图库刷新，否则相册里不能立刻看到
                 Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
                 mediaScanIntent.setData(Uri.fromFile(galleryFile));
                 requireContext().sendBroadcast(mediaScanIntent);
             }
 
-            // 执行相册写入
             if (galleryStream != null) {
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, galleryStream);
                 galleryStream.flush();
@@ -427,7 +372,6 @@ public class FoundDetailFragment extends BaseFragment<FragmentFoundDetailBinding
             Uri shareUri = FileProvider.getUriForFile(requireContext(),
                     requireContext().getPackageName() + ".fileprovider", shareFile);
 
-            // 构造标准分享 Intent
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
             shareIntent.setType("image/png");
             shareIntent.putExtra(Intent.EXTRA_STREAM, shareUri);

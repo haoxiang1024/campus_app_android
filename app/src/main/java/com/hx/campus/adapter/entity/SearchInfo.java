@@ -48,23 +48,34 @@ public class SearchInfo {
     /** 发布者昵称 */
     private String nickname;
 
+    private String type;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     public SearchInfo() {
     }
 
-    public SearchInfo(Integer id, String title, String img, Date pub_date, String content, String place, String phone, String state, Integer stick, Integer lostfoundtype_id, LostFoundType lostfoundtype, Integer user_id, String nickname) {
-        this.id = id;
-        this.title = title;
-        this.img = img;
-        this.pub_date = pub_date;
+    public SearchInfo(String content, Integer id, String img, LostFoundType lostfoundtype, Integer lostfoundtype_id, String nickname, String phone, String place, Date pub_date, String state, Integer stick, String title, String type, Integer user_id) {
         this.content = content;
-        this.place = place;
+        this.id = id;
+        this.img = img;
+        this.lostfoundtype = lostfoundtype;
+        this.lostfoundtype_id = lostfoundtype_id;
+        this.nickname = nickname;
         this.phone = phone;
+        this.place = place;
+        this.pub_date = pub_date;
         this.state = state;
         this.stick = stick;
-        this.lostfoundtype_id = lostfoundtype_id;
-        this.lostfoundtype = lostfoundtype;
+        this.title = title;
+        this.type = type;
         this.user_id = user_id;
-        this.nickname = nickname;
     }
 
     public Integer getId() {
@@ -187,11 +198,11 @@ public class SearchInfo {
     @Override
     public String toString() {
         return "SearchInfo{" +
-                "id=" + id +
+                "content='" + content + '\'' +
+                ", id=" + id +
                 ", title='" + title + '\'' +
                 ", img='" + img + '\'' +
                 ", pub_date=" + pub_date +
-                ", content='" + content + '\'' +
                 ", place='" + place + '\'' +
                 ", phone='" + phone + '\'' +
                 ", state='" + state + '\'' +
@@ -200,6 +211,7 @@ public class SearchInfo {
                 ", lostfoundtype=" + lostfoundtype +
                 ", user_id=" + user_id +
                 ", nickname='" + nickname + '\'' +
+                ", type='" + type + '\'' +
                 '}';
     }
 }
