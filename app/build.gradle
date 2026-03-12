@@ -166,6 +166,8 @@ dependencies {
     implementation 'com.baidu.lbsyun:BaiduMapSDK_Location:9.6.6.2'
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
     implementation 'com.baidu.lbsyun:BaiduMapSDK_Map:7.6.4'
+    //二维码分享
+    implementation 'com.google.zxing:core:3.4.1'
 }
 
 

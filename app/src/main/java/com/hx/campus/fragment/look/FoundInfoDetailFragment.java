@@ -1,9 +1,13 @@
 package com.hx.campus.fragment.look;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,9 +22,15 @@ import android.widget.AdapterView; // 新增：Spinner监听器需要的包
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 import com.hx.campus.R;
 import com.hx.campus.adapter.comment.CommentAdapter;
 import com.hx.campus.adapter.entity.Comment;
@@ -33,7 +43,10 @@ import com.hx.campus.utils.api.Result;
 import com.hx.campus.utils.api.RetrofitClient;
 import com.xuexiang.xpage.annotation.Page;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.List;
 
 import retrofit2.Call;
@@ -89,6 +102,15 @@ public class FoundInfoDetailFragment extends BaseFragment<FragmentFoundInfoDetai
         initCommentList();  // 初始化评论列表
         initCommentEvent(); // 初始化发送评论事件
         initEmojiPanel();
+
+        if (binding.btnSharePoster != null) {
+            binding.btnSharePoster.setOnClickListener(v -> {
+                // 提示用户正在生成
+                Utils.showResponse("正在生成分享海报...");
+                // 调用分享方法
+                sharePoster();
+            });
+        }
     }
 
     /**
@@ -336,5 +358,96 @@ public class FoundInfoDetailFragment extends BaseFragment<FragmentFoundInfoDetai
                         Utils.showResponse("网络异常");
                     }
                 });
+    }
+    private void sharePoster() {
+        if (found == null) {
+            Utils.showResponse("数据未加载完成");
+            return;
+        }
+
+        // 填充海报数据
+        binding.posterTitle.setText(found.getTitle());
+        binding.posterContent.setText(found.getContent());
+        String baseUrl = Utils.getUrlFromAssets(getContext());
+        String shareUrl = baseUrl+"share.html?id=" + found.getId();
+
+        // 生成二维码并贴到海报上
+        Bitmap qrBitmap = generateQRCode(shareUrl, 400, 400);
+        if (qrBitmap != null) {
+            binding.posterQrcode.setImageBitmap(qrBitmap);
+        }
+
+        // 延迟一下等待 View 渲染，然后截图分享
+        binding.layoutPoster.post(() -> {
+            Bitmap posterBitmap = createBitmapFromView(binding.layoutPoster);
+            if (posterBitmap != null) {
+                shareImage(posterBitmap);
+            } else {
+                Utils.showResponse("海报生成失败");
+            }
+        });
+    }
+
+    /**
+     * 使用 ZXing 生成二维码 Bitmap
+     */
+    private Bitmap generateQRCode(String text, int width, int height) {
+        try {
+            Hashtable<EncodeHintType, String> hints = new Hashtable<>();
+            hints.put(EncodeHintType.CHARACTER_SET, "utf-8");
+            BitMatrix bitMatrix = new QRCodeWriter().encode(text, BarcodeFormat.QR_CODE, width, height, hints);
+            int[] pixels = new int[width * height];
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    pixels[y * width + x] = bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE;
+                }
+            }
+            Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
+            return bitmap;
+        } catch (WriterException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * 将 View 转化为 Bitmap (即使 View 是 invisible 的)
+     */
+    private Bitmap createBitmapFromView(View view) {
+        view.measure(View.MeasureSpec.makeMeasureSpec(view.getLayoutParams().width, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
+        Bitmap bitmap = Bitmap.createBitmap(view.getMeasuredWidth(), view.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        view.draw(canvas);
+        return bitmap;
+    }
+
+    /**
+     *  保存图片并调用系统分享
+     */
+    private void shareImage(Bitmap bitmap) {
+        try {
+            File cachePath = new File(requireContext().getCacheDir(), "images");
+            cachePath.mkdirs();
+            File imageFile = new File(cachePath, "share_poster.png");
+            FileOutputStream stream = new FileOutputStream(imageFile);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            stream.close();
+
+            Uri imageUri = FileProvider.getUriForFile(requireContext(),
+                    requireContext().getPackageName() + ".fileprovider", imageFile);
+
+            Intent shareIntent = new Intent();
+            shareIntent.setAction(Intent.ACTION_SEND);
+            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            shareIntent.setDataAndType(imageUri, requireContext().getContentResolver().getType(imageUri));
+            shareIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
+            startActivity(Intent.createChooser(shareIntent, "分享失物招领"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            Utils.showResponse("分享失败");
+        }
     }
 }

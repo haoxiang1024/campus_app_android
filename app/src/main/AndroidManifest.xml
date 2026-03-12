@@ -32,6 +32,15 @@
         android:windowSoftInputMode="adjustPan|stateHidden"
         tools:ignore="LockedOrientationActivity"
         tools:replace="android:allowBackup">
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
         <!-- 百度地图定位服务 -->
         <service
             android:name="com.baidu.location.f"
@@ -75,7 +84,24 @@
             android:configChanges="screenSize|keyboardHidden|orientation|keyboard"
             android:exported="true"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustPan|stateHidden" />
+            android:windowSoftInputMode="adjustPan|stateHidden">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="hxcampus"
+                    android:host="found"
+                    android:path="/detail" />
+            </intent-filter>
+
+        </activity>
         <activity
             android:name=".activity.LoginActivity"
             android:configChanges="screenSize|keyboardHidden|orientation|keyboard"

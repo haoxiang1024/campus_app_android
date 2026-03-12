@@ -3,8 +3,10 @@
 package com.hx.campus.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -28,11 +30,13 @@ import androidx.viewpager.widget.ViewPager;
 import com.bumptech.glide.Glide;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.hx.campus.R;
+import com.hx.campus.adapter.entity.LostFound;
 import com.hx.campus.adapter.entity.User;
 import com.hx.campus.core.BaseActivity;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.databinding.ActivityMainBinding;
 import com.hx.campus.fragment.dynamic.DynamicFragment;
+import com.hx.campus.fragment.look.FoundInfoDetailFragment;
 import com.hx.campus.fragment.look.LookFragment;
 import com.hx.campus.fragment.message.MessageMainFragment;
 import com.hx.campus.fragment.other.AboutFragment;
@@ -41,8 +45,11 @@ import com.hx.campus.fragment.personal.AccountFragment;
 import com.hx.campus.fragment.personal.PersonalFragment;
 import com.hx.campus.fragment.settings.SettingsFragment;
 import com.hx.campus.utils.Utils;
+import com.hx.campus.utils.api.Result;
+import com.hx.campus.utils.api.RetrofitClient;
 import com.hx.campus.utils.common.TokenUtils;
 import com.hx.campus.utils.sdkinit.XUpdateInit;
+import com.xuexiang.xpage.core.PageOption;
 import com.xuexiang.xui.adapter.FragmentAdapter;
 import com.xuexiang.xui.utils.ResUtils;
 import com.xuexiang.xui.utils.ThemeUtils;
@@ -56,6 +63,9 @@ import com.xuexiang.xutil.display.Colors;
 
 import io.rong.imkit.IMCenter;
 import io.rong.imlib.RongIMClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> implements View.OnClickListener, BottomNavigationView.OnNavigationItemSelectedListener, ClickUtils.OnClick2ExitListener, Toolbar.OnMenuItemClickListener {
 
@@ -75,11 +85,84 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
         checkIMStatus();
         // 检查并申请通知权限
         checkNotificationPermission();
+        // 检查是否是从外部链接唤起打开的
+        handleDeepLinkIntent(getIntent());
 
     }
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        handleDeepLinkIntent(intent);
+    }
+    /**
+     * 处理 Deep Link 跳转
+     */
+    private void handleDeepLinkIntent(Intent intent) {
+        if (intent != null && Intent.ACTION_VIEW.equals(intent.getAction())) {
+            Uri data = intent.getData();
+            // 判断协议是否是我们配置的 hxcampus
+            if (data != null && "hxcampus".equals(data.getScheme())) {
+                String path = data.getPath();
+                if ("/detail".equals(path)) {
+                    // 提取 URL 中的 id 参数
+                    String idStr = data.getQueryParameter("id");
+                    if (!TextUtils.isEmpty(idStr)) {
+                        int id = Integer.parseInt(idStr);
+                        // 根据 ID 跳转详情页
+                        jumpToDetail(id);
+                    }
+                }
+            }
+        }
+    }
+    /**
+     * 提供给【App内扫一扫】回调使用的方法
+     */
+    public void onScanResult(String resultUrl) {
+        // App 扫码扫出了 http://你的IP/share.html?id=123
+        if (resultUrl.contains("share.html?id=")) {
+            Uri uri = Uri.parse(resultUrl);
+            String idStr = uri.getQueryParameter("id");
+            if (!TextUtils.isEmpty(idStr)) {
+                int id = Integer.parseInt(idStr);
+                // 执行页面跳转，同上
+            }
+        } else {
+            Utils.showResponse("无效的二维码");
+        }
+    }
 
+    /**
+     * 根据 ID 获取详细数据并跳转
+     */
+    private void jumpToDetail(int foundId) {
+        // 提示用户正在加载
+        Utils.showResponse("正在加载详情...");
+        RetrofitClient.getInstance().getApi().getLostFoundById(foundId).enqueue(new Callback<Result<LostFound>>() {
+            @Override
+            public void onResponse(Call<Result<LostFound>> call, Response<Result<LostFound>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    if (response.body().isSuccess() && response.body().getData() != null) {
+                        LostFound found = response.body().getData();
+                        // 获取数据成功，使用 XPage 进行跳转，并把对象传递过去
+                        PageOption.to(FoundInfoDetailFragment.class)
+                                .putSerializable(FoundInfoDetailFragment.KEY_FOUND, found)
+                                .open(MainActivity.this);
+                    } else {
+                        Utils.showResponse("该物品可能已被删除");
+                    }
+                } else {
+                    Utils.showResponse("获取物品详情失败");
+                }
+            }
 
-
+            @Override
+            public void onFailure(Call<Result<LostFound>> call, Throwable t) {
+                Utils.showResponse("网络异常，无法打开详情");
+            }
+        });
+    }
     private void checkNotificationPermission() {
         if (Build.VERSION.SDK_INT >= 33) {
             if (ContextCompat.checkSelfPermission(this, "android.permission.POST_NOTIFICATIONS")
