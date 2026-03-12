@@ -1,5 +1,6 @@
 package com.hx.campus.fragment.message;
 
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,10 +9,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.hx.campus.R;
-import com.hx.campus.adapter.entity.Message; // 假设你的留言实体类名是 Message
 import com.hx.campus.adapter.entity.MessageVO;
 import com.hx.campus.adapter.entity.User;
 import com.hx.campus.core.BaseFragment;
+import com.hx.campus.core.webview.AgentWebActivity;
 import com.hx.campus.databinding.LayoutCommonListBinding;
 import com.hx.campus.utils.Utils;
 import com.hx.campus.utils.api.Result;
@@ -32,8 +33,9 @@ import retrofit2.Response;
 @Page(name = "我的留言")
 public class MyMessagesFragment extends BaseFragment<LayoutCommonListBinding> {
 
-    private BaseRecyclerAdapter<Message> mAdapter;
-    private List<Message> mDataList = new ArrayList<>();
+    // 统一使用 MessageVO 的适配器和数据源
+    private BaseRecyclerAdapter<MessageVO> mAdapter;
+    private List<MessageVO> mDataList = new ArrayList<>();
     private User user;
 
     @NonNull
@@ -51,8 +53,8 @@ public class MyMessagesFragment extends BaseFragment<LayoutCommonListBinding> {
         user = Utils.getBeanFromSp(getContext(), "User", "user");
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // 初始化适配器
-        mAdapter = new BaseRecyclerAdapter<Message>(mDataList) {
+        // 初始化适配器，将泛型改为 MessageVO
+        mAdapter = new BaseRecyclerAdapter<MessageVO>(mDataList) {
             @Override
             protected int getItemLayoutId(int viewType) {
                 // TODO: 确保你创建了这个 item 的 XML 布局文件
@@ -60,7 +62,7 @@ public class MyMessagesFragment extends BaseFragment<LayoutCommonListBinding> {
             }
 
             @Override
-            protected void bindData(@NonNull RecyclerViewHolder holder, int position, Message item) {
+            protected void bindData(@NonNull RecyclerViewHolder holder, int position, MessageVO item) {
                 if (user != null) {
                     holder.text(R.id.tv_nickname, user.getNickname() != null ? user.getNickname() : "校友");
                     com.bumptech.glide.Glide.with(getContext())
@@ -69,6 +71,7 @@ public class MyMessagesFragment extends BaseFragment<LayoutCommonListBinding> {
                             .circleCrop()
                             .into((android.widget.ImageView) holder.findViewById(R.id.iv_avatar));
                 }
+                // 绑定 MessageVO 的数据
                 holder.text(R.id.tv_comment_content, item.getContent() != null ? item.getContent() : "");
                 holder.text(R.id.tv_time, item.getCreateTime() != null ? Utils.formatCommentTime(String.valueOf(item.getCreateTime())) : "");
             }
@@ -79,16 +82,21 @@ public class MyMessagesFragment extends BaseFragment<LayoutCommonListBinding> {
         // 加载留言数据
         loadData();
     }
-
+    private void openMSGWeb() {
+        User user = Utils.getBeanFromSp(getContext(), "User", "user");
+        Uri uri = Uri.parse("/pages/message_board.html")
+                .buildUpon()
+                .appendQueryParameter("userId", String.valueOf(user.getId()))
+                .build();
+        String url = Utils.rebuildUrl(uri.toString(), getContext());
+        AgentWebActivity.goWeb(getContext(), url);
+    }
     @Override
     protected void initListeners() {
-        // 点击留言（如果留言不需要跳转详情，可以只弹个 Toast 或者留空）
         mAdapter.setOnItemClickListener((itemView, item, position) -> {
-            Utils.showResponse("查看留言详情");
-            // 如果留言也关联了具体的失物招领帖子，可以参考评论模块实现 jumpDetail(item)
+            openMSGWeb();
         });
 
-        // 【长按】删除该留言
         mAdapter.setOnItemLongClickListener((itemView, item, position) -> {
             new MaterialDialog.Builder(getContext())
                     .title("提示")

@@ -164,6 +164,6 @@ public interface ApiService {
 
     //删除用户留言
     @FormUrlEncoded
-    @POST("deleteMessage")
+    @POST("message/deleteMessage")
     Call<Result<String>> deleteMessage(@Field("id") int id);
 }

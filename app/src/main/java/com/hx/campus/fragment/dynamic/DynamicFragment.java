@@ -454,18 +454,22 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
                     else if (title.contains("招领")) openNewPage(FoundFragment.class, FoundFragment.KEY_TITLE_NAME, title);
                     else if (title.contains("搜索")) openNewPage(SearchFragment.class);
                     else if (title.contains("留言")){
-                        User user = Utils.getBeanFromSp(getContext(), "User", "user");
-                        Uri uri = Uri.parse("/pages/message_board.html")
-                                .buildUpon()
-                                .appendQueryParameter("userId", String.valueOf(user.getId()))
-                                .build();
-                        String url = Utils.rebuildUrl(uri.toString(), getContext());
-                        AgentWebActivity.goWeb(getContext(), url);
+                        openMSGWeb();
                     }
 
                 });
             }
         };
+    }
+
+    private void openMSGWeb() {
+        User user = Utils.getBeanFromSp(getContext(), "User", "user");
+        Uri uri = Uri.parse("/pages/message_board.html")
+                .buildUpon()
+                .appendQueryParameter("userId", String.valueOf(user.getId()))
+                .build();
+        String url = Utils.rebuildUrl(uri.toString(), getContext());
+        AgentWebActivity.goWeb(getContext(), url);
     }
 
     @Override

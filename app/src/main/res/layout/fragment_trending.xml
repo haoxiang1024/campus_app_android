@@ -48,6 +48,12 @@
                             style="@style/InfoItem.Account"
                             app:sDividerLineType="none"
                             app:sLeftTextString="我的评论" />
+
+                        <com.xuexiang.xui.widget.textview.supertextview.SuperTextView
+                            android:id="@+id/my_message"
+                            style="@style/InfoItem.Account"
+                            app:sDividerLineType="none"
+                            app:sLeftTextString="我的留言" />
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 

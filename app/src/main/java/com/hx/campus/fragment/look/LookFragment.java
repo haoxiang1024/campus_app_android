@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.databinding.FragmentTrendingBinding;
 import com.hx.campus.fragment.message.MyCommentsFragment;
+import com.hx.campus.fragment.message.MyMessagesFragment;
 import com.xuexiang.xpage.annotation.Page;
 import com.xuexiang.xpage.enums.CoreAnim;
 import com.xuexiang.xui.widget.actionbar.TitleBar;
@@ -66,6 +67,8 @@ public class LookFragment extends BaseFragment<FragmentTrendingBinding> implemen
         binding.found.setOnSuperTextViewClickListener(this);
         //"我的评论"设置点击监听器
         binding.myComments.setOnSuperTextViewClickListener(this);
+        binding.myMessage.setOnSuperTextViewClickListener(this);
+
     }
 
     /**
@@ -88,6 +91,9 @@ public class LookFragment extends BaseFragment<FragmentTrendingBinding> implemen
         }else if (view.getId() == binding.myComments.getId()) {
             // 跳转到我的评论页面
             openNewPage(MyCommentsFragment.class);
+        } else if (view.getId()==binding.myMessage.getId()) {
+            //我的留言页面
+            openNewPage(MyMessagesFragment.class);
         }
     }
 }
