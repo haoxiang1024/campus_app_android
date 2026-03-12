@@ -52,7 +52,16 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
+import android.content.ContentValues;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
+import android.provider.MediaStore;
+import androidx.core.content.FileProvider;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 @Page()
 public class FoundInfoDetailFragment extends BaseFragment<FragmentFoundInfoDetailBinding> {
 
@@ -369,7 +378,7 @@ public class FoundInfoDetailFragment extends BaseFragment<FragmentFoundInfoDetai
         binding.posterTitle.setText(found.getTitle());
         binding.posterContent.setText(found.getContent());
         String baseUrl = Utils.getUrlFromAssets(getContext());
-        String shareUrl = baseUrl+"share.html?id=" + found.getId();
+        String shareUrl = baseUrl+"share.html?id=" + found.getId()+ "&type=found";
 
         // 生成二维码并贴到海报上
         Bitmap qrBitmap = generateQRCode(shareUrl, 400, 400);
@@ -381,7 +390,7 @@ public class FoundInfoDetailFragment extends BaseFragment<FragmentFoundInfoDetai
         binding.layoutPoster.post(() -> {
             Bitmap posterBitmap = createBitmapFromView(binding.layoutPoster);
             if (posterBitmap != null) {
-                shareImage(posterBitmap);
+                saveAndShareImage(posterBitmap);
             } else {
                 Utils.showResponse("海报生成失败");
             }
@@ -424,30 +433,76 @@ public class FoundInfoDetailFragment extends BaseFragment<FragmentFoundInfoDetai
         return bitmap;
     }
 
-    /**
-     *  保存图片并调用系统分享
-     */
-    private void shareImage(Bitmap bitmap) {
+
+
+    private void saveAndShareImage(Bitmap bitmap) {
+        if (bitmap == null) {
+            Utils.showResponse("图片生成异常，请重试");
+            return;
+        }
+
         try {
+
+            String fileName = "Campus_Poster_" + System.currentTimeMillis() + ".png";
+            OutputStream galleryStream = null;
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
+                values.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
+                values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/Campus");
+
+                Uri galleryUri = requireContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                if (galleryUri != null) {
+                    galleryStream = requireContext().getContentResolver().openOutputStream(galleryUri);
+                }
+            } else {
+                String imagesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString();
+                File galleryFile = new File(imagesDir, fileName);
+                galleryStream = new FileOutputStream(galleryFile);
+
+                // 通知图库刷新，否则相册里不能立刻看到
+                Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                mediaScanIntent.setData(Uri.fromFile(galleryFile));
+                requireContext().sendBroadcast(mediaScanIntent);
+            }
+
+            // 执行相册写入
+            if (galleryStream != null) {
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, galleryStream);
+                galleryStream.flush();
+                galleryStream.close();
+                Utils.showResponse("已保存到相册，正在拉起分享...");
+            }
+
+
             File cachePath = new File(requireContext().getCacheDir(), "images");
-            cachePath.mkdirs();
-            File imageFile = new File(cachePath, "share_poster.png");
-            FileOutputStream stream = new FileOutputStream(imageFile);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-            stream.close();
+            if (!cachePath.exists()) {
+                cachePath.mkdirs();
+            }
+            File shareFile = new File(cachePath, "share_poster.png");
+            FileOutputStream shareStream = new FileOutputStream(shareFile);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, shareStream);
+            shareStream.flush();
+            shareStream.close();
 
-            Uri imageUri = FileProvider.getUriForFile(requireContext(),
-                    requireContext().getPackageName() + ".fileprovider", imageFile);
+            Uri shareUri = FileProvider.getUriForFile(requireContext(),
+                    requireContext().getPackageName() + ".fileprovider", shareFile);
 
-            Intent shareIntent = new Intent();
-            shareIntent.setAction(Intent.ACTION_SEND);
+            // 构造标准分享 Intent
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("image/png");
+            shareIntent.putExtra(Intent.EXTRA_STREAM, shareUri);
             shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            shareIntent.setDataAndType(imageUri, requireContext().getContentResolver().getType(imageUri));
-            shareIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
-            startActivity(Intent.createChooser(shareIntent, "分享失物招领"));
+
+            // 弹出选择框
+            Intent chooserIntent = Intent.createChooser(shareIntent, "分享失物招领海报");
+            chooserIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(chooserIntent);
+
         } catch (Exception e) {
             e.printStackTrace();
-            Utils.showResponse("分享失败");
+            Utils.showResponse("操作异常，请检查权限配置");
         }
     }
 }

@@ -1,8 +1,16 @@
 package com.hx.campus.fragment.navigation;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,9 +21,15 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 import com.hx.campus.R;
 import com.hx.campus.adapter.comment.CommentAdapter;
 import com.hx.campus.adapter.entity.Comment;
@@ -28,6 +42,10 @@ import com.hx.campus.utils.api.Result;
 import com.hx.campus.utils.api.RetrofitClient;
 import com.xuexiang.xpage.annotation.Page;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.util.Hashtable;
 import java.util.List;
 
 import retrofit2.Call;
@@ -81,6 +99,15 @@ public class FoundDetailFragment extends BaseFragment<FragmentFoundDetailBinding
         initCommentList();  // 初始化评论列表
         initCommentEvent(); // 初始化发送评论事件
         initEmojiPanel();
+
+        if (binding.btnSharePoster != null) {
+            binding.btnSharePoster.setOnClickListener(v -> {
+                // 提示用户正在生成
+                Utils.showResponse("正在生成分享海报...");
+                // 调用分享方法
+                sharePoster();
+            });
+        }
     }
 
     private void initEmojiPanel() {
@@ -278,5 +305,141 @@ public class FoundDetailFragment extends BaseFragment<FragmentFoundDetailBinding
                     targetId
             );
         });
+    }
+
+    private void sharePoster() {
+        if (found == null) {
+            Utils.showResponse("数据未加载完成");
+            return;
+        }
+
+        // 填充海报数据
+        binding.posterTitle.setText(found.getTitle());
+        binding.posterContent.setText(found.getContent());
+        String baseUrl = Utils.getUrlFromAssets(getContext());
+        String shareUrl = baseUrl + "share.html?id=" + found.getId() + "&type=found";
+
+        // 生成二维码并贴到海报上
+        Bitmap qrBitmap = generateQRCode(shareUrl, 400, 400);
+        if (qrBitmap != null) {
+            binding.posterQrcode.setImageBitmap(qrBitmap);
+        }
+
+        // 延迟一下等待 View 渲染，然后截图分享
+        binding.layoutPoster.post(() -> {
+            Bitmap posterBitmap = createBitmapFromView(binding.layoutPoster);
+            if (posterBitmap != null) {
+                saveAndShareImage(posterBitmap);
+            } else {
+                Utils.showResponse("海报生成失败");
+            }
+        });
+    }
+
+    /**
+     * 使用 ZXing 生成二维码 Bitmap
+     */
+    private Bitmap generateQRCode(String text, int width, int height) {
+        try {
+            Hashtable<EncodeHintType, String> hints = new Hashtable<>();
+            hints.put(EncodeHintType.CHARACTER_SET, "utf-8");
+            BitMatrix bitMatrix = new QRCodeWriter().encode(text, BarcodeFormat.QR_CODE, width, height, hints);
+            int[] pixels = new int[width * height];
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    pixels[y * width + x] = bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE;
+                }
+            }
+            Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
+            return bitmap;
+        } catch (WriterException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * 将 View 转化为 Bitmap
+     */
+    private Bitmap createBitmapFromView(View view) {
+        view.measure(View.MeasureSpec.makeMeasureSpec(view.getLayoutParams().width, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
+        Bitmap bitmap = Bitmap.createBitmap(view.getMeasuredWidth(), view.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        view.draw(canvas);
+        return bitmap;
+    }
+
+    /**
+     * 保存图片并调用系统分享
+     */
+    private void saveAndShareImage(Bitmap bitmap) {
+        if (bitmap == null) {
+            Utils.showResponse("图片生成异常，请重试");
+            return;
+        }
+
+        try {
+            String fileName = "Campus_Poster_" + System.currentTimeMillis() + ".png";
+            OutputStream galleryStream = null;
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
+                values.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
+                values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/Campus");
+
+                Uri galleryUri = requireContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                if (galleryUri != null) {
+                    galleryStream = requireContext().getContentResolver().openOutputStream(galleryUri);
+                }
+            } else {
+                String imagesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString();
+                File galleryFile = new File(imagesDir, fileName);
+                galleryStream = new FileOutputStream(galleryFile);
+
+                // 通知图库刷新，否则相册里不能立刻看到
+                Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                mediaScanIntent.setData(Uri.fromFile(galleryFile));
+                requireContext().sendBroadcast(mediaScanIntent);
+            }
+
+            // 执行相册写入
+            if (galleryStream != null) {
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, galleryStream);
+                galleryStream.flush();
+                galleryStream.close();
+                Utils.showResponse("已保存到相册，正在拉起分享...");
+            }
+
+            File cachePath = new File(requireContext().getCacheDir(), "images");
+            if (!cachePath.exists()) {
+                cachePath.mkdirs();
+            }
+            File shareFile = new File(cachePath, "share_poster.png");
+            FileOutputStream shareStream = new FileOutputStream(shareFile);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, shareStream);
+            shareStream.flush();
+            shareStream.close();
+
+            Uri shareUri = FileProvider.getUriForFile(requireContext(),
+                    requireContext().getPackageName() + ".fileprovider", shareFile);
+
+            // 构造标准分享 Intent
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("image/png");
+            shareIntent.putExtra(Intent.EXTRA_STREAM, shareUri);
+            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            Intent chooserIntent = Intent.createChooser(shareIntent, "分享寻物启事海报");
+            chooserIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(chooserIntent);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Utils.showResponse("操作异常，请检查权限配置");
+        }
     }
 }

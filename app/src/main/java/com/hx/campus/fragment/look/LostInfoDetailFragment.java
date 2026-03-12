@@ -1,9 +1,17 @@
 package com.hx.campus.fragment.look;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,9 +26,15 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 import com.hx.campus.R;
 import com.hx.campus.adapter.comment.CommentAdapter;
 import com.hx.campus.adapter.entity.Comment;
@@ -33,7 +47,11 @@ import com.hx.campus.utils.api.Result;
 import com.hx.campus.utils.api.RetrofitClient;
 import com.xuexiang.xpage.annotation.Page;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.List;
 
 import retrofit2.Call;
@@ -44,10 +62,9 @@ import retrofit2.Response;
 public class LostInfoDetailFragment extends BaseFragment<FragmentLostInfoDetailBinding> {
 
     public static final String KEY_LOST = "lost";
-
-    LostFound lost; // 实体类改为 LostFound
+    LostFound lost;
     private CommentAdapter commentAdapter;
-    private int currentParentId = 0;      // 0 代表直接评论失物招领帖子
+    private int currentParentId = 0;      // 0 代表直接评论帖子
     private int currentReplyUserId = 0;   // 0 代表没有回复特定的人
 
     @Override
@@ -90,6 +107,15 @@ public class LostInfoDetailFragment extends BaseFragment<FragmentLostInfoDetailB
         initCommentList();  // 初始化评论列表
         initCommentEvent(); // 初始化发送评论事件
         initEmojiPanel();
+
+        if (binding.btnSharePoster != null) {
+            binding.btnSharePoster.setOnClickListener(v -> {
+                // 提示用户正在生成
+                Utils.showResponse("正在生成分享海报...");
+                // 调用分享方法
+                sharePoster();
+            });
+        }
     }
 
     /**
@@ -118,7 +144,6 @@ public class LostInfoDetailFragment extends BaseFragment<FragmentLostInfoDetailB
 
     /**
      * 根据选中状态更新按钮可用状态
-     * @param selectedState 选中的状态文本
      */
     private void updateSubmitBtnStatus(String selectedState) {
         if (binding.sumbitBtn == null) return;
@@ -128,35 +153,12 @@ public class LostInfoDetailFragment extends BaseFragment<FragmentLostInfoDetailB
         // 设置按钮可用状态
         binding.sumbitBtn.setEnabled(!isDisabled);
 
-        // 视觉区分：设置按钮背景色
         if (isDisabled) {
-            binding.sumbitBtn.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#CCCCCC")));        } else {
+            binding.sumbitBtn.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#CCCCCC")));
+        } else {
             int primaryColor = ContextCompat.getColor(requireContext(), R.color.colorPrimary);
             binding.sumbitBtn.setBackgroundTintList(ColorStateList.valueOf(primaryColor));
         }
-    }
-
-    /**
-     * 初始化评论列表和 RecyclerView
-     */
-    private void initCommentList() {
-        commentAdapter = new CommentAdapter();
-        binding.rvComments.setLayoutManager(new LinearLayoutManager(getContext()));
-        binding.rvComments.setAdapter(commentAdapter);
-
-        commentAdapter.setOnCommentClickListener((parentId, targetUserId, targetNickname) -> {
-            currentParentId = parentId;
-            currentReplyUserId = targetUserId;
-            binding.etCommentInput.setHint("回复 " + targetNickname + "...");
-            binding.etCommentInput.requestFocus();
-            InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-            if (imm != null) {
-                imm.showSoftInput(binding.etCommentInput, InputMethodManager.SHOW_IMPLICIT);
-            }
-        });
-
-        // 加载评论数据
-        loadComments();
     }
 
     /**
@@ -179,6 +181,56 @@ public class LostInfoDetailFragment extends BaseFragment<FragmentLostInfoDetailB
             @Override
             public void onFailure(Call<Result<List<Comment>>> call, Throwable t) {
                 Utils.showResponse("网络异常");
+            }
+        });
+    }
+
+    private void initEmojiPanel() {
+        // 常用的自带 Emoji 列表
+        String[] emojis = {
+                "😀","😂","🤣","😅","😊","😍","😘","😜",
+                "😝","🤩","😔","😢","😭","😡","🤯","👍",
+                "👎","🙏","🤝","👏","🔥","💯","❤️","💔"
+        };
+
+        // 动态创建一个简单的网格布局放表情
+        GridLayout gridLayout = new GridLayout(getContext());
+        gridLayout.setColumnCount(8);
+        gridLayout.setBackgroundColor(Color.parseColor("#F5F6F9"));
+        gridLayout.setPadding(16, 16, 16, 16);
+
+        for (String emoji : emojis) {
+            TextView tv = new TextView(getContext());
+            tv.setText(emoji);
+            tv.setTextSize(26);
+            tv.setPadding(12, 12, 12, 12);
+            tv.setOnClickListener(v -> {
+                // 点击表情，直接插入到输入框当前光标位置
+                int cursor = binding.etCommentInput.getSelectionStart();
+                binding.etCommentInput.getText().insert(cursor, emoji);
+            });
+            gridLayout.addView(tv);
+        }
+
+        // 用 PopupWindow 包装这个面板
+        PopupWindow emojiPopup = new PopupWindow(gridLayout,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                true);
+        emojiPopup.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        emojiPopup.setOutsideTouchable(true);
+
+        // 点击表情按钮弹出
+        binding.btnEmoji.setOnClickListener(v -> {
+            InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (imm != null) imm.hideSoftInputFromWindow(binding.etCommentInput.getWindowToken(), 0);
+            emojiPopup.showAsDropDown(binding.btnEmoji, 0, - (binding.btnEmoji.getHeight() + 400));
+        });
+
+        // 当用户点击输入框时，如果表情面板开着就把它关掉
+        binding.etCommentInput.setOnClickListener(v -> {
+            if (emojiPopup.isShowing()) {
+                emojiPopup.dismiss();
             }
         });
     }
@@ -208,7 +260,6 @@ public class LostInfoDetailFragment extends BaseFragment<FragmentLostInfoDetailB
      * 提交评论到后端
      */
     private void submitComment(int lostfoundId, int userId, String content, int parentId, int replyUserId) {
-        // 禁用按钮防连点
         binding.btnSendComment.setEnabled(false);
         RetrofitClient.getInstance().getApi().addComment(lostfoundId, userId, content, parentId, replyUserId).enqueue(new Callback<Result<String>>() {
             @Override
@@ -243,59 +294,28 @@ public class LostInfoDetailFragment extends BaseFragment<FragmentLostInfoDetailB
         });
     }
 
-    private void initEmojiPanel() {
-        // 常用的自带 Emoji 列表
-        String[] emojis = {
-                "😀","😂","🤣","😅","😊","😍","😘","😜",
-                "😝","🤩","😔","😢","😭","😡","🤯","👍",
-                "👎","🙏","🤝","👏","🔥","💯","❤️","💔"
-        };
+    /**
+     * 初始化评论列表和 RecyclerView
+     */
+    private void initCommentList() {
+        commentAdapter = new CommentAdapter();
+        binding.rvComments.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.rvComments.setAdapter(commentAdapter);
 
-        // 动态创建一个简单的网格布局放表情
-        GridLayout gridLayout = new GridLayout(getContext());
-        gridLayout.setColumnCount(8); // 每行8个表情
-        gridLayout.setBackgroundColor(Color.parseColor("#F5F6F9"));
-        gridLayout.setPadding(16, 16, 16, 16);
-
-        for (String emoji : emojis) {
-            TextView tv = new TextView(getContext());
-            tv.setText(emoji);
-            tv.setTextSize(26);
-            tv.setPadding(12, 12, 12, 12);
-            tv.setOnClickListener(v -> {
-                // 点击表情，直接插入到输入框当前光标位置
-                int cursor = binding.etCommentInput.getSelectionStart();
-                binding.etCommentInput.getText().insert(cursor, emoji);
-            });
-            gridLayout.addView(tv);
-        }
-
-        // 用 PopupWindow 包装这个面板
-        PopupWindow emojiPopup = new PopupWindow(gridLayout,
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                true); // true 允许点击外部消失
-        emojiPopup.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        emojiPopup.setOutsideTouchable(true);
-
-        // 点击表情按钮弹出
-        binding.btnEmoji.setOnClickListener(v -> {
-            // 隐藏软键盘
+        commentAdapter.setOnCommentClickListener((parentId, targetUserId, targetNickname) -> {
+            currentParentId = parentId;
+            currentReplyUserId = targetUserId;
+            binding.etCommentInput.setHint("回复 " + targetNickname + "...");
+            binding.etCommentInput.requestFocus();
             InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-            if (imm != null) imm.hideSoftInputFromWindow(binding.etCommentInput.getWindowToken(), 0);
-
-            // 在输入框上方或下方弹出
-            emojiPopup.showAsDropDown(binding.btnEmoji, 0, - (binding.btnEmoji.getHeight() + 400));
-        });
-
-        // 当用户点击输入框时，如果表情面板开着就把它关掉
-        binding.etCommentInput.setOnClickListener(v -> {
-            if (emojiPopup.isShowing()) {
-                emojiPopup.dismiss();
+            if (imm != null) {
+                imm.showSoftInput(binding.etCommentInput, InputMethodManager.SHOW_IMPLICIT);
             }
         });
-    }
 
+        // 加载评论数据
+        loadComments();
+    }
 
     private void setViews() {
         binding.tvLostTitle.setText(lost.getTitle());
@@ -310,20 +330,17 @@ public class LostInfoDetailFragment extends BaseFragment<FragmentLostInfoDetailB
         binding.tvPhonenum.setText(lost.getPhone());
         binding.location.setText(lost.getPlace());
 
-        // 设置状态
-        String[] statuses = {"待审核","已驳回","已认领", "待认领"};
+        String[] statuses = {"待审核","已驳回","寻找中", "已找到"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_spinner_item, statuses);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         binding.state.setAdapter(adapter);
-
         int position = Arrays.asList(statuses).indexOf(lost.getState());
         if (position >= 0) binding.state.setSelection(position);
         binding.tvDate.setText(Utils.dateFormat(lost.getPubDate()));
     }
 
     private void submitState(String selectedState) {
-        // 使用 Retrofit 统一更新状态接口
         RetrofitClient.getInstance().getApi()
                 .updateState(lost.getId(), selectedState, lost.getUserId())
                 .enqueue(new Callback<Result<String>>() {
@@ -333,7 +350,8 @@ public class LostInfoDetailFragment extends BaseFragment<FragmentLostInfoDetailB
                             lost.setState(selectedState);
                             Utils.showResponse("状态已更改");
                         } else {
-                            Utils.showResponse("操作失败");
+                            String errorMsg = (response.body() != null) ? response.body().getMsg() : "返回体为空";
+                            Utils.showResponse("操作失败: " + errorMsg);
                         }
                     }
 
@@ -342,5 +360,141 @@ public class LostInfoDetailFragment extends BaseFragment<FragmentLostInfoDetailB
                         Utils.showResponse("网络异常");
                     }
                 });
+    }
+
+    private void sharePoster() {
+        if (lost == null) {
+            Utils.showResponse("数据未加载完成");
+            return;
+        }
+
+        // 填充海报数据
+        binding.posterTitle.setText(lost.getTitle());
+        binding.posterContent.setText(lost.getContent());
+        String baseUrl = Utils.getUrlFromAssets(getContext());
+        String shareUrl = baseUrl + "share.html?id=" + lost.getId() + "&type=lost";
+
+        // 生成二维码并贴到海报上
+        Bitmap qrBitmap = generateQRCode(shareUrl, 400, 400);
+        if (qrBitmap != null) {
+            binding.posterQrcode.setImageBitmap(qrBitmap);
+        }
+
+        // 延迟一下等待 View 渲染，然后截图分享
+        binding.layoutPoster.post(() -> {
+            Bitmap posterBitmap = createBitmapFromView(binding.layoutPoster);
+            if (posterBitmap != null) {
+                saveAndShareImage(posterBitmap);
+            } else {
+                Utils.showResponse("海报生成失败");
+            }
+        });
+    }
+
+    /**
+     * 使用 ZXing 生成二维码 Bitmap
+     */
+    private Bitmap generateQRCode(String text, int width, int height) {
+        try {
+            Hashtable<EncodeHintType, String> hints = new Hashtable<>();
+            hints.put(EncodeHintType.CHARACTER_SET, "utf-8");
+            BitMatrix bitMatrix = new QRCodeWriter().encode(text, BarcodeFormat.QR_CODE, width, height, hints);
+            int[] pixels = new int[width * height];
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    pixels[y * width + x] = bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE;
+                }
+            }
+            Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
+            return bitmap;
+        } catch (WriterException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * 将 View 转化为 Bitmap (即使 View 是 invisible 的)
+     */
+    private Bitmap createBitmapFromView(View view) {
+        view.measure(View.MeasureSpec.makeMeasureSpec(view.getLayoutParams().width, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
+        Bitmap bitmap = Bitmap.createBitmap(view.getMeasuredWidth(), view.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        view.draw(canvas);
+        return bitmap;
+    }
+
+    /**
+     * 保存图片并调用系统分享（双重保存保障机制）
+     */
+    private void saveAndShareImage(Bitmap bitmap) {
+        if (bitmap == null) {
+            Utils.showResponse("图片生成异常，请重试");
+            return;
+        }
+
+        try {
+            String fileName = "Campus_Poster_" + System.currentTimeMillis() + ".png";
+            OutputStream galleryStream = null;
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
+                values.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
+                values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/Campus");
+
+                Uri galleryUri = requireContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                if (galleryUri != null) {
+                    galleryStream = requireContext().getContentResolver().openOutputStream(galleryUri);
+                }
+            } else {
+                String imagesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString();
+                File galleryFile = new File(imagesDir, fileName);
+                galleryStream = new FileOutputStream(galleryFile);
+
+                // 通知图库刷新，否则相册里不能立刻看到
+                Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                mediaScanIntent.setData(Uri.fromFile(galleryFile));
+                requireContext().sendBroadcast(mediaScanIntent);
+            }
+
+            // 执行相册写入
+            if (galleryStream != null) {
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, galleryStream);
+                galleryStream.flush();
+                galleryStream.close();
+                Utils.showResponse("已保存到相册，正在拉起分享...");
+            }
+
+            File cachePath = new File(requireContext().getCacheDir(), "images");
+            if (!cachePath.exists()) {
+                cachePath.mkdirs();
+            }
+            File shareFile = new File(cachePath, "share_poster.png");
+            FileOutputStream shareStream = new FileOutputStream(shareFile);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, shareStream);
+            shareStream.flush();
+            shareStream.close();
+
+            Uri shareUri = FileProvider.getUriForFile(requireContext(),
+                    requireContext().getPackageName() + ".fileprovider", shareFile);
+
+            // 构造标准分享 Intent
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("image/png");
+            shareIntent.putExtra(Intent.EXTRA_STREAM, shareUri);
+            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            Intent chooserIntent = Intent.createChooser(shareIntent, "分享寻物启事海报");
+            chooserIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(chooserIntent);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Utils.showResponse("操作异常，请检查权限配置");
+        }
     }
 }

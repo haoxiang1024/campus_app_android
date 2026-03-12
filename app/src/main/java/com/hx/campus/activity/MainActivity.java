@@ -1,5 +1,3 @@
-
-
 package com.hx.campus.activity;
 
 import android.content.Context;
@@ -38,6 +36,7 @@ import com.hx.campus.databinding.ActivityMainBinding;
 import com.hx.campus.fragment.dynamic.DynamicFragment;
 import com.hx.campus.fragment.look.FoundInfoDetailFragment;
 import com.hx.campus.fragment.look.LookFragment;
+import com.hx.campus.fragment.look.LostInfoDetailFragment;
 import com.hx.campus.fragment.message.MessageMainFragment;
 import com.hx.campus.fragment.other.AboutFragment;
 import com.hx.campus.fragment.other.SearchFragment;
@@ -49,6 +48,7 @@ import com.hx.campus.utils.api.Result;
 import com.hx.campus.utils.api.RetrofitClient;
 import com.hx.campus.utils.common.TokenUtils;
 import com.hx.campus.utils.sdkinit.XUpdateInit;
+import com.xuexiang.xpage.core.CoreSwitchBean;
 import com.xuexiang.xpage.core.PageOption;
 import com.xuexiang.xui.adapter.FragmentAdapter;
 import com.xuexiang.xui.utils.ResUtils;
@@ -95,13 +95,13 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
         setIntent(intent);
         handleDeepLinkIntent(intent);
     }
+
     /**
      * 处理 Deep Link 跳转
      */
     private void handleDeepLinkIntent(Intent intent) {
         if (intent != null && Intent.ACTION_VIEW.equals(intent.getAction())) {
             Uri data = intent.getData();
-            // 判断协议是否是我们配置的 hxcampus
             if (data != null && "hxcampus".equals(data.getScheme())) {
                 String path = data.getPath();
                 if ("/detail".equals(path)) {
@@ -116,17 +116,18 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
             }
         }
     }
+
     /**
      * 提供给【App内扫一扫】回调使用的方法
      */
     public void onScanResult(String resultUrl) {
-        // App 扫码扫出了 http://你的IP/share.html?id=123
         if (resultUrl.contains("share.html?id=")) {
             Uri uri = Uri.parse(resultUrl);
             String idStr = uri.getQueryParameter("id");
             if (!TextUtils.isEmpty(idStr)) {
                 int id = Integer.parseInt(idStr);
-                // 执行页面跳转，同上
+                // 执行页面跳转
+                jumpToDetail(id);
             }
         } else {
             Utils.showResponse("无效的二维码");
@@ -144,11 +145,14 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
             public void onResponse(Call<Result<LostFound>> call, Response<Result<LostFound>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     if (response.body().isSuccess() && response.body().getData() != null) {
-                        LostFound found = response.body().getData();
-                        // 获取数据成功，使用 XPage 进行跳转，并把对象传递过去
-                        PageOption.to(FoundInfoDetailFragment.class)
-                                .putSerializable(FoundInfoDetailFragment.KEY_FOUND, found)
-                                .open(MainActivity.this);
+                        LostFound lostFound = response.body().getData();
+                        if ("失物".equals(lostFound.getType())) {
+                            // 跳转到失物详情页面
+                            openLost(lostFound);
+                        } else {
+                            // 跳转到招领详情页面
+                            openFound(lostFound);
+                        }
                     } else {
                         Utils.showResponse("该物品可能已被删除");
                     }
@@ -163,6 +167,25 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
             }
         });
     }
+
+    private void openFound(LostFound lostFound) {
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(FoundInfoDetailFragment.KEY_FOUND, lostFound);
+        CoreSwitchBean page = new CoreSwitchBean(FoundInfoDetailFragment.class)
+                .setBundle(bundle)
+                .setNewActivity(true);
+        openPage(page);
+    }
+
+    private void openLost(LostFound lostFound) {
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(LostInfoDetailFragment.KEY_LOST, lostFound);
+        CoreSwitchBean page = new CoreSwitchBean(LostInfoDetailFragment.class)
+                .setBundle(bundle)
+                .setNewActivity(true);
+        openPage(page);
+    }
+
     private void checkNotificationPermission() {
         if (Build.VERSION.SDK_INT >= 33) {
             if (ContextCompat.checkSelfPermission(this, "android.permission.POST_NOTIFICATIONS")
@@ -203,9 +226,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
                 IMCenter.getInstance().connect(cachedToken, connectCallback);
             }
         }
-
     }
-
 
     @Override
     protected boolean isSupportSlideBack() {
@@ -229,7 +250,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
                 new PersonalFragment()//我的页面
         };
         FragmentAdapter<BaseFragment> adapter = new FragmentAdapter<>(getSupportFragmentManager(), fragments);
-        binding.includeMain.viewPager.setOffscreenPageLimit(mTitles.length - 1);//设置ViewPager预加载页面数量的方法。它指定了当前页面两侧（左侧和右侧）的未选中页面数量，这些页面都会被预加载
+        binding.includeMain.viewPager.setOffscreenPageLimit(mTitles.length - 1);//设置ViewPager预加载页面数量的方法。
         binding.includeMain.viewPager.setAdapter(adapter);//viewpager 适配器
     }
 
@@ -239,7 +260,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
         XUpdateInit.checkUpdate(this, false);
     }
 
-
     private void initHeader() {
         binding.navView.setItemIconTintList(null);
         View headerView = binding.navView.getHeaderView(0);
@@ -248,6 +268,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
         TextView tvAvatar = headerView.findViewById(R.id.tv_avatar);
         TextView tvSign = headerView.findViewById(R.id.tv_sign);
         ImageView sexView = headerView.findViewById(R.id.sex_photo);
+
         if (Utils.isColorDark(ThemeUtils.resolveColor(this, R.attr.colorAccent))) {
             tvAvatar.setTextColor(Colors.WHITE);
             tvSign.setTextColor(Colors.WHITE);
@@ -261,42 +282,49 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
                 ivAvatar.setImageTintList(ResUtils.getColors(R.color.xui_config_color_gray_3));
             }
         }
+
         //获取存储对象
         User user = Utils.getBeanFromSp(this, "User", "user");
-        //加载图片
-        if (TextUtils.isEmpty(user.getPhoto())) {
-            tvAvatar.setVisibility(View.GONE);
+
+        if (user != null) {
+            //加载图片
+            if (TextUtils.isEmpty(user.getPhoto())) {
+                tvAvatar.setVisibility(View.GONE);
+            } else {
+                tvAvatar.setVisibility(View.VISIBLE);
+                Glide.with(this).load(user.getPhoto()).into(ivAvatar);
+            }
+            //设置昵称
+            tvAvatar.setText(user.getNickname());
+
+            //设置简介与判断性别 (使用 "男".equals 避免空指针)
+            if ("男".equals(user.getSex())) {
+                String language = Utils.language(this);
+                if(language.equals("zh")){
+                    tvSign.setText("小哥哥");
+                } else if (language.equals("en")) {
+                    tvSign.setText("Male");
+                }
+                sexView.setVisibility(View.VISIBLE);
+                Glide.with(this).load(R.drawable.man).into(sexView);
+            } else {
+                String language = Utils.language(this);
+                if(language.equals("zh")){
+                    tvSign.setText("小姐姐");
+                } else if (language.equals("en")) {
+                    tvSign.setText("FeMale");
+                }
+                sexView.setVisibility(View.VISIBLE);
+                Glide.with(this).load(R.drawable.women).into(sexView);
+            }
         } else {
+            // 未登录状态下的默认 UI 显示
             tvAvatar.setVisibility(View.VISIBLE);
-            Glide.with(this).load(user.getPhoto()).into(ivAvatar);
+            tvAvatar.setText("未登录");
+            tvSign.setText("点击登录/注册");
+            sexView.setVisibility(View.GONE);
         }
-        //设置昵称
-        tvAvatar.setText(user.getNickname());
-        //设置简介
-        //判断性别
-        if (user.getSex().equals("男")) {
-            //判断语言
-            String language = Utils.language(this);
-            if(language.equals("zh")){
-                tvSign.setText("小哥哥");
-            } else if (language.equals("en")) {
-                tvSign.setText("Male");
-            }
-            //设置性别图标
-            sexView.setVisibility(View.VISIBLE);
-            Glide.with(this).load(R.drawable.man).into(sexView);
-        } else {
-            //判断语言
-            String language = Utils.language(this);
-            if(language.equals("zh")){
-                tvSign.setText("小姐姐");
-            } else if (language.equals("en")) {
-                tvSign.setText("FeMale");
-            }
-            //设置性别图标
-            sexView.setVisibility(View.VISIBLE);
-            Glide.with(this).load(R.drawable.women).into(sexView);
-        }
+
         navHeader.setOnClickListener(this);
     }
 
@@ -371,12 +399,11 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
         return false;
     }
 
-
     @Override
     public void onClick(View v) {
         int id = v.getId();
         if (id == R.id.nav_header) {
-            openNewPage(AccountFragment.class);//打开账户页
+            openNewPage(AccountFragment.class);
         }
     }
 
@@ -427,11 +454,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
         XToastUtils.toast("再按一次退出程序");
     }
 
-
     @Override
     public void onExit() {
         XUtil.exitApp();
     }
-
-
 }
