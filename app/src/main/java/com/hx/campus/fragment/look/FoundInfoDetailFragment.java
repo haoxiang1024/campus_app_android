@@ -423,7 +423,7 @@ public class FoundInfoDetailFragment extends BaseFragment<FragmentFoundInfoDetai
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, galleryStream);
                 galleryStream.flush();
                 galleryStream.close();
-                Utils.showResponse("已保存到相册，正在拉起分享...");
+
             }
 
             File cachePath = new File(requireContext().getCacheDir(), "images");
