@@ -76,6 +76,10 @@
                             android:id="@+id/tips"
                             style="@style/InfoItem.Account"
                             app:sLeftTextString="@string/notification" />
+                        <com.xuexiang.xui.widget.textview.supertextview.SuperTextView
+                            android:id="@+id/points"
+                            style="@style/InfoItem.Account"
+                            app:sLeftTextString="@string/point" />
 
                         <com.xuexiang.xui.widget.textview.supertextview.SuperTextView
                             android:id="@+id/menu_settings"

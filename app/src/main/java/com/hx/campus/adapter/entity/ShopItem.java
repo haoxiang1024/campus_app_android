@@ -24,12 +24,11 @@ public class ShopItem implements Serializable {
     private int status; // 0-下架，1-上架
 
     @SerializedName("create_time")
-    private String createTime; // 可以用 String 接收格式化的时间，或者用 java.util.Date
+    private String createTime;
 
     @SerializedName("update_time")
     private String updateTime;
 
-    // --- Getter 和 Setter ---
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }

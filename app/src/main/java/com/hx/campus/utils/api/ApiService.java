@@ -6,7 +6,9 @@ import com.hx.campus.adapter.entity.LostFound;
 import com.hx.campus.adapter.entity.LostFoundType;
 import com.hx.campus.adapter.entity.Message;
 import com.hx.campus.adapter.entity.MessageVO;
+import com.hx.campus.adapter.entity.PointHistory;
 import com.hx.campus.adapter.entity.SearchInfo;
+import com.hx.campus.adapter.entity.ShopItem;
 import com.hx.campus.adapter.entity.User;
 
 import java.util.List;
@@ -166,4 +168,25 @@ public interface ApiService {
     @FormUrlEncoded
     @POST("message/deleteMessage")
     Call<Result<String>> deleteMessage(@Field("id") int id);
+
+    /**
+     * 获取可兑换商品列表
+     */
+    @GET("shop/items")
+    Call<Result<List<ShopItem>>> getShopItems();
+
+    /**
+     * 发起积分兑换
+     */
+    @POST("shop/exchange")
+    Call<Result<String>> exchangeItem(
+            @Query("userId") Integer userId,
+            @Query("itemId") Integer itemId
+    );
+
+    /**
+     * 获取我的积分明细
+     */
+    @GET("shop/history")
+    Call<Result<List<PointHistory>>> getPointHistory(@Query("userId") Integer userId);
 }

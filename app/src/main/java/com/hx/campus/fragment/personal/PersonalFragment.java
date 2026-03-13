@@ -17,6 +17,7 @@ import com.hx.campus.core.webview.AgentWebActivity;
 import com.hx.campus.databinding.FragmentProfileBinding;
 import com.hx.campus.fragment.other.AboutFragment;
 import com.hx.campus.fragment.settings.SettingsFragment;
+import com.hx.campus.fragment.shop.ShopFragment;
 import com.hx.campus.utils.Utils;
 import com.xuexiang.xpage.annotation.Page;
 import com.xuexiang.xpage.enums.CoreAnim;
@@ -107,6 +108,8 @@ public class PersonalFragment extends BaseFragment<FragmentProfileBinding> imple
         binding.menuSettings.setOnSuperTextViewClickListener(this);
         // 为关于按钮添加点击监听
         binding.menuAbout.setOnSuperTextViewClickListener(this);
+        //积分商城
+        binding.points.setOnSuperTextViewClickListener(this);
     }
 
     /**
@@ -130,16 +133,8 @@ public class PersonalFragment extends BaseFragment<FragmentProfileBinding> imple
                 openNewPage(AccountFragment.class);
                 break;
             case R.id.tips:
-                // 跳转到公告页面，根据当前语言选择对应的页面
-                // 获取应用当前语言设置
-                String currentLanguage = Utils.language(getContext());
-                if(currentLanguage.equals("zh")){
-                    // 中文环境跳转到中文公告页
-                    AgentWebActivity.goWeb(getContext(), Utils.rebuildUrl("/pages/notification.html", getContext()));
-                } else if (currentLanguage.equals("en")) {
-                    // 英文环境跳转到英文公告页
-                    AgentWebActivity.goWeb(getContext(), Utils.rebuildUrl("/pages/notification_en.html", getContext()));
-                }
+                // 跳转到公告页面
+                AgentWebActivity.goWeb(getContext(), Utils.rebuildUrl("/pages/notification.html", getContext()));
                 break;
             case R.id.suggestion:
                 // 跳转到意见反馈页面
@@ -153,6 +148,11 @@ public class PersonalFragment extends BaseFragment<FragmentProfileBinding> imple
                 // 跳转到关于页面
                 openNewPage(AboutFragment.class);
                 break;
+            case R.id.points:
+                    // 跳转到积分商城页面
+                    openNewPage(ShopFragment.class);
+                    break;
+
         }
     }
 }
