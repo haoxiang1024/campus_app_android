@@ -23,10 +23,8 @@ public class User implements Serializable {
     private String sex;
     /** 用户手机号码 */
     private String phone;
-    /** 用户余额 */
-    private Integer balance;
-    /** 用户声望值 */
-    private Integer prestige;
+    private int points; // 用户当前积分余额
+
     /** 用户注册日期 */
     private Date reg_date;
     /** 用户邮箱地址 */
@@ -68,6 +66,14 @@ public class User implements Serializable {
         this.email = email;
     }
 
+    public int getPoints() {
+        return points;
+    }
+
+    public void setPoints(int points) {
+        this.points = points;
+    }
+
     public String getEmail() {
         return email;
     }
@@ -76,12 +82,11 @@ public class User implements Serializable {
         this.email = email;
     }
 
-    public User(String photo, String phone, String sex, Integer balance, Integer prestige, Date reg_date, String email, int state, int role, String nickname, String password) {
+    public User(String photo, String phone, String sex, int points, Date reg_date, String email, int state, int role, String nickname, String password) {
         this.photo = photo;
         this.phone = phone;
         this.sex = sex;
-        this.balance = balance;
-        this.prestige = prestige;
+        this.points = points;
         this.reg_date = reg_date;
         this.email = email;
         this.state = state;
@@ -178,27 +183,7 @@ public class User implements Serializable {
      *
      */
 
-    public Integer getBalance() {
-        return balance;
-    }
 
-    public void setBalance(Integer balance) {
-        this.balance = balance;
-    }
-
-    /**
-     *
-     */
-    public Integer getPrestige() {
-        return prestige;
-    }
-
-    /**
-     *
-     */
-    public void setPrestige(Integer prestige) {
-        this.prestige = prestige;
-    }
 
     /**
      *
@@ -217,16 +202,15 @@ public class User implements Serializable {
     @Override
     public String toString() {
         return "User{" +
-                "id=" + id +
+                "email='" + email + '\'' +
+                ", id=" + id +
                 ", password='" + password + '\'' +
                 ", nickname='" + nickname + '\'' +
                 ", photo='" + photo + '\'' +
                 ", sex='" + sex + '\'' +
                 ", phone='" + phone + '\'' +
-                ", balance=" + balance +
-                ", prestige=" + prestige +
+                ", points=" + points +
                 ", reg_date=" + reg_date +
-                ", email='" + email + '\'' +
                 ", state=" + state +
                 ", role=" + role +
                 ", im_token='" + im_token + '\'' +
