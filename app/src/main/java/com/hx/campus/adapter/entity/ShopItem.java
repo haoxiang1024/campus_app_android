@@ -2,58 +2,108 @@ package com.hx.campus.adapter.entity;
 
 import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
+import java.util.Date;
 
-public class ShopItem implements Serializable {
-
-    private int id;
-
+public class ShopItem  {
+    private Integer id;
     private String name;
-
     private String description;
+    private String image_url;
+    private Integer required_points;
+    private Integer stock;
+    private Integer status; // 0-下架, 1-上架
+    private Date create_time;
+    private Date update_time;
 
-    // 映射后端的 image_url 字段
-    @SerializedName("image_url")
-    private String imageUrl;
+    public ShopItem() {
+    }
 
-    // 映射后端的 required_points 字段
-    @SerializedName("required_points")
-    private int requiredPoints;
+    @Override
+    public String toString() {
+        return "ShopItem{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", image_url='" + image_url + '\'' +
+                ", required_points=" + required_points +
+                ", stock=" + stock +
+                ", status=" + status +
+                ", create_time=" + create_time +
+                ", update_time=" + update_time +
+                '}';
+    }
 
-    private int stock;
+    public String getImage_url() {
+        return image_url;
+    }
 
-    private int status; // 0-下架，1-上架
+    public void setImage_url(String image_url) {
+        this.image_url = image_url;
+    }
 
-    @SerializedName("create_time")
-    private String createTime;
+    public Integer getRequired_points() {
+        return required_points;
+    }
 
-    @SerializedName("update_time")
-    private String updateTime;
+    public void setRequired_points(Integer required_points) {
+        this.required_points = required_points;
+    }
+
+    public Date getCreate_time() {
+        return create_time;
+    }
+
+    public void setCreate_time(Date create_time) {
+        this.create_time = create_time;
+    }
+
+    public Date getUpdate_time() {
+        return update_time;
+    }
+
+    public void setUpdate_time(Date update_time) {
+        this.update_time = update_time;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public Integer getStock() {
+        return stock;
+    }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public void setStock(Integer stock) {
+        this.stock = stock;
+    }
 
-    public String getImageUrl() { return imageUrl; }
-    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+    public Integer getStatus() {
+        return status;
+    }
 
-    public int getRequiredPoints() { return requiredPoints; }
-    public void setRequiredPoints(int requiredPoints) { this.requiredPoints = requiredPoints; }
-
-    public int getStock() { return stock; }
-    public void setStock(int stock) { this.stock = stock; }
-
-    public int getStatus() { return status; }
-    public void setStatus(int status) { this.status = status; }
-
-    public String getCreateTime() { return createTime; }
-    public void setCreateTime(String createTime) { this.createTime = createTime; }
-
-    public String getUpdateTime() { return updateTime; }
-    public void setUpdateTime(String updateTime) { this.updateTime = updateTime; }
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
 }

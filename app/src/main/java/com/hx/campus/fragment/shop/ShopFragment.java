@@ -2,6 +2,7 @@ package com.hx.campus.fragment.shop;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -34,8 +35,9 @@ import retrofit2.Response;
 public class ShopFragment extends BaseFragment<FragmentShopBinding> {
 
     RecyclerView recyclerView;
-
+    User user;
     SmartRefreshLayout refreshLayout;
+    TextView tvUserPoints;
 
     private ShopAdapter mAdapter;
 
@@ -43,27 +45,33 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
 
     @Override
     protected void initViews() {
+        user = Utils.getBeanFromSp(getContext(), "User", "user");
         recyclerView = findViewById(R.id.recycler_view);
         refreshLayout = findViewById(R.id.refresh_layout);
+        tvUserPoints=findViewById(R.id.tv_user_points);
+        tvUserPoints.setText(String.valueOf(user.getPoints()));
         // 设置网格布局，2列
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
         mAdapter = new ShopAdapter();
         recyclerView.setAdapter(mAdapter);
-
+        loadShopItems();//第一一次加载数据
         // 设置点击兑换的回调
         mAdapter.setOnExchangeClickListener(item -> showExchangeConfirmDialog(item));
 
         // 下拉刷新逻辑
         refreshLayout.setOnRefreshListener(refreshLayout -> loadShopItems());
 
-        // 自动触发第一次加载
-        refreshLayout.autoRefresh();
-    }
 
+    }
+    @Override
+    protected String getPageTitle() {
+        return "积分商城";
+    }
     /**
      * 调用 ApiService 获取商品列表
      */
     private void loadShopItems() {
+        //积分余额
         RetrofitClient.getInstance().getApi().getShopItems().enqueue(new Callback<Result<List<ShopItem>>>() {
             @Override
             public void onResponse(Call<Result<List<ShopItem>>> call, Response<Result<List<ShopItem>>> response) {
@@ -89,7 +97,7 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
     private void showExchangeConfirmDialog(ShopItem item) {
         new MaterialDialog.Builder(getContext())
                 .title("兑换确认")
-                .content(String.format("您确定要消耗 %d 积分兑换【%s】吗？", item.getRequiredPoints(), item.getName()))
+                .content(String.format("您确定要消耗 %d 积分兑换【%s】吗？", item.getRequired_points(), item.getName()))
                 .positiveText("确认兑换")
                 .negativeText("取消")
                 .onPositive((dialog, which) -> requestExchange(item.getId()))
@@ -112,6 +120,7 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
             public void onResponse(Call<Result<String>> call, Response<Result<String>> response) {
                 if (response.body() != null && response.body().getStatus() == 0) {
                     XToastUtils.success("🎉 兑换成功！");
+                    //更新积分
                     refreshLayout.autoRefresh();
                 } else {
                     XToastUtils.error("兑换失败：" + response.body().getMsg());

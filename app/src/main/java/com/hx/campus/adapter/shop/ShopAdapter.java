@@ -41,10 +41,10 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ShopItem item = mData.get(position);
         holder.tvName.setText(item.getName());
-        holder.tvPoints.setText(item.getRequiredPoints() + " 积分");
+        holder.tvPoints.setText(item.getRequired_points() + " 积分");
 
         // 如果有图片链接，用 Glide 加载
-         Glide.with(holder.itemView.getContext()).load(item.getImageUrl()).into(holder.ivImage);
+         Glide.with(holder.itemView.getContext()).load(item.getImage_url()).into(holder.ivImage);
 
         holder.btnExchange.setOnClickListener(v -> {
             if (mListener != null) {
