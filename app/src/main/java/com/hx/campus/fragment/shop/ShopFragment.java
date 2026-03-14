@@ -69,7 +69,6 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
         }
 
         loadShopItems();
-
         // 绑定兑换按钮点击事件
         mAdapter.setOnExchangeClickListener(item -> showExchangeConfirmDialog(item));
 
@@ -225,7 +224,7 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
         tvCode.setTextColor(Color.parseColor("#FF5722")); // 醒目红色
         layout.addView(tvCode);
 
-        // 4. 显示弹窗
+        // 显示弹窗
         new MaterialDialog.Builder(getContext())
                 .customView(layout, false)
                 .cancelable(false)
@@ -282,5 +281,12 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
     @Override
     protected FragmentShopBinding viewBindingInflate(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, boolean attachToRoot) {
         return FragmentShopBinding.inflate(inflater, container, attachToRoot);
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (user != null) {
+            fetchLatestUserInfo(user.getId());
+        }
     }
 }

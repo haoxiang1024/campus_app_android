@@ -2,14 +2,18 @@
 package com.hx.campus.fragment.personal;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.bumptech.glide.Glide;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.hx.campus.R;
 import com.hx.campus.adapter.entity.User;
 import com.hx.campus.core.BaseFragment;
@@ -19,10 +23,18 @@ import com.hx.campus.fragment.other.AboutFragment;
 import com.hx.campus.fragment.settings.SettingsFragment;
 import com.hx.campus.fragment.shop.ShopFragment;
 import com.hx.campus.utils.Utils;
+import com.hx.campus.utils.api.Result;
+import com.hx.campus.utils.api.RetrofitClient;
 import com.xuexiang.xpage.annotation.Page;
 import com.xuexiang.xpage.enums.CoreAnim;
+import com.xuexiang.xui.utils.XToastUtils;
 import com.xuexiang.xui.widget.actionbar.TitleBar;
+import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog;
 import com.xuexiang.xui.widget.textview.supertextview.SuperTextView;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 // 个人中心页面 - 用户个人信息管理和设置入口
@@ -69,6 +81,10 @@ public class PersonalFragment extends BaseFragment<FragmentProfileBinding> imple
     protected void initViews() {
         // 初始化账户数据和用户信息显示
         initAc();
+        SuperTextView menuScan = findViewById(R.id.menu_scan);
+        if (menuScan != null) {
+            menuScan.setOnClickListener(v -> startQrCodeScanner());
+        }
     }
 
     /**
@@ -154,5 +170,92 @@ public class PersonalFragment extends BaseFragment<FragmentProfileBinding> imple
                     break;
 
         }
+    }
+    /**
+     * 调起 ZXing 扫码摄像头
+     */
+    private void startQrCodeScanner() {
+        IntentIntegrator integrator = IntentIntegrator.forSupportFragment(this);
+        integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE);
+        integrator.setPrompt("请对准二维码进行扫描");
+        integrator.setCameraId(0); // 0是后置摄像头
+        integrator.setBeepEnabled(true); // 扫码成功时“滴”一声
+        integrator.setBarcodeImageEnabled(false);
+        integrator.initiateScan();
+    }
+
+    /**
+     * 接收扫码结果
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        if (result != null) {
+            if (result.getContents() == null) {
+                XToastUtils.info("已取消扫码");
+            } else {
+                // 获取扫到的内容，并交给智能路由处理
+                String scannedContent = result.getContents().trim();
+                handleScannedResult(scannedContent);
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    /**
+     * 智能处理扫码结果：网页跳转 or 订单核销
+     */
+    private void handleScannedResult(String content) {
+        // 判断是否是网页链接 (如扫海报、活动页)
+        if (content.toLowerCase().startsWith("http://") || content.toLowerCase().startsWith("https://")) {
+            // 使用AgentWebActivity 直接打开网页
+            AgentWebActivity.goWeb(getContext(), content);
+            return;
+        }
+
+        //  如果不是链接，判断当前用户是否是管理员进行核销
+        User user = Utils.getBeanFromSp(getContext(), "User", "user");
+        if (user != null && user.getRole() == 1) { // role == 1 为管理员
+            if (content.length() == 8) {
+                requestVerifyOrder(content.toUpperCase(), user.getId());
+            } else {
+                XToastUtils.warning("无法识别的核销码：" + content);
+            }
+        } else {
+            // 普通用户扫了无法识别的普通文本
+            new MaterialDialog.Builder(getContext())
+                    .title("扫描结果")
+                    .content(content)
+                    .positiveText("关闭")
+                    .show();
+        }
+    }
+
+    /**
+     * 调用 ApiService 发起核销请求
+     */
+    private void requestVerifyOrder(String verifyCode, int adminId) {
+        Utils.showResponse("正在核销中...");
+
+        RetrofitClient.getInstance().getApi().verifyOrder(verifyCode, adminId).enqueue(new Callback<Result<String>>() {
+            @Override
+            public void onResponse(Call<Result<String>> call, Response<Result<String>> response) {
+                if (response.body() != null && response.body().getStatus() == 0) {
+                    new MaterialDialog.Builder(getContext())
+                            .title("✅ 核销成功")
+                            .content(response.body().getMsg())
+                            .positiveText("完成")
+                            .show();
+                } else {
+                    XToastUtils.error("核销失败：" + (response.body() != null ? response.body().getMsg() : "未知原因"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Result<String>> call, Throwable t) {
+                XToastUtils.error("网络请求失败，请检查网络");
+            }
+        });
     }
 }

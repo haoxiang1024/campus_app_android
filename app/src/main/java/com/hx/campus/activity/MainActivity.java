@@ -62,7 +62,9 @@ import com.xuexiang.xutil.common.CollectionUtils;
 import com.xuexiang.xutil.display.Colors;
 
 import io.rong.imkit.IMCenter;
+import io.rong.imkit.RongIM;
 import io.rong.imlib.RongIMClient;
+import io.rong.imlib.model.UserInfo;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -211,6 +213,22 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
                     @Override
                     public void onSuccess(String userId) {
                         Log.e("IM_LOG", "融云连接成功 用户id: " + userId);
+                        User user = Utils.getBeanFromSp(MainActivity.this, "User", "user");
+                        if (user != null) {
+                            String fullAvatarUrl = "";
+                            if (!TextUtils.isEmpty(user.getPhoto())) {
+                                fullAvatarUrl = user.getPhoto().startsWith("http") ?
+                                        user.getPhoto() :
+                                        Utils.rebuildUrl("upload/" + user.getPhoto(), MainActivity.this);
+                            }
+                            UserInfo myInfo = new UserInfo(
+                                    String.valueOf(user.getId()),
+                                    user.getNickname(),
+                                    Uri.parse(fullAvatarUrl)
+                            );
+                            // 告诉融云：这是当前登录用户的个人信息
+                            RongIM.getInstance().setCurrentUserInfo(myInfo);
+                        }
                     }
 
                     @Override
@@ -220,7 +238,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
 
                     @Override
                     public void onDatabaseOpened(RongIMClient.DatabaseOpenStatus code) {
-
                     }
                 };
                 IMCenter.getInstance().connect(cachedToken, connectCallback);
@@ -299,21 +316,11 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
 
             //设置简介与判断性别 (使用 "男".equals 避免空指针)
             if ("男".equals(user.getSex())) {
-                String language = Utils.language(this);
-                if(language.equals("zh")){
-                    tvSign.setText("小哥哥");
-                } else if (language.equals("en")) {
-                    tvSign.setText("Male");
-                }
+                tvSign.setText("小哥哥");
                 sexView.setVisibility(View.VISIBLE);
                 Glide.with(this).load(R.drawable.man).into(sexView);
             } else {
-                String language = Utils.language(this);
-                if(language.equals("zh")){
-                    tvSign.setText("小姐姐");
-                } else if (language.equals("en")) {
-                    tvSign.setText("FeMale");
-                }
+                tvSign.setText("小姐姐");
                 sexView.setVisibility(View.VISIBLE);
                 Glide.with(this).load(R.drawable.women).into(sexView);
             }

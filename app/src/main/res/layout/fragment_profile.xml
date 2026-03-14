@@ -77,6 +77,10 @@
                             style="@style/InfoItem.Account"
                             app:sLeftTextString="@string/notification" />
                         <com.xuexiang.xui.widget.textview.supertextview.SuperTextView
+                            android:id="@+id/menu_scan"
+                            style="@style/InfoItem.Account"
+                            app:sLeftTextString="扫一扫" />
+                        <com.xuexiang.xui.widget.textview.supertextview.SuperTextView
                             android:id="@+id/points"
                             style="@style/InfoItem.Account"
                             app:sLeftTextString="@string/point" />

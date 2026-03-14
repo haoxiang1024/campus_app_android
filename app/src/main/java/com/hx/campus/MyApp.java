@@ -20,6 +20,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.multidex.MultiDex;
 
@@ -218,18 +220,20 @@ public class MyApp extends Application {
             public void onResponse(Call<User> call, Response<User> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     User user = response.body();
-                    String fullAvatarUrl = user.getPhoto();
-                    
-                    // 处理头像URL，相对路径需要拼接完整地址
-                    if (!user.getPhoto().startsWith("http")) {
-                        fullAvatarUrl = Utils.rebuildUrl("/upload/" + user.getPhoto(), getApplicationContext());
+                    String fullAvatarUrl = "";
+                    String photo = user.getPhoto();
+                    if (!TextUtils.isEmpty(photo)) {
+                        if (photo.startsWith("http")) {
+                            fullAvatarUrl = photo;
+                        } else {
+                            fullAvatarUrl = Utils.rebuildUrl("upload/" + photo, getApplicationContext());
+                        }
                     }
-                    
                     // 构建融云用户信息对象
                     UserInfo userInfo = new UserInfo(
                             userId,
                             user.getNickname(),
-                            Uri.parse(fullAvatarUrl)
+                            Uri.parse(fullAvatarUrl) // 如果 fullAvatarUrl 是空字符串，融云会显示你设置的默认头像
                     );
                     // 刷新本地用户信息缓存
                     RongUserInfoManager.getInstance().refreshUserInfoCache(userInfo);

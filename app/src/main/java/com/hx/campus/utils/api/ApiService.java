@@ -139,11 +139,11 @@ public interface ApiService {
     Call<Result<List<Comment>>> getCommentsByUserId(@Query("user_id") int user_id);
 
     //删除用户评论
-    @GET("/school/admin/deleteCommentById")
+    @GET("admin/deleteCommentById")
     Call<Result<String>>deleteComment(@Query("commentId") int commentId);
 
     //根据Id获取失物招领信息
-    @GET("/school/admin/getLostFoundById")
+    @GET("admin/getLostFoundById")
     Call<Result<LostFound>>getLostFoundById(@Query("lostFoundId") int lostFoundId);
     // 修改手机号
     @POST("updatePhone")
@@ -189,4 +189,9 @@ public interface ApiService {
      */
     @GET("shop/history")
     Call<Result<List<PointHistory>>> getPointHistory(@Query("userId") Integer userId);
+
+    // 管理员核销提货码接口
+    @POST("admin/verifyOrder")
+    @FormUrlEncoded
+    Call<Result<String>> verifyOrder(@Field("verifyCode") String verifyCode, @Field("adminId") int adminId);
 }

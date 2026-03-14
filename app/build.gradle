@@ -168,6 +168,8 @@ dependencies {
     implementation 'com.baidu.lbsyun:BaiduMapSDK_Map:7.6.4'
     //二维码分享
     implementation 'com.google.zxing:core:3.4.1'
+    // 添加 ZXing 扫码 UI 界面库
+    implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
 }
 
 
