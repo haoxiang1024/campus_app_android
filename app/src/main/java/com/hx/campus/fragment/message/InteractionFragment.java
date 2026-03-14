@@ -34,7 +34,7 @@ import io.rong.imlib.model.Message;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
+//评论页
 @Page
 public class InteractionFragment extends BaseFragment<LayoutCommonListBinding> {
 

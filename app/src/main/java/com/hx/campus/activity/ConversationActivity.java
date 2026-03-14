@@ -7,7 +7,7 @@
  * @version 1.0.0
  * @since 2024
  */
-package com.hx.campus.activity.chat;
+package com.hx.campus.activity;
 
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -16,6 +16,8 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.hx.campus.R;
@@ -35,7 +37,13 @@ public class ConversationActivity extends AppCompatActivity {
 
     /** 用户信息观察者，用于监听用户信息变化 */
     private RongUserInfoManager.UserDataObserver userDataObserver;
-
+    ConversationFragment fragment;
+    private void background(@NonNull View view) {
+        TypedValue typedValue = new TypedValue();
+        this.getTheme().resolveAttribute(com.xuexiang.xui.R.attr.xui_config_color_background, typedValue, true);
+        int backgroundColor = typedValue.data;
+        view.setBackgroundColor(backgroundColor);
+    }
     /**
      * Activity创建时的初始化方法
      * 设置布局、挂载聊天Fragment、配置标题栏和用户信息监听
@@ -49,12 +57,21 @@ public class ConversationActivity extends AppCompatActivity {
         
         // 挂载聊天Fragment
         if (savedInstanceState == null) {
-            ConversationFragment fragment = new ConversationFragment();
+            fragment  = new ConversationFragment();
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, fragment)
                     .commit();
+            getSupportFragmentManager().registerFragmentLifecycleCallbacks(new androidx.fragment.app.FragmentManager.FragmentLifecycleCallbacks() {
+                @Override
+                public void onFragmentViewCreated(@NonNull androidx.fragment.app.FragmentManager fm, @NonNull androidx.fragment.app.Fragment f, @NonNull View v, @Nullable Bundle savedInstanceState) {
+                    super.onFragmentViewCreated(fm, f, v, savedInstanceState);
+                    if (f instanceof ConversationFragment) {
+
+                        background(v);
+                    }
+                }
+            }, false);
         }
-        
         // 配置标题栏
         TitleBar titleBar = findViewById(R.id.title_bar);
         titleBar.setLeftClickListener(v -> finish());

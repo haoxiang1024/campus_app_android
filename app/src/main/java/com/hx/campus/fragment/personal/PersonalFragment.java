@@ -15,6 +15,7 @@ import com.bumptech.glide.Glide;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.hx.campus.R;
+import com.hx.campus.activity.CustomScannerActivity;
 import com.hx.campus.adapter.entity.User;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.core.webview.AgentWebActivity;
@@ -181,6 +182,8 @@ public class PersonalFragment extends BaseFragment<FragmentProfileBinding> imple
         integrator.setCameraId(0); // 0是后置摄像头
         integrator.setBeepEnabled(true); // 扫码成功时“滴”一声
         integrator.setBarcodeImageEnabled(false);
+        integrator.setOrientationLocked(true); // 锁定方向
+        integrator.setCaptureActivity(CustomScannerActivity.class); // 指定自定义的扫描页面
         integrator.initiateScan();
     }
 
@@ -226,7 +229,7 @@ public class PersonalFragment extends BaseFragment<FragmentProfileBinding> imple
             // 普通用户扫了无法识别的普通文本
             new MaterialDialog.Builder(getContext())
                     .title("扫描结果")
-                    .content(content)
+                    .content("您不是管理员，无法核销商品")
                     .positiveText("关闭")
                     .show();
         }

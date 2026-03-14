@@ -21,7 +21,6 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
-import android.util.Log;
 
 import androidx.multidex.MultiDex;
 
@@ -29,7 +28,7 @@ import com.baidu.location.LocationClient;
 import com.baidu.mapapi.CoordType;
 import com.baidu.mapapi.SDKInitializer;
 import com.hx.campus.activity.LoginActivity;
-import com.hx.campus.activity.chat.ConversationActivity;
+import com.hx.campus.activity.ConversationActivity;
 import com.hx.campus.adapter.entity.User;
 import com.hx.campus.utils.Utils;
 import com.hx.campus.utils.api.RetrofitClient;
@@ -50,11 +49,9 @@ import io.rong.imkit.utils.RouteUtils;
 import io.rong.imlib.IRongCoreListener;
 import io.rong.imlib.listener.OnReceiveMessageWrapperListener;
 import io.rong.imlib.RongCoreClient;
-import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Message;
 import io.rong.imlib.model.ReceivedProfile;
 import io.rong.imlib.model.UserInfo;
-import io.rong.message.CommandMessage;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;

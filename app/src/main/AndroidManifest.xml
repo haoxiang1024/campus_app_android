@@ -52,6 +52,10 @@
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="@string/amap_api_key"/>
         <activity
+            android:name=".activity.CustomScannerActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
+        <activity
             android:name=".activity.SplashActivity"
             android:configChanges="screenSize|keyboardHidden|orientation|keyboard"
             android:exported="true"
@@ -65,7 +69,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.hx.campus.activity.chat.ConversationActivity"
+            android:name="com.hx.campus.activity.ConversationActivity"
             android:exported="true"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize" >
