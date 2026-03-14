@@ -8,7 +8,9 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,6 +24,7 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.hx.campus.R;
+import com.hx.campus.adapter.entity.PointHistory;
 import com.hx.campus.adapter.entity.ShopItem;
 import com.hx.campus.adapter.entity.User;
 import com.hx.campus.adapter.shop.ShopAdapter;
@@ -49,8 +52,11 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
     User user;
     SmartRefreshLayout refreshLayout;
     TextView tvUserPoints;
+    TextView tvPointHistory;
 
     private ShopAdapter mAdapter;
+
+
 
     @Override
     protected void initViews() {
@@ -58,6 +64,7 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
         recyclerView = findViewById(R.id.recycler_view);
         refreshLayout = findViewById(R.id.refresh_layout);
         tvUserPoints = findViewById(R.id.tv_user_points);
+        tvPointHistory = findViewById(R.id.tv_point_history);
 
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
         mAdapter = new ShopAdapter();
@@ -69,13 +76,18 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
         }
 
         loadShopItems();
+
         // 绑定兑换按钮点击事件
         mAdapter.setOnExchangeClickListener(item -> showExchangeConfirmDialog(item));
 
-        // 绑定商品卡片点击事件 弹出详情
+        // 绑定商品卡片点击事件弹出详情
         mAdapter.setOnItemClickListener(item -> showItemDetailDialog(item));
 
+        // 绑定下拉刷新事件
         refreshLayout.setOnRefreshListener(refreshLayout -> loadShopItems());
+
+        // 绑定积分明细点击事件
+        tvPointHistory.setOnClickListener(v -> requestPointHistory());
     }
 
     @Override
@@ -101,6 +113,105 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
                 XToastUtils.error("网络异常，请稍后再试");
             }
         });
+    }
+
+    // 请求积分明细列表数据
+    private void requestPointHistory() {
+        if (user == null || user.getId() == -1) {
+            XToastUtils.warning("请先登录");
+            return;
+        }
+
+        RetrofitClient.getInstance().getApi().getPointHistory(user.getId()).enqueue(new Callback<Result<List<PointHistory>>>() {
+            @Override
+            public void onResponse(Call<Result<List<PointHistory>>> call, Response<Result<List<PointHistory>>> response) {
+                if (response.body() != null && response.body().getStatus() == 0) {
+                    showPointHistoryDialog(response.body().getData());
+                } else {
+                    XToastUtils.error("获取明细失败：" + (response.body() != null ? response.body().getMsg() : "未知错误"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Result<List<PointHistory>>> call, Throwable t) {
+
+            }
+        });
+
+
+    }
+
+    // 展示积分明细弹窗
+    private void showPointHistoryDialog(List<PointHistory> historyList) {
+        ScrollView scrollView = new ScrollView(getContext());
+        LinearLayout layout = new LinearLayout(getContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(40, 20, 40, 20);
+        scrollView.addView(layout);
+
+        // 处理数据为空的情况
+        if (historyList == null || historyList.isEmpty()) {
+            TextView emptyView = new TextView(getContext());
+            emptyView.setText("暂无积分变动记录");
+            emptyView.setGravity(Gravity.CENTER);
+            emptyView.setPadding(0, 50, 0, 50);
+            emptyView.setTextColor(Color.parseColor("#999999"));
+            layout.addView(emptyView);
+        } else {
+            // 遍历构建每一条明细的视图
+            for (PointHistory history : historyList) {
+                LinearLayout itemLayout = new LinearLayout(getContext());
+                itemLayout.setOrientation(LinearLayout.VERTICAL);
+                itemLayout.setPadding(0, 20, 0, 20);
+
+                // 顶部包裹描述和积分数值的水平容器
+                LinearLayout topRow = new LinearLayout(getContext());
+                topRow.setOrientation(LinearLayout.HORIZONTAL);
+
+                TextView tvDesc = new TextView(getContext());
+                tvDesc.setText(history.getDescription() != null ? history.getDescription() : "积分变动");
+                tvDesc.setTextColor(Color.parseColor("#333333"));
+                tvDesc.setTextSize(15);
+                LinearLayout.LayoutParams descParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f);
+                tvDesc.setLayoutParams(descParams);
+
+                TextView tvPoints = new TextView(getContext());
+                int p = Integer.parseInt(history.getDisplayPoints());
+                // 根据积分正负显示不同颜色和符号
+                tvPoints.setText(p > 0 ? "+" + p : String.valueOf(p));
+                tvPoints.setTextColor(p > 0 ? Color.parseColor("#4CAF50") : Color.parseColor("#F44336"));
+                tvPoints.setTextSize(16);
+                tvPoints.setTypeface(null, Typeface.BOLD);
+
+                topRow.addView(tvDesc);
+                topRow.addView(tvPoints);
+
+                // 底部显示时间的视图
+                TextView tvTime = new TextView(getContext());
+                tvTime.setText(history.getCreateTime() != null ? history.getCreateTime() : "");
+                tvTime.setTextColor(Color.parseColor("#999999"));
+                tvTime.setTextSize(12);
+                tvTime.setPadding(0, 8, 0, 0);
+
+                // 底部细线分割线
+                View divider = new View(getContext());
+                divider.setBackgroundColor(Color.parseColor("#EEEEEE"));
+                LinearLayout.LayoutParams dividerParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 1);
+                dividerParams.topMargin = 20;
+
+                itemLayout.addView(topRow);
+                itemLayout.addView(tvTime);
+                itemLayout.addView(divider);
+
+                layout.addView(itemLayout);
+            }
+        }
+
+        new MaterialDialog.Builder(getContext())
+                .title("积分明细")
+                .customView(scrollView, false)
+                .positiveText("关闭")
+                .show();
     }
 
     private void showItemDetailDialog(ShopItem item) {
@@ -142,13 +253,11 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
                 .content(String.format("您确定要消耗 %d 积分兑换【%s】吗？", item.getRequired_points(), item.getName()))
                 .positiveText("确认兑换")
                 .negativeText("取消")
-                .onPositive((dialog, which) -> requestExchange(item)) // 注意这里传的是 item 对象
+                .onPositive((dialog, which) -> requestExchange(item))
                 .show();
     }
 
-    /**
-     * 请求兑换商品
-     */
+    // 请求兑换商品
     private void requestExchange(ShopItem item) {
         User currentUser = Utils.getBeanFromSp(getContext(), "User", "user");
         if (currentUser == null || currentUser.getId() == -1) {
@@ -163,10 +272,10 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
             @Override
             public void onResponse(Call<Result<String>> call, Response<Result<String>> response) {
                 if (response.body() != null && response.body().getStatus() == 0) {
-                    // 获取后端生成的 8位 核销码
+                    // 获取后端生成的核销码
                     String verifyCode = response.body().getData();
 
-                    // 兑换成功，展示核销码和二维码弹窗
+                    // 兑换成功展示核销码和二维码弹窗
                     showVerifyCodeDialog(verifyCode, item);
 
                     // 刷新最新积分和列表
@@ -184,16 +293,14 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
         });
     }
 
-    /**
-     * 弹出包含二维码和核销码的核销凭证弹窗
-     */
+    // 弹出包含二维码和核销码的核销凭证弹窗
     private void showVerifyCodeDialog(String verifyCode, ShopItem item) {
         LinearLayout layout = new LinearLayout(getContext());
         layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setGravity(Gravity.CENTER); // 整体居中
+        layout.setGravity(Gravity.CENTER);
         layout.setPadding(50, 40, 50, 40);
 
-        //  顶部提示文字
+        // 顶部提示文字
         TextView tvTip = new TextView(getContext());
         tvTip.setText("请向管理员出示此二维码或核销码\n领取【" + item.getName() + "】");
         tvTip.setTextSize(16);
@@ -203,10 +310,10 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
 
         // 二维码 ImageView
         ImageView ivQrCode = new ImageView(getContext());
-        // 转换 dp 为 px
+        // 转换尺寸单位
         int qrSize = (int) (220 * getResources().getDisplayMetrics().density + 0.5f);
         LinearLayout.LayoutParams qrParams = new LinearLayout.LayoutParams(qrSize, qrSize);
-        qrParams.setMargins(0, 60, 0, 60); // 上下间距
+        qrParams.setMargins(0, 60, 0, 60);
         ivQrCode.setLayoutParams(qrParams);
 
         Bitmap qrBitmap = createQRCode(verifyCode, qrSize, qrSize);
@@ -215,13 +322,13 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
         }
         layout.addView(ivQrCode);
 
-        //  底部红色显眼核销码
+        // 底部显眼核销码
         TextView tvCode = new TextView(getContext());
         tvCode.setText("核销码：" + verifyCode);
         tvCode.setTextSize(22);
-        tvCode.setTypeface(null, Typeface.BOLD); // 加粗
+        tvCode.setTypeface(null, Typeface.BOLD);
         tvCode.setGravity(Gravity.CENTER);
-        tvCode.setTextColor(Color.parseColor("#FF5722")); // 醒目红色
+        tvCode.setTextColor(Color.parseColor("#FF5722"));
         layout.addView(tvCode);
 
         // 显示弹窗
@@ -232,15 +339,13 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
                 .show();
     }
 
-    /**
-     * 使用 ZXing 生成二维码 Bitmap
-     */
+    // 使用 ZXing 生成二维码图片数据
     private Bitmap createQRCode(String content, int width, int height) {
         try {
             Hashtable<EncodeHintType, Object> hints = new Hashtable<>();
             hints.put(EncodeHintType.CHARACTER_SET, "utf-8");
             hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
-            hints.put(EncodeHintType.MARGIN, 1); // 二维码边距
+            hints.put(EncodeHintType.MARGIN, 1);
 
             BitMatrix matrix = new QRCodeWriter().encode(content, BarcodeFormat.QR_CODE, width, height, hints);
             int[] pixels = new int[width * height];
@@ -282,6 +387,7 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
     protected FragmentShopBinding viewBindingInflate(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, boolean attachToRoot) {
         return FragmentShopBinding.inflate(inflater, container, attachToRoot);
     }
+
     @Override
     public void onResume() {
         super.onResume();
