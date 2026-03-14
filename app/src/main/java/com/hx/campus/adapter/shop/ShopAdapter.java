@@ -1,5 +1,6 @@
 package com.hx.campus.adapter.shop;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.hx.campus.R;
 import com.hx.campus.adapter.entity.ShopItem;
+import com.xuexiang.xui.widget.textview.supertextview.SuperButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,15 +21,26 @@ import java.util.List;
 public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ViewHolder> {
 
     private List<ShopItem> mData = new ArrayList<>();
-    private OnExchangeClickListener mListener;
+    private OnExchangeClickListener mExchangeListener;
+    private OnItemClickListener mItemClickListener;
+    private int mUserPoints = 0;
 
     public void setData(List<ShopItem> data) {
         this.mData = data;
         notifyDataSetChanged();
     }
 
+    public void setUserPoints(int points) {
+        this.mUserPoints = points;
+        notifyDataSetChanged();
+    }
+
     public void setOnExchangeClickListener(OnExchangeClickListener listener) {
-        this.mListener = listener;
+        this.mExchangeListener = listener;
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.mItemClickListener = listener;
     }
 
     @NonNull
@@ -43,12 +56,28 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ViewHolder> {
         holder.tvName.setText(item.getName());
         holder.tvPoints.setText(item.getRequired_points() + " 积分");
 
-        // 如果有图片链接，用 Glide 加载
-         Glide.with(holder.itemView.getContext()).load(item.getImage_url()).into(holder.ivImage);
+        Glide.with(holder.itemView.getContext()).load(item.getImage_url()).into(holder.ivImage);
 
+        if (mUserPoints >= item.getRequired_points()) {
+            holder.btnExchange.setShapeSolidColor(Color.parseColor("#0099FF"));
+            holder.btnExchange.setEnabled(true);
+        } else {
+            holder.btnExchange.setShapeSolidColor(Color.parseColor("#B0B0B0"));
+            holder.btnExchange.setEnabled(false);
+        }
+        holder.btnExchange.setUseShape();
+
+        // 兑换按钮点击事件
         holder.btnExchange.setOnClickListener(v -> {
-            if (mListener != null) {
-                mListener.onExchangeClick(item);
+            if (mExchangeListener != null) {
+                mExchangeListener.onExchangeClick(item);
+            }
+        });
+
+        // 整个商品卡片点击事件
+        holder.itemView.setOnClickListener(v -> {
+            if (mItemClickListener != null) {
+                mItemClickListener.onItemClick(item);
             }
         });
     }
@@ -62,7 +91,7 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ViewHolder> {
         ImageView ivImage;
         TextView tvName;
         TextView tvPoints;
-        View btnExchange;
+        SuperButton btnExchange;
 
         ViewHolder(View view) {
             super(view);
@@ -75,5 +104,9 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ViewHolder> {
 
     public interface OnExchangeClickListener {
         void onExchangeClick(ShopItem item);
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(ShopItem item);
     }
 }
