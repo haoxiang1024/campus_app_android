@@ -18,6 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="当前积分："
+            android:textColor="#2196F3"
             android:textSize="16sp" />
 
         <TextView
@@ -33,6 +34,14 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_weight="1" />
+        <TextView
+            android:id="@+id/tv_my_orders"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="我的订单"
+            android:padding="8dp"
+            android:textColor="#2196F3"
+            android:layout_marginStart="8dp"/>
 
         <TextView
             android:id="@+id/tv_point_history"

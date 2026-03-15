@@ -88,6 +88,11 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
 
         // 绑定积分明细点击事件
         tvPointHistory.setOnClickListener(v -> requestPointHistory());
+        //我的订单
+        TextView tvMyOrders = findViewById(R.id.tv_my_orders);
+        tvMyOrders.setOnClickListener(v -> {
+            openNewPage(MyOrderFragment.class);
+        });
     }
 
     @Override

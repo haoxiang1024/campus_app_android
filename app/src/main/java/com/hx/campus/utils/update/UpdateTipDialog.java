@@ -18,11 +18,9 @@ public class UpdateTipDialog extends AppCompatActivity implements DialogInterfac
 
     public static final String KEY_CONTENT = "com.hx.campus.utils.update.KEY_CONTENT";
 
-    // TODO: 2021/5/11 填写你应用下载类型名
-    public static final String DOWNLOAD_TYPE_NAME = "蒲公英";
+    public static final String DOWNLOAD_TYPE_NAME = "gitee";
 
-    // TODO: 2021/5/11 填写你应用下载页面的链接
-    private static final String DOWNLOAD_URL = "这里填写你应用下载页面的链接";
+    private static final String DOWNLOAD_URL = "https://gitee.com/hx_a/campus_app_android/releases/tag/1.0";
 
     /**
      * 显示版本更新重试提示弹窗

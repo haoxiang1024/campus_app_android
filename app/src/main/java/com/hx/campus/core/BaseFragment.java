@@ -1,15 +1,6 @@
 
 
-/**
- * 应用基础Fragment抽象类
- * 提供统一的页面管理、生命周期处理、页面跳转等核心功能
- * 所有业务Fragment都应该继承此类以获得一致的行为和便利方法
- * 
- * @param <Binding> ViewBinding泛型参数，用于类型安全的视图绑定
- * @author 开发团队
- * @version 1.0.0
- * @since 2024
- */
+
 package com.hx.campus.core;
 
 import android.content.res.Configuration;
