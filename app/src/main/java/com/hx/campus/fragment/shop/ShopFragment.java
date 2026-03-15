@@ -121,24 +121,7 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
             XToastUtils.warning("请先登录");
             return;
         }
-
-        RetrofitClient.getInstance().getApi().getPointHistory(user.getId()).enqueue(new Callback<Result<List<PointHistory>>>() {
-            @Override
-            public void onResponse(Call<Result<List<PointHistory>>> call, Response<Result<List<PointHistory>>> response) {
-                if (response.body() != null && response.body().getStatus() == 0) {
-                    showPointHistoryDialog(response.body().getData());
-                } else {
-                    XToastUtils.error("获取明细失败：" + (response.body() != null ? response.body().getMsg() : "未知错误"));
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Result<List<PointHistory>>> call, Throwable t) {
-
-            }
-        });
-
-
+        openNewPage(PointHistoryFragment.class);
     }
 
     // 展示积分明细弹窗
@@ -188,7 +171,7 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
 
                 // 底部显示时间的视图
                 TextView tvTime = new TextView(getContext());
-                tvTime.setText(history.getCreateTime() != null ? history.getCreateTime() : "");
+                tvTime.setText(history.getcreate_time() != null ? history.getcreate_time() : "");
                 tvTime.setTextColor(Color.parseColor("#999999"));
                 tvTime.setTextSize(12);
                 tvTime.setPadding(0, 8, 0, 0);

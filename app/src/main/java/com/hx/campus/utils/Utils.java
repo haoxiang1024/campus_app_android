@@ -417,6 +417,12 @@ public final class Utils {
     //获取服务端返回的用户数据并存储
     public static void doUserData(User user) {
         if (user == null) return;
+        String photoUrl = user.getPhoto();
+        if (!photoUrl.startsWith("http")) {
+            // 如果不是以 http 开头，说明是文件名，需要手动拼接
+            photoUrl = Utils.rebuildUrl("upload/" + photoUrl, getContext());
+            user.setPhoto(photoUrl);
+        }
         //存储SharedPreferences以便之后调用
         Utils.saveBean2Sp(getContext(), user, "User", "user");
     }

@@ -22,7 +22,7 @@ import com.journeyapps.barcodescanner.DecoratedBarcodeView;
 import com.xuexiang.xui.utils.XToastUtils;
 
 import java.io.InputStream;
-
+//扫码界面
 public class CustomScannerActivity extends AppCompatActivity {
 
     private CaptureManager capture;
