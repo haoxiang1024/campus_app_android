@@ -67,23 +67,29 @@ public class FoundFragment extends BaseFragment<FragmentFoundBinding> {
      */
     @Override
     protected void initViews() {
-        showLoading();
-        RetrofitClient.getInstance().getApi().getAllType().enqueue(new Callback<Result<List<LostFoundType>>>() {
-            @Override
-            public void onResponse(Call<Result<List<LostFoundType>>> call, Response<Result<List<LostFoundType>>> response) {
-                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
-                    List<LostFoundType> types = response.body().getData();
-                    setupViewPager(types);
-                } else {
-                    Utils.showResponse("获取分类失败");
+        binding.getRoot().postDelayed(() -> {
+            // 加上 isAdded() 判断，防止用户在 300ms 内手速极快地退出了页面导致崩溃
+            if (!isAdded()) return;
+            showLoading();
+            RetrofitClient.getInstance().getApi().getAllType().enqueue(new Callback<Result<List<LostFoundType>>>() {
+                @Override
+                public void onResponse(Call<Result<List<LostFoundType>>> call, Response<Result<List<LostFoundType>>> response) {
+                    if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                        List<LostFoundType> types = response.body().getData();
+                        setupViewPager(types);
+                    } else {
+                        Utils.showResponse("获取分类失败");
+                        hideLoadingDialog();
+                    }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<Result<List<LostFoundType>>> call, Throwable t) {
-                Utils.showResponse("网络错误: " + t.getMessage());
-            }
-        });
+                @Override
+                public void onFailure(Call<Result<List<LostFoundType>>> call, Throwable t) {
+                    Utils.showResponse("网络错误: " + t.getMessage());
+                    hideLoadingDialog();
+                }
+            });
+        }, 300); // 300ms
     }
     private void setupViewPager(List<LostFoundType> types) {
         String[] titles = new String[types.size()];
