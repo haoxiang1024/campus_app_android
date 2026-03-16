@@ -199,7 +199,7 @@ public interface ApiService {
     Call<Result<String>> verifyOrder(@Field("verifyCode") String verifyCode, @Field("adminId") int adminId);
 
     @GET("shop/myOrders")
-    Call<Result<List<ExchangeOrder>>> getMyOrders(@Query("keyword") String keyword);
+    Call<Result<List<ExchangeOrder>>> getMyOrders(@Query("userId") Integer userId,@Query("keyword") String keyword);
 
     @FormUrlEncoded
     @POST("shop/deleteOrder")
