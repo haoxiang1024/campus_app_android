@@ -49,7 +49,7 @@ public class PointHistoryFragment extends BaseFragment<FragmentPointHistoryBindi
 
     @Override
     protected void initViews() {
-        // 使用 binding.recyclerView 替换 findViewById 防止空指针闪退
+        // 使用 binding.recyclerView 防止空指针闪退
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         mAdapter = new PointHistoryAdapter();
@@ -60,29 +60,24 @@ public class PointHistoryFragment extends BaseFragment<FragmentPointHistoryBindi
             PointHistory history = mAdapter.getItem(position);
             showHistoryDetailDialog(history);
         });
-        binding.etSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-            }
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                mAdapter.filter(s.toString());
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
+        binding.ivSearch.setOnClickListener(v -> {
+            // 获取输入框中的文本并去除前后空格
+            String keyword = binding.etSearch.getText().toString().trim();
+            // 调用适配器的过滤方法
+            if (mAdapter != null) {
+                mAdapter.filter(keyword);
             }
         });
+
         loadData();
     }
 
     // 加载积分历史数据
     private void loadData() {
         User user = Utils.getBeanFromSp(getContext(), "User", "user");
-        if (user == null) return; // 容错：防止 user 为空时调用 getId() 闪退
+        if (user == null) return;
         RetrofitClient.getInstance().getApi().getPointHistory(user.getId()).enqueue(new Callback<Result<List<PointHistory>>>() {
             @Override
             public void onResponse(Call<Result<List<PointHistory>>> call, Response<Result<List<PointHistory>>> response) {
@@ -93,7 +88,6 @@ public class PointHistoryFragment extends BaseFragment<FragmentPointHistoryBindi
 
             @Override
             public void onFailure(Call<Result<List<PointHistory>>> call, Throwable t) {
-                // 可在这里处理网络请求失败的 UI 提示
                 Utils.showResponse("网络错误");
             }
         });
@@ -112,8 +106,6 @@ public class PointHistoryFragment extends BaseFragment<FragmentPointHistoryBindi
                 .title("积分详情")
                 .content(detailMsg)
                 .positiveText("确定");
-
-
 
         builder.show();
     }

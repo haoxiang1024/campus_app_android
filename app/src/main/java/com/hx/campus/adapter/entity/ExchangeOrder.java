@@ -14,7 +14,15 @@ public class ExchangeOrder {
     private Date create_time;
     private Date verify_time;//核销时间
     private Integer verify_admin_id; // 核销管理员ID
+    private String item_image;
 
+    public String getItem_image() {
+        return item_image;
+    }
+
+    public void setItem_image(String item_image) {
+        this.item_image = item_image;
+    }
     public ExchangeOrder() {
     }
 
