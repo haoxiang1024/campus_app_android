@@ -198,7 +198,7 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
                     Log.e("IM_LOG", "Token一致，执行快速连接...");
                     IMCenter.getInstance().connect(token, connectCallback);
                 } else {
-                    // 首次连接：传入超时时间（例如 10 秒）
+                    // 首次连接：传入超时时间
                     Log.e("IM_LOG", "Token变更，执行带超时的首次连接...");
                     IMCenter.getInstance().connect(token, timeLimit, connectCallback);
                 }

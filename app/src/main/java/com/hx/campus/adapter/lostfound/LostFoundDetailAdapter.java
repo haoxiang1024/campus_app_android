@@ -67,7 +67,7 @@ public class LostFoundDetailAdapter extends BaseAdapter {
     // 定义两种视图类型：0 代表失物，1 代表招领
     @Override
     public int getItemViewType(int position) {
-        // 根据实体类中的 type 字段判断（假设 "0" 是失物，"1" 是招领）
+        // 根据实体类中的 type 字段判断
         return "0".equals(getItem(position).getType()) ? 0 : 1;
     }
 

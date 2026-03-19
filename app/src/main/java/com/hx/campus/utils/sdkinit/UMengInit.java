@@ -64,9 +64,7 @@ public final class UMengInit {
         if (MyApp.isDebug()) {
             return;
         }
-        //初始化组件化基础库, 注意: 即使您已经在AndroidManifest.xml中配置过appkey和channel值，也需要在App代码中调用初始化接口（如需要使用AndroidManifest.xml中配置好的appkey和channel值，UMConfigure.init调用中appkey和channel参数请置为null）。
         //第二个参数是appkey，最后一个参数是pushSecret
-        //这里BuildConfig.APP_ID_UMENG是根据local.properties中定义的APP_ID_UMENG生成的，只是运行看效果的话，可以不初始化该SDK
         UMConfigure.init(application, BuildConfig.APP_ID_UMENG, getChannel(application), UMConfigure.DEVICE_TYPE_PHONE, "");
         //统计SDK是否支持采集在子进程中打点的自定义事件，默认不支持
         //支持多进程打点

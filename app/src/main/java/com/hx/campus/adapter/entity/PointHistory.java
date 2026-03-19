@@ -40,7 +40,6 @@ public class PointHistory implements Serializable {
     public String getcreate_time() { return create_time; }
     public void setcreate_time(String create_time) { this.create_time = create_time; }
 
-    // 可以加一个辅助方法，方便 UI 显示（比如给正数加上 '+' 号）
     public String getDisplayPoints() {
         if (points_changed > 0) {
             return "+" + points_changed;

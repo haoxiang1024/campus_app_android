@@ -1,7 +1,7 @@
 package com.hx.campus.adapter.entity;
 
 /**
- * 登录成功返回的DTO（包含用户信息+Token）
+ * 登录成功返回的DTO
  */
 public class LoginResponseDTO {
     // 用户信息

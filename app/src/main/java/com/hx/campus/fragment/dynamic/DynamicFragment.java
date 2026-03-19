@@ -79,7 +79,7 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
     // 保存当前地图上的所有原始数据
     private List<LostFound> currentMapDataList = new ArrayList<>();
 
-    // 修复弹窗重叠：保存当前的弹窗实例
+    // 保存当前的弹窗实例
     private MaterialDialog mBottomSheetDialog;
 
     @NonNull
@@ -95,13 +95,13 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
 
     @Override
     protected void initViews() {
-        // 1. 初始化顶部固定的 Banner
+        // 初始化顶部固定的 Banner
         initFixedBanner();
 
-        // 2. 初始化顶部固定的 九宫格菜单
+        //  初始化顶部固定的 九宫格菜单
         initFixedGrid();
 
-        // 3. 初始化下方可滑动的列表（只有标题和推荐新闻）
+        //  初始化下方可滑动的列表
         VirtualLayoutManager virtualLayoutManager = new VirtualLayoutManager(getContext());
         binding.recyclerView.setLayoutManager(virtualLayoutManager);
         RecyclerView.RecycledViewPool viewPool = new RecyclerView.RecycledViewPool();

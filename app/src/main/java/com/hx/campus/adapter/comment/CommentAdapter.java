@@ -191,7 +191,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                 String htmlText = "<font color='#888888'>" + namePart + "：</font> <font color='#222222'>" + reply.getContent() + "</font>";
                 replyTv.setText(Html.fromHtml(htmlText));
 
-                // 创建底部操作栏容器（包含时间和回复按钮）
+                // 创建底部操作栏容器
                 LinearLayout actionContainer = new LinearLayout(mContext);
                 actionContainer.setOrientation(LinearLayout.HORIZONTAL);
                 LinearLayout.LayoutParams actionContainerParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
