@@ -153,7 +153,7 @@ public class SearchInfoFragment extends BaseFragment<FragmentSearchInfoBinding> 
             if (imm != null) imm.hideSoftInputFromWindow(binding.etCommentInput.getWindowToken(), 0);
 
             // 弹出Emoji面板
-            emojiPopup.showAsDropDown(binding.btnEmoji, 0, - (binding.btnEmoji.getHeight() + 400));
+            emojiPopup.showAsDropDown(binding.btnEmoji, 0, - (binding.btnEmoji.getHeight() + 500));
         });
 
         // 输入框点击关闭Emoji面板

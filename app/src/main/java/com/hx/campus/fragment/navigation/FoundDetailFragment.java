@@ -130,7 +130,7 @@ public class FoundDetailFragment extends BaseFragment<FragmentFoundDetailBinding
         binding.btnEmoji.setOnClickListener(v -> {
             InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
             if (imm != null) imm.hideSoftInputFromWindow(binding.etCommentInput.getWindowToken(), 0);
-            emojiPopup.showAsDropDown(binding.btnEmoji, 0, - (binding.btnEmoji.getHeight() + 400));
+            emojiPopup.showAsDropDown(binding.btnEmoji, 0, - (binding.btnEmoji.getHeight() + 500));
         });
 
         binding.etCommentInput.setOnClickListener(v -> {
