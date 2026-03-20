@@ -1,8 +1,17 @@
 package com.hx.campus.fragment.shop;
 
+import static com.xuexiang.xui.utils.DrawableUtils.createBitmapFromView;
+
+import android.content.ContentValues;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -11,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,8 +46,10 @@ import com.hx.campus.utils.api.RetrofitClient;
 import com.scwang.smart.refresh.layout.SmartRefreshLayout;
 import com.xuexiang.xpage.annotation.Page;
 import com.xuexiang.xui.utils.XToastUtils;
+import com.xuexiang.xui.widget.dialog.materialdialog.DialogAction;
 import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog;
 
+import java.io.OutputStream;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -129,78 +141,6 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
         openNewPage(PointHistoryFragment.class);
     }
 
-    // 展示积分明细弹窗
-    private void showPointHistoryDialog(List<PointHistory> historyList) {
-        ScrollView scrollView = new ScrollView(getContext());
-        LinearLayout layout = new LinearLayout(getContext());
-        layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(40, 20, 40, 20);
-        scrollView.addView(layout);
-
-        // 处理数据为空的情况
-        if (historyList == null || historyList.isEmpty()) {
-            TextView emptyView = new TextView(getContext());
-            emptyView.setText("暂无积分变动记录");
-            emptyView.setGravity(Gravity.CENTER);
-            emptyView.setPadding(0, 50, 0, 50);
-            emptyView.setTextColor(Color.parseColor("#999999"));
-            layout.addView(emptyView);
-        } else {
-            // 遍历构建每一条明细的视图
-            for (PointHistory history : historyList) {
-                LinearLayout itemLayout = new LinearLayout(getContext());
-                itemLayout.setOrientation(LinearLayout.VERTICAL);
-                itemLayout.setPadding(0, 20, 0, 20);
-
-                // 顶部包裹描述和积分数值的水平容器
-                LinearLayout topRow = new LinearLayout(getContext());
-                topRow.setOrientation(LinearLayout.HORIZONTAL);
-
-                TextView tvDesc = new TextView(getContext());
-                tvDesc.setText(history.getDescription() != null ? history.getDescription() : "积分变动");
-                tvDesc.setTextColor(Color.parseColor("#333333"));
-                tvDesc.setTextSize(15);
-                LinearLayout.LayoutParams descParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f);
-                tvDesc.setLayoutParams(descParams);
-
-                TextView tvPoints = new TextView(getContext());
-                int p = Integer.parseInt(history.getDisplayPoints());
-                // 根据积分正负显示不同颜色和符号
-                tvPoints.setText(p > 0 ? "+" + p : String.valueOf(p));
-                tvPoints.setTextColor(p > 0 ? Color.parseColor("#4CAF50") : Color.parseColor("#F44336"));
-                tvPoints.setTextSize(16);
-                tvPoints.setTypeface(null, Typeface.BOLD);
-
-                topRow.addView(tvDesc);
-                topRow.addView(tvPoints);
-
-                // 底部显示时间的视图
-                TextView tvTime = new TextView(getContext());
-                tvTime.setText(history.getcreate_time() != null ? history.getcreate_time() : "");
-                tvTime.setTextColor(Color.parseColor("#999999"));
-                tvTime.setTextSize(12);
-                tvTime.setPadding(0, 8, 0, 0);
-
-                // 底部细线分割线
-                View divider = new View(getContext());
-                divider.setBackgroundColor(Color.parseColor("#EEEEEE"));
-                LinearLayout.LayoutParams dividerParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 1);
-                dividerParams.topMargin = 20;
-
-                itemLayout.addView(topRow);
-                itemLayout.addView(tvTime);
-                itemLayout.addView(divider);
-
-                layout.addView(itemLayout);
-            }
-        }
-
-        new MaterialDialog.Builder(getContext())
-                .title("积分明细")
-                .customView(scrollView, false)
-                .positiveText("关闭")
-                .show();
-    }
 
     private void showItemDetailDialog(ShopItem item) {
         LinearLayout layout = new LinearLayout(getContext());
@@ -254,16 +194,15 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
         }
 
         int userId = currentUser.getId();
-        Utils.showResponse("正在处理兑换请求...");
 
         RetrofitClient.getInstance().getApi().exchangeItem(userId, item.getId()).enqueue(new Callback<Result<String>>() {
             @Override
             public void onResponse(Call<Result<String>> call, Response<Result<String>> response) {
                 if (response.body() != null && response.body().getStatus() == 0) {
-                    // 获取后端生成的核销码
+                    // 获取后端生成的核验码
                     String verifyCode = response.body().getData();
 
-                    // 兑换成功展示核销码和二维码弹窗
+                    // 兑换成功展示核验码和二维码弹窗
                     showVerifyCodeDialog(verifyCode, item);
 
                     // 刷新最新积分和列表
@@ -281,8 +220,9 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
         });
     }
 
-    // 弹出包含二维码和核销码的核销凭证弹窗
+    // 弹出包含二维码和核验码的核验凭证弹窗
     private void showVerifyCodeDialog(String verifyCode, ShopItem item) {
+        Utils.showResponse("兑换成功");
         LinearLayout layout = new LinearLayout(getContext());
         layout.setOrientation(LinearLayout.VERTICAL);
         layout.setGravity(Gravity.CENTER);
@@ -290,7 +230,7 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
 
         // 顶部提示文字
         TextView tvTip = new TextView(getContext());
-        tvTip.setText("请向管理员出示此二维码或核销码\n领取【" + item.getName() + "】");
+        tvTip.setText("请向管理员出示此二维码或核验码\n领取【" + item.getName() + "】");
         tvTip.setTextSize(16);
         tvTip.setGravity(Gravity.CENTER);
         tvTip.setTextColor(Color.parseColor("#333333"));
@@ -310,9 +250,9 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
         }
         layout.addView(ivQrCode);
 
-        // 底部显眼核销码
+        // 底部显眼核验码
         TextView tvCode = new TextView(getContext());
-        tvCode.setText("核销码：" + verifyCode);
+        tvCode.setText("核验码：" + verifyCode);
         tvCode.setTextSize(22);
         tvCode.setTypeface(null, Typeface.BOLD);
         tvCode.setGravity(Gravity.CENTER);
@@ -322,11 +262,88 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
         // 显示弹窗
         new MaterialDialog.Builder(getContext())
                 .customView(layout, false)
-                .cancelable(false)
-                .positiveText("我已截图保存")
+                .cancelable(true)
+                .canceledOnTouchOutside(true)
+                .positiveText("保存二维码")
+                .onPositive((dialog, which) -> {
+                    Bitmap viewBitmap = createBitmapFromView(layout);
+                    if (viewBitmap != null) {
+                        // 保存到相册
+                        saveBitmapToGallery(viewBitmap);
+                    } else {
+                        Toast.makeText(getContext(), "生成图片失败", Toast.LENGTH_SHORT).show();
+                    }
+                })
                 .show();
     }
 
+    /**
+     * 将 Bitmap 保存到手机相册
+     */
+    private void saveBitmapToGallery(Bitmap bitmap) {
+        // 准备图片的元数据
+        String fileName = "VerifyCode_" + System.currentTimeMillis() + ".png";
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
+
+        // 适配 Android 10 (API 29) 及以上
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES); // 保存到 Pictures 目录
+            values.put(MediaStore.Images.Media.IS_PENDING, 1);
+        }
+
+        // 插入图片信息并获取 Uri
+        Uri uri = getContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+        if (uri != null) {
+            try {
+                // 打开输出流并压缩图片
+                OutputStream outputStream = getContext().getContentResolver().openOutputStream(uri);
+                if (outputStream != null) {
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+                    outputStream.close();
+                }
+
+                // 适配 Android 10：解除 PENDING 状态
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    values.clear();
+                    values.put(MediaStore.Images.Media.IS_PENDING, 0);
+                    getContext().getContentResolver().update(uri, values, null, null);
+                }
+
+                Toast.makeText(getContext(), "核验码已保存到相册", Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(getContext(), "保存失败：" + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            Toast.makeText(getContext(), "无法访问相册", Toast.LENGTH_SHORT).show();
+        }
+    }
+    /**
+     * 将 View 转换为 Bitmap
+     */
+    private Bitmap createBitmapFromView(View view) {
+        // 获取 View 的宽和高
+        int width = view.getWidth();
+        int height = view.getHeight();
+        if (width <= 0 || height <= 0) {
+            return null;
+        }
+
+        // 创建一个和 View 大小一样的 Bitmap
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+
+        // 绘制白色背景，防止保存后透明部分变黑
+        canvas.drawColor(Color.WHITE);
+
+        // 将 View 的内容绘制到 Canvas 上
+        view.draw(canvas);
+
+        return bitmap;
+    }
     // 使用 ZXing 生成二维码图片数据
     private Bitmap createQRCode(String content, int width, int height) {
         try {

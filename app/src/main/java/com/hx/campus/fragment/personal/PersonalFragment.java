@@ -207,7 +207,7 @@ public class PersonalFragment extends BaseFragment<FragmentProfileBinding> imple
     }
 
     /**
-     * 智能处理扫码结果：网页跳转 or 订单核销
+     * 智能处理扫码结果：网页跳转 or 订单核验
      */
     private void handleScannedResult(String content) {
         // 判断是否是网页链接 (如扫海报、活动页)
@@ -217,41 +217,41 @@ public class PersonalFragment extends BaseFragment<FragmentProfileBinding> imple
             return;
         }
 
-        //  如果不是链接，判断当前用户是否是管理员进行核销
+        //  如果不是链接，判断当前用户是否是管理员进行核验
         User user = Utils.getBeanFromSp(getContext(), "User", "user");
         if (user != null && user.getRole() == 1) { // role == 1 为管理员
             if (content.length() == 8) {
                 requestVerifyOrder(content.toUpperCase(), user.getId());
             } else {
-                XToastUtils.warning("无法识别的核销码：" + content);
+                XToastUtils.warning("无法识别的核验码：" + content);
             }
         } else {
             // 普通用户扫了无法识别的普通文本
             new MaterialDialog.Builder(getContext())
                     .title("扫描结果")
-                    .content("您不是管理员，无法核销商品")
+                    .content("您不是管理员，无法核验商品")
                     .positiveText("关闭")
                     .show();
         }
     }
 
     /**
-     * 调用 ApiService 发起核销请求
+     * 调用 ApiService 发起核验请求
      */
     private void requestVerifyOrder(String verifyCode, int adminId) {
-        Utils.showResponse("正在核销中...");
+        Utils.showResponse("正在核验中...");
 
         RetrofitClient.getInstance().getApi().verifyOrder(verifyCode, adminId).enqueue(new Callback<Result<String>>() {
             @Override
             public void onResponse(Call<Result<String>> call, Response<Result<String>> response) {
                 if (response.body() != null && response.body().getStatus() == 0) {
                     new MaterialDialog.Builder(getContext())
-                            .title("✅ 核销成功")
+                            .title("✅ 核验成功")
                             .content(response.body().getMsg())
                             .positiveText("完成")
                             .show();
                 } else {
-                    XToastUtils.error("核销失败：" + (response.body() != null ? response.body().getMsg() : "未知原因"));
+                    XToastUtils.error("核验失败：" + (response.body() != null ? response.body().getMsg() : "未知原因"));
                 }
             }
 

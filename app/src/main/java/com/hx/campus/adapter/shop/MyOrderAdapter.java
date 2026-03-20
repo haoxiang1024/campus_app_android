@@ -64,11 +64,11 @@ public class MyOrderAdapter extends RecyclerView.Adapter<MyOrderAdapter.ViewHold
         holder.tvCreateTime.setText("兑换时间：" + formatTime(order.getCreate_time()));
         int status = order.getStatus();
         if (status == 0) {
-            holder.tvStatus.setText("待核销");
+            holder.tvStatus.setText("待核验");
             holder.tvStatus.setTextColor(Color.parseColor("#FFA500"));
             holder.tvDelete.setVisibility(View.GONE);
         } else if (status == 1) {
-            holder.tvStatus.setText("已核销");
+            holder.tvStatus.setText("已核验");
             holder.tvStatus.setTextColor(Color.parseColor("#008000"));
             holder.tvDelete.setVisibility(View.VISIBLE);
         } else {

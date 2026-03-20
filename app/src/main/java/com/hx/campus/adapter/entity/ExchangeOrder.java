@@ -9,11 +9,11 @@ public class ExchangeOrder {
     private Integer item_id;       // 商品ID
     private String item_name;      // 商品名称(快照)
     private Integer points_cost;   // 消耗积分
-    private String verify_code;    // 8位提货核销码
-    private Integer status;       // 状态：0-待核销, 1-已核销, 2-已取消
+    private String verify_code;    // 8位提货核验码
+    private Integer status;       // 状态：0-待核验, 1-已核验, 2-已取消
     private Date create_time;
-    private Date verify_time;//核销时间
-    private Integer verify_admin_id; // 核销管理员ID
+    private Date verify_time;//核验时间
+    private Integer verify_admin_id; // 核验管理员ID
     private String item_image;
 
     public String getItem_image() {

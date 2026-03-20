@@ -86,7 +86,7 @@ public class MyOrderFragment extends BaseFragment<FragmentMyOrderBinding> {
 
         adapter.setOnDeleteClickListener(order -> {
             if (order.getStatus() == 0) {
-                Utils.showResponse("待核销的订单不能删除哦");
+                Utils.showResponse("待核验的订单不能删除哦");
                 return; // 提前结束，不弹出删除框
             }
             new MaterialDialog.Builder(getContext())
@@ -126,22 +126,22 @@ public class MyOrderFragment extends BaseFragment<FragmentMyOrderBinding> {
             // 处理状态显示和二维码按钮逻辑
             int status = order.getStatus();
             if (status == 0) {
-                tvStatus.setText("订单状态：待核销");
+                tvStatus.setText("订单状态：待核验");
                 tvStatus.setTextColor(Color.parseColor("#FFA500"));
 
-                // 只有待核销状态才显示获取二维码按钮
+                // 只有待核验状态才显示获取二维码按钮
                 tvGetQrCode.setVisibility(View.VISIBLE);
                 tvGetQrCode.setOnClickListener(v -> {
                     String verifyCode = order.getVerify_code();
                     if (verifyCode != null && !verifyCode.isEmpty()) {
                         showVerifyCodeDialog(verifyCode, order.getItem_name());
                     } else {
-                        Utils.showResponse("未找到核销码数据");
+                        Utils.showResponse("未找到核验码数据");
                     }
                 });
 
             } else if (status == 1) {
-                tvStatus.setText("订单状态：已核销");
+                tvStatus.setText("订单状态：已核验");
                 tvStatus.setTextColor(Color.parseColor("#008000"));
                 tvGetQrCode.setVisibility(View.GONE);
             } else {
@@ -161,7 +161,7 @@ public class MyOrderFragment extends BaseFragment<FragmentMyOrderBinding> {
     }
 
 
-    // 弹出包含二维码和核销码的核销凭证弹窗
+    // 弹出包含二维码和核验码的核验凭证弹窗
     private void showVerifyCodeDialog(String verifyCode, String itemName) {
         LinearLayout layout = new LinearLayout(getContext());
         layout.setOrientation(LinearLayout.VERTICAL);
@@ -170,7 +170,7 @@ public class MyOrderFragment extends BaseFragment<FragmentMyOrderBinding> {
 
         // 顶部提示文字
         TextView tvTip = new TextView(getContext());
-        tvTip.setText("请向管理员出示此二维码或核销码\n领取【" + itemName + "】");
+        tvTip.setText("请向管理员出示此二维码或核验码\n领取【" + itemName + "】");
         tvTip.setTextSize(16);
         tvTip.setGravity(Gravity.CENTER);
         tvTip.setTextColor(Color.parseColor("#333333"));
@@ -189,9 +189,9 @@ public class MyOrderFragment extends BaseFragment<FragmentMyOrderBinding> {
         }
         layout.addView(ivQrCode);
 
-        // 底部显眼核销码
+        // 底部显眼核验码
         TextView tvCode = new TextView(getContext());
-        tvCode.setText("核销码：" + verifyCode);
+        tvCode.setText("核验码：" + verifyCode);
         tvCode.setTextSize(22);
         tvCode.setTypeface(null, Typeface.BOLD);
         tvCode.setGravity(Gravity.CENTER);
@@ -266,6 +266,9 @@ public class MyOrderFragment extends BaseFragment<FragmentMyOrderBinding> {
             @Override
             public void onResponse(Call<Result<List<ExchangeOrder>>> call, Response<Result<List<ExchangeOrder>>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getStatus() == 0) {
+                    if(orderList.isEmpty()){
+                        Utils.showResponse("没有订单");
+                    }
                     orderList.clear();
                     orderList.addAll(response.body().getData());
                     adapter.notifyDataSetChanged();

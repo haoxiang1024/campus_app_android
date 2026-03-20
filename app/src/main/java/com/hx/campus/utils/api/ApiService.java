@@ -193,7 +193,7 @@ public interface ApiService {
     @GET("shop/history")
     Call<Result<List<PointHistory>>> getPointHistory(@Query("userId") Integer userId);
 
-    // 管理员核销提货码接口
+    // 管理员核验提货码接口
     @POST("admin/verifyOrder")
     @FormUrlEncoded
     Call<Result<String>> verifyOrder(@Field("verifyCode") String verifyCode, @Field("adminId") int adminId);
