@@ -118,6 +118,10 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
             public void onResponse(Call<Result<List<ShopItem>>> call, Response<Result<List<ShopItem>>> response) {
                 refreshLayout.finishRefresh();
                 if (response.body() != null && response.body().getStatus() == 0) {
+                   List<ShopItem> shopItems= response.body().getData();
+                   if (shopItems.isEmpty()){
+                       Utils.showResponse("没有商品");
+                   }
                     mAdapter.setData(response.body().getData());
                 } else {
                     XToastUtils.error("加载失败：" + (response.body() != null ? response.body().getMsg() : "未知错误"));
