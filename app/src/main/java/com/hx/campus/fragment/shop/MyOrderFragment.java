@@ -266,11 +266,11 @@ public class MyOrderFragment extends BaseFragment<FragmentMyOrderBinding> {
             @Override
             public void onResponse(Call<Result<List<ExchangeOrder>>> call, Response<Result<List<ExchangeOrder>>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getStatus() == 0) {
+                    orderList.clear();
+                    orderList.addAll(response.body().getData());
                     if(orderList.isEmpty()){
                         Utils.showResponse("没有订单");
                     }
-                    orderList.clear();
-                    orderList.addAll(response.body().getData());
                     adapter.notifyDataSetChanged();
                 } else {
                     Utils.showResponse("获取订单失败");
