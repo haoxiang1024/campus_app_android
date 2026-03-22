@@ -60,38 +60,19 @@ public class SuggestionFragment extends BaseFragment<FragmentSuggestionBinding> 
     @Override
     public void onClick(SuperTextView view) {
         int id = view.getId();
-        //获取app当前语言
-        String currentLanguage = Utils.language(getContext());
-        if(currentLanguage.equals("zh")){
-            switch (id) {
-                case R.id.hot1:
-                    //闪退如何解决
-                    AgentWebActivity.goWeb(getContext(), Utils.rebuildUrl("/pages/appcrash.html", getContext()));
-                    break;
-                case R.id.hot2:
-                    //手机号/账户问题
-                    AgentWebActivity.goWeb(getContext(), Utils.rebuildUrl("/pages/account.html", getContext()));
-                    break;
-                case R.id.hot3:
-                    //隐私保护问题
-                    AgentWebActivity.goWeb(getContext(), Utils.rebuildUrl("/pages/privacy.html", getContext()));
-                    break;
-            }
-        } else if (currentLanguage.equals("en")) {
-            switch (id) {
-                case R.id.hot1:
-                    //闪退如何解决
-                    AgentWebActivity.goWeb(getContext(), Utils.rebuildUrl("/pages/appcrash_en.html", getContext()));
-                    break;
-                case R.id.hot2:
-                    //手机号/账户问题
-                    AgentWebActivity.goWeb(getContext(), Utils.rebuildUrl("/pages/account_en.html", getContext()));
-                    break;
-                case R.id.hot3:
-                    //隐私保护问题
-                    AgentWebActivity.goWeb(getContext(), Utils.rebuildUrl("/pages/privacy_en.html", getContext()));
-                    break;
-            }
+        switch (id) {
+            case R.id.hot1:
+                //闪退如何解决
+                AgentWebActivity.goWeb(getContext(), Utils.rebuildUrl("/pages/appcrash.html", getContext()));
+                break;
+            case R.id.hot2:
+                //手机号/账户问题
+                AgentWebActivity.goWeb(getContext(), Utils.rebuildUrl("/pages/account.html", getContext()));
+                break;
+            case R.id.hot3:
+                //隐私保护问题
+                AgentWebActivity.goWeb(getContext(), Utils.rebuildUrl("/pages/privacy.html", getContext()));
+                break;
         }
 
     }
@@ -104,8 +85,8 @@ public class SuggestionFragment extends BaseFragment<FragmentSuggestionBinding> 
     @Override
     public void onClick(View v) {
         if (v.getId() == binding.suBtn.getId()) {
-            //意见反馈页
-            AgentWebActivity.goWeb(getContext(), Utils.rebuildUrl("/pages/contract.html", getContext()));
+            //意见反馈
+            AgentWebActivity.goWeb(getContext(),"https://wj.qq.com/s2/26067194/2a15/");
         }
     }
 }
