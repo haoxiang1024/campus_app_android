@@ -79,7 +79,7 @@ import java.util.Properties;
 public final class Utils {
 
     /** 应用隐私政策网页地址 */
-    private static final String PRIVACY_URL = "https://gitee.com/xuexiangjys/TemplateAppProject/raw/master/LICENSE";
+    private static final String PRIVACY_URL = "https://gitee.com/hx_a/campus_app_android/blob/master/LICENSE";
 
     /**
      * 私有构造函数
@@ -121,42 +121,33 @@ public final class Utils {
                                 context, 
                                 ResUtils.getString(R.string.title_reminder), 
                                 String.format(ResUtils.getString(R.string.content_privacy_explain_again), ResUtils.getString(R.string.app_name)), 
-                                ResUtils.getString(R.string.lab_look_again), 
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                        // 重新显示隐私政策对话框
-                                        showPrivacyDialog(context, submitListener);
-                                    }
-                                }, 
-                                ResUtils.getString(R.string.lab_still_disagree), 
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                        // 最后一次确认机会
-                                        DialogLoader.getInstance().showConfirmDialog(
-                                                context, 
-                                                ResUtils.getString(R.string.content_think_about_it_again), 
-                                                ResUtils.getString(R.string.lab_look_again), 
-                                                new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                        dialog.dismiss();
-                                                        showPrivacyDialog(context, submitListener);
-                                                    }
-                                                }, 
-                                                ResUtils.getString(R.string.lab_exit_app), 
-                                                new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                        dialog.dismiss();
-                                                        // 用户最终拒绝，退出应用
-                                                        XUtil.exitApp();
-                                                    }
-                                                });
-                                    }
+                                ResUtils.getString(R.string.lab_look_again),
+                                (dialog3, which2) -> {
+                                    dialog3.dismiss();
+                                    // 重新显示隐私政策对话框
+                                    showPrivacyDialog(context, submitListener);
+                                },
+                                ResUtils.getString(R.string.lab_still_disagree),
+                                (dialog2, which1) -> {
+                                    dialog2.dismiss();
+                                    // 最后一次确认机会
+                                    DialogLoader.getInstance().showConfirmDialog(
+                                            context,
+                                            ResUtils.getString(R.string.content_think_about_it_again),
+                                            ResUtils.getString(R.string.lab_look_again),
+                                            new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog2, int which1) {
+                                                    dialog2.dismiss();
+                                                    showPrivacyDialog(context, submitListener);
+                                                }
+                                            },
+                                            ResUtils.getString(R.string.lab_exit_app),
+                                            (dialog4, which3) -> {
+                                                dialog4.dismiss();
+                                                // 用户最终拒绝，退出应用
+                                                XUtil.exitApp();
+                                            });
                                 });
                     }
                 }).build();
