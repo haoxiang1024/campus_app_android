@@ -33,10 +33,9 @@ public class DemoDataProvider {
     public static String APPSECRET = "b0MwcllXNVB4eHdBaDN1cFFqQmR0QT09";//新闻接口密钥
 
     public static String[] urls = new String[]{//640*360 360/640=0.5625
-            "https://p5.itc.cn/q_70/images03/20211108/6811c0f831614cebbabe194bdf4566cf.jpeg",//紧急通知"
-            "https://www.lmlccdn.com/www.lmlc.com.new/cdn/desktop/popular/feedback/img/header.6284a0d800.jpg",//意见反馈
-            "https://p8.itc.cn/q_70/images03/20210322/e3b1fd5131054817a2430aee925f86a4.png",//app帮助
-            "https://demons.yirendai.com/introductionPages/image/privacy-icon.png",//隐私
+            "https://gitee.com/hx_a/pic/raw/master/%E4%B8%8B%E8%BD%BD.png",//紧急通知"
+            "https://gitee.com/hx_a/pic/raw/master/2026%E5%B9%B4-03%E6%9C%88-23%E6%97%A5_11%E6%97%B6-30%E5%88%86-03%E7%A7%92.png",//app帮助
+            "https://gitee.com/hx_a/pic/raw/master/2026%E5%B9%B4-03%E6%9C%88-23%E6%97%A5_11%E6%97%B6-36%E5%88%86-15%E7%A7%92.png",//隐私
     };
 
 

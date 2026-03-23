@@ -122,26 +122,21 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
             banner.setSource(DemoDataProvider.getBannerList())
                     .setOnItemClickListener((view, item, pos) -> {
                         String url = "";
-                        boolean isExternal = false; // 标记是否为外部链接
                         switch (pos) {
                             case 0:
-                                url = "/pages/notification.html";
+                                url = "/pages/notification.html"; // 系统公告
                                 break;
                             case 1:
-                                url = "https://wj.qq.com/s2/26067194/2a15/";
-                                isExternal = true; // 腾讯问卷是外部链接
+                                url = "/pages/appcrash.html";    // 崩溃日志
                                 break;
                             case 2:
-                                url = "/pages/appcrash.html";
-                                break;
-                            case 3:
-                                url = "/pages/privacy.html";
+                                url = "/pages/privacy.html";     // 隐私协议
                                 break;
                             default:
                                 url = "/pages/notification.html";
                                 break;
                         }
-                        String finalUrl = isExternal ? url : Utils.rebuildUrl(url, getContext());
+                        String finalUrl = Utils.rebuildUrl(url, getContext());
                         AgentWebActivity.goWeb(getContext(), finalUrl);
                     }).startScroll();
         }

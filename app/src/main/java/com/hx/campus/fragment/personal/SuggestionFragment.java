@@ -52,7 +52,6 @@ public class SuggestionFragment extends BaseFragment<FragmentSuggestionBinding> 
         binding.hot1.setOnSuperTextViewClickListener(this);
         binding.hot2.setOnSuperTextViewClickListener(this);
         binding.hot3.setOnSuperTextViewClickListener(this);
-        binding.suBtn.setOnClickListener(this);
 
     }
 
@@ -84,9 +83,6 @@ public class SuggestionFragment extends BaseFragment<FragmentSuggestionBinding> 
      */
     @Override
     public void onClick(View v) {
-        if (v.getId() == binding.suBtn.getId()) {
-            //意见反馈
-            AgentWebActivity.goWeb(getContext(),"https://wj.qq.com/s2/26067194/2a15/");
-        }
+
     }
 }
