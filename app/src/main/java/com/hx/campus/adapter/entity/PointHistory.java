@@ -15,7 +15,7 @@ public class PointHistory implements Serializable {
     @SerializedName("points_changed")
     private int points_changed; // 变动数值，正数或负数
 
-    private String description; // 例如 "兑换商品：校园定制笔记本"
+    private String description;
 
     @SerializedName("create_time")
     private String create_time;
@@ -58,7 +58,6 @@ public class PointHistory implements Serializable {
     }
     public String getFormattedTime() {
         if (create_time == null) return "";
-        // 假设原始格式是 "yyyy-MM-dd HH:mm:ss"，这里转化为更易读的格式
         try {
             return (create_time.length() > 16 ? create_time.substring(0, 16) : create_time)
                     .replace("T", " ");        } catch (Exception e) {

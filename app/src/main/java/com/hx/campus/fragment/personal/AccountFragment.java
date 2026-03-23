@@ -82,7 +82,6 @@ public class AccountFragment extends BaseFragment<FragmentAccountBinding> implem
             Glide.with(this).load(currentUser.getPhoto()).into(imgView);
         }
 
-        // 设置昵称 (现在是EditText，直接设置文本即可)
         binding.etNickName.setText(currentUser.getNickname());
 
         // 设置性别

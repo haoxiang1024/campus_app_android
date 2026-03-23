@@ -18,7 +18,7 @@ public final class TokenUtils {
     private static final String KEY_PROFILE_CHANNEL = "github";
     private static String sToken;
     private static Context context;
-    // 新增：专门存储融云 IM Token 的键
+    // 专门存储融云 IM Token 的键
     private static final String KEY_IM_TOKEN = "com.hx.campus.utils.KEY_IM_TOKEN";
     /**
      * 获取存储的 IM Token

@@ -226,7 +226,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
                                     user.getNickname(),
                                     Uri.parse(fullAvatarUrl)
                             );
-                            // 告诉融云：这是当前登录用户的个人信息
                             RongIM.getInstance().setCurrentUserInfo(myInfo);
                         }
                     }
@@ -314,7 +313,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
             //设置昵称
             tvAvatar.setText(user.getNickname());
 
-            //设置简介与判断性别 (使用 "男".equals 避免空指针)
+            //设置简介与判断性别
             if ("男".equals(user.getSex())) {
                 tvSign.setText("小哥哥");
                 sexView.setVisibility(View.VISIBLE);
@@ -343,7 +342,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
         toggle.syncState();//同步页面状态
         //侧边栏点击事件
         binding.navView.setNavigationItemSelectedListener(menuItem -> {
-            //判断菜单是否有选中行为的菜单项有则切换,无则打开页面
             if (menuItem.isCheckable()) {
                 binding.drawerLayout.closeDrawers();//关闭抽屉
                 return handleNavigationItemSelected(menuItem);//打开被选中项
@@ -414,7 +412,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
         }
     }
 
-    //================Navigation================//
 
     /**
      * 底部导航栏点击事件

@@ -210,7 +210,7 @@ public class PersonalFragment extends BaseFragment<FragmentProfileBinding> imple
      * 智能处理扫码结果：网页跳转 or 订单核验
      */
     private void handleScannedResult(String content) {
-        // 判断是否是网页链接 (如扫海报、活动页)
+        // 判断是否是网页链接
         if (content.toLowerCase().startsWith("http://") || content.toLowerCase().startsWith("https://")) {
             // 使用AgentWebActivity 直接打开网页
             AgentWebActivity.goWeb(getContext(), content);

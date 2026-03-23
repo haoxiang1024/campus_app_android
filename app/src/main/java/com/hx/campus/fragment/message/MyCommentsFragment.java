@@ -81,11 +81,10 @@ public class MyCommentsFragment extends BaseFragment<LayoutCommonListBinding> {
     @Override
     protected void initListeners() {
         mAdapter.setOnItemClickListener((itemView, item, position) -> {
-            // TODO: 构建传参用的实体对象，跳转到详情页
             jumpDetail(item);
         });
 
-        // 【长按】删除该评论
+        // 删除该评论
         mAdapter.setOnItemLongClickListener((itemView, item, position) -> {
             new MaterialDialog.Builder(getContext())
                     .title("提示")
@@ -127,7 +126,7 @@ public class MyCommentsFragment extends BaseFragment<LayoutCommonListBinding> {
     }
 
     private void loadData() {
-        // 清空原有数据并刷新（避免数据残留）
+        // 清空原有数据并刷新
         mDataList.clear();
         mAdapter.refresh(mDataList);
         checkEmptyState();
@@ -157,7 +156,7 @@ public class MyCommentsFragment extends BaseFragment<LayoutCommonListBinding> {
             @Override
             public void onFailure(Call<Result<List<Comment>>> call, Throwable t) {
                 Utils.showResponse("网络请求失败");
-                t.printStackTrace(); // 打印异常日志，方便调试
+                t.printStackTrace();
                 checkEmptyState();
             }
         });

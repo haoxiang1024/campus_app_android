@@ -121,7 +121,6 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements
             switch (id) {
                 case R.id.btn_login:
                     // 登录
-                    //showLoadingDialog();//显示加载动画
                     if (binding.etPhoneNumber.validate() && binding.etPassword.validate()) {
                         //校验成功进行登录
                         Login();

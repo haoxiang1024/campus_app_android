@@ -68,7 +68,6 @@ public class FoundFragment extends BaseFragment<FragmentFoundBinding> {
     @Override
     protected void initViews() {
         binding.getRoot().postDelayed(() -> {
-            // 加上 isAdded() 判断，防止用户在 300ms 内手速极快地退出了页面导致崩溃
             if (!isAdded()) return;
             showLoading();
             RetrofitClient.getInstance().getApi().getAllType().enqueue(new Callback<Result<List<LostFoundType>>>() {

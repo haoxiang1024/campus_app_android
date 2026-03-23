@@ -12,7 +12,6 @@ import com.hx.campus.utils.common.TokenUtils;
 import com.xuexiang.xrouter.utils.TextUtils;
 
 public class SplashActivity extends AppCompatActivity {
-    public static final String LANG_KEY = "language";//语言设置
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

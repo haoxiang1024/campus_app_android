@@ -57,7 +57,6 @@ public class MyMessagesFragment extends BaseFragment<LayoutCommonListBinding> {
         mAdapter = new BaseRecyclerAdapter<MessageVO>(mDataList) {
             @Override
             protected int getItemLayoutId(int viewType) {
-                // TODO: 确保你创建了这个 item 的 XML 布局文件
                 return R.layout.adapter_my_comment_item;
             }
 

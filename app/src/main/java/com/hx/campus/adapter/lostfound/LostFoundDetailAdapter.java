@@ -82,7 +82,7 @@ public class LostFoundDetailAdapter extends BaseAdapter {
         int type = getItemViewType(position);
 
         if (type == 0) {
-            // 处理失物布局 (Lost)
+            // 处理失物布局
             LostItemsBinding lostBinding;
             if (view == null) {
                 lostBinding = LostItemsBinding.inflate(LayoutInflater.from(context), viewGroup, false);
@@ -98,7 +98,7 @@ public class LostFoundDetailAdapter extends BaseAdapter {
             loadImage(item.getImg(), lostBinding.lostImg);
 
         } else {
-            // 处理招领布局 (Found)
+            // 处理招领布局
             FoundItemsBinding foundBinding;
             if (view == null) {
                 foundBinding = FoundItemsBinding.inflate(LayoutInflater.from(context), viewGroup, false);

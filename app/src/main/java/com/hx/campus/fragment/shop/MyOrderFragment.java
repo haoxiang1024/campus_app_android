@@ -238,7 +238,7 @@ public class MyOrderFragment extends BaseFragment<FragmentMyOrderBinding> {
         if (timeObj instanceof String) {
             String timeStr = (String) timeObj;
             if (timeStr.contains("T")) {
-                // 处理 2026-03-14T12:51:50...
+                // 处理 2026-03-14T12:51:50
                 return timeStr.replace("T", " ").substring(0, 16);
             }
             // 兼容可能已经是格式化好的字符串

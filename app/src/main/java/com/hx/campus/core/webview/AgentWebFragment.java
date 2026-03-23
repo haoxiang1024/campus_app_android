@@ -344,7 +344,6 @@ public class AgentWebFragment extends Fragment implements FragmentKeyDown {
         return inflater.inflate(R.layout.fragment_agentweb, container, false);
     }
 
-    //========================================//
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -495,7 +494,6 @@ public class AgentWebFragment extends Fragment implements FragmentKeyDown {
     }
 
 
-    //========================菜单功能================================//
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -562,7 +560,6 @@ public class AgentWebFragment extends Fragment implements FragmentKeyDown {
         manager.setPrimaryClip(ClipData.newPlainText(null, text));
     }
 
-    //===================生命周期管理===========================//
 
     @Override
     public void onResume() {
@@ -587,7 +584,6 @@ public class AgentWebFragment extends Fragment implements FragmentKeyDown {
         super.onDestroyView();
     }
 
-    //===================中间键===========================//
 
 
     /**

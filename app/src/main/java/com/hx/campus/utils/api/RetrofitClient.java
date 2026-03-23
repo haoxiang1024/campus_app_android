@@ -232,7 +232,7 @@ public class RetrofitClient {
      * @return 解析后的 Date 对象，解析失败返回 null
      */
     private Date parseDateString(String dateStr) {
-        // 尝试解析 CST 时区格式
+        // 解析 CST 时区格式
         if (dateStr.contains("CST")) {
             try {
                 SimpleDateFormat cstSdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss 'CST' yyyy", Locale.US);
@@ -252,7 +252,7 @@ public class RetrofitClient {
                 "yyyy-MM-dd HH:mm"
         };
 
-        // 依次尝试各种日期格式
+        // 各种日期格式
         for (String format : formats) {
             try {
                 SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.US);

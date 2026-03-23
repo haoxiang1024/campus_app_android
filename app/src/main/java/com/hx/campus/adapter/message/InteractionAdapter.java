@@ -75,7 +75,6 @@ public class InteractionAdapter extends RecyclerView.Adapter<InteractionAdapter.
         holder.tvContent.setText(msg.content);
         holder.tvTime.setText(Utils.formatCommentTime(String.valueOf(msg.getTime())));
 
-        // TODO: 使用 Glide 等图片加载库加载头像
          Glide.with(holder.itemView.getContext()).load(msg.avatarUrl).into(holder.ivAvatar);
         holder.itemView.setOnClickListener(v -> {
             if (mListener != null) {

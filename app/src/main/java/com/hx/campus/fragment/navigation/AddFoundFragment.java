@@ -473,9 +473,8 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
         }
     }
 
-    // ======================================
     // 弹窗相关辅助方法和适配器
-    // ======================================
+
 
     private int dpToPx(Context context, float dp) {
         if (context == null) return 0;

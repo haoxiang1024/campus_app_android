@@ -291,7 +291,7 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
         values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
         values.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
 
-        // 适配 Android 10 (API 29) 及以上
+        // 适配 Android 10 及以上
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES); // 保存到 Pictures 目录
             values.put(MediaStore.Images.Media.IS_PENDING, 1);

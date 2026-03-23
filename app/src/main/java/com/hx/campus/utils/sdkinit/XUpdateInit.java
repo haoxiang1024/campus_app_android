@@ -18,7 +18,6 @@ public final class XUpdateInit {
     /**
      * 应用版本更新的检查地址
      */
-    // TODO: 2021/5/26 需要开启版本更新功能的话，就需要配置一下版本更新的地址
     private static final String KEY_UPDATE_URL = "";
 
     private XUpdateInit() {

@@ -68,9 +68,9 @@ import retrofit2.Response;
 @Page(anim = CoreAnim.fade)
 public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
 
-    // 新闻信息适配器，用于显示推荐内容列表
+    // 信息适配器，用于显示推荐内容列表
     private SimpleDelegateAdapter<NewInfo> newInfoSimpleDelegateAdapter;
-    // 新闻信息数据列表
+    // 信息数据列表
     private List<NewInfo> list = new ArrayList<>();
     // 地图相关变量
     private com.baidu.mapapi.map.MapView mMapView;
