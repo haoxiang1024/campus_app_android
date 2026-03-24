@@ -122,8 +122,6 @@ def xlibrary = [:]
 
 xlibrary.xui = "com.github.xuexiangjys:XUI:$versions.xui"
 xlibrary.xupdate = "com.github.xuexiangjys:XUpdate:$versions.xupdate"
-//xlibrary.xaop_runtime = "com.github.xuexiangjys.XAOP:xaop-runtime:$versions.xaop"
-//xlibrary.xaop_plugin = "com.github.xuexiangjys.XAOP:xaop-plugin:$versions.xaop"
 xlibrary.xutil_core = "com.github.xuexiangjys.XUtil:xutil-core:$versions.xutil"
 xlibrary.xhttp2 = "com.github.xuexiangjys:XHttp2:$versions.xhttp2"
 xlibrary.xpage_lib = "com.github.xuexiangjys.XPage:xpage-lib:$versions.xpage"
@@ -198,12 +196,10 @@ static def addRepos(RepositoryHandler handler) {
 ext.addRepos = this.&addRepos
 
 
-//自动添加XAOP和XRouter插件
+//添加XRouter插件
 project.buildscript.configurations.each { configuration ->
     def dependencies = getProject().dependencies
     if (configuration.name == "classpath") {
-        //XAOP插件
-        //configuration.dependencies.add(dependencies.create(deps.xlibrary.xaop_plugin))
         //XRouter插件
         configuration.dependencies.add(dependencies.create(deps.xlibrary.xrouter_plugin))
     }

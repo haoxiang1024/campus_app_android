@@ -21,10 +21,8 @@
     </style>
 
 
-    <!-- Base application theme. -->
     <style name="AppTheme" parent="XUITheme.Phone">
         <item name="customCardBg">@android:attr/windowBackground</item>
-        <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -46,7 +44,6 @@
     <style name="AppTheme.Launch.App">
         <!--注意修改图标-->
         <item name="xui_config_splash_app_logo">@drawable/first</item>
-        <!--        <item name="xui_config_splash_company_logo">@drawable/ic_splash_company_logo</item>-->
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
