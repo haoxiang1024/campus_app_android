@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.xuexiang.xpage.annotation.Page;
-
+import com.hx.campus.R;
 import io.rong.imkit.conversationlist.ConversationListAdapter;
 import io.rong.imkit.conversationlist.ConversationListFragment;
 import io.rong.imkit.widget.adapter.ViewHolder;
@@ -32,7 +32,7 @@ public class ChatListFragment extends ConversationListFragment {
 
     private void background(@NonNull View view) {
         TypedValue typedValue = new TypedValue();
-        getContext().getTheme().resolveAttribute(com.xuexiang.xui.R.attr.xui_config_color_background, typedValue, true);
+        getContext().getTheme().resolveAttribute(R.attr.xui_config_color_background, typedValue, true);
         int backgroundColor = typedValue.data;
         view.setBackgroundColor(backgroundColor);
     }
@@ -44,7 +44,7 @@ public class ChatListFragment extends ConversationListFragment {
                 super.onBindViewHolder(holder, position);
                 //设置聊天列表项的背景色
                 TypedValue typedValue = new TypedValue();
-                getContext().getTheme().resolveAttribute(com.xuexiang.xui.R.attr.xui_config_color_background, typedValue, true);
+                getContext().getTheme().resolveAttribute(R.attr.xui_config_color_background, typedValue, true);
                 int backgroundColor = typedValue.data;
                 holder.itemView.setBackgroundColor(backgroundColor);
             }
