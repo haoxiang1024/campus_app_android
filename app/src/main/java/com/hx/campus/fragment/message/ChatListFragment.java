@@ -7,7 +7,6 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.hx.campus.R;
 import com.xuexiang.xpage.annotation.Page;
 
 import io.rong.imkit.conversationlist.ConversationListAdapter;

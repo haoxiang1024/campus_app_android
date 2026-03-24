@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -22,7 +21,6 @@ import com.hx.campus.utils.api.RetrofitClient;
 import com.hx.campus.utils.common.CacheClean;
 import com.hx.campus.utils.common.TokenUtils;
 import com.xuexiang.xpage.annotation.Page;
-import com.xuexiang.xui.utils.XToastUtils;
 import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog;
 import com.xuexiang.xui.widget.textview.supertextview.SuperTextView;
 import com.xuexiang.xutil.XUtil;

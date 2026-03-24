@@ -22,7 +22,6 @@ import com.hx.campus.utils.Utils;
 import com.hx.campus.utils.api.Result;
 import com.hx.campus.utils.api.RetrofitClient;
 import com.hx.campus.utils.common.LoadingDialog;
-import com.hx.campus.utils.common.RandomUtils;
 import com.hx.campus.utils.common.ResponseMsg;
 import com.hx.campus.utils.common.SettingUtils;
 import com.hx.campus.utils.common.TokenUtils;

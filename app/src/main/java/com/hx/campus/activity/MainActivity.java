@@ -1,8 +1,6 @@
 package com.hx.campus.activity;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
@@ -19,7 +17,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -49,7 +46,6 @@ import com.hx.campus.utils.api.RetrofitClient;
 import com.hx.campus.utils.common.TokenUtils;
 import com.hx.campus.utils.sdkinit.XUpdateInit;
 import com.xuexiang.xpage.core.CoreSwitchBean;
-import com.xuexiang.xpage.core.PageOption;
 import com.xuexiang.xui.adapter.FragmentAdapter;
 import com.xuexiang.xui.utils.ResUtils;
 import com.xuexiang.xui.utils.ThemeUtils;

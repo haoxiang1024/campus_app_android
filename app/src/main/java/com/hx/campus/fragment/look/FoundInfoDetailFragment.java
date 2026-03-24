@@ -1,5 +1,6 @@
 package com.hx.campus.fragment.look;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -8,17 +9,20 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
-import android.widget.AdapterView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -45,6 +49,7 @@ import com.xuexiang.xpage.annotation.Page;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
@@ -52,11 +57,6 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import android.content.ContentValues;
-import android.os.Build;
-import android.os.Environment;
-import android.provider.MediaStore;
-import java.io.OutputStream;
 
 @Page()
 public class FoundInfoDetailFragment extends BaseFragment<FragmentFoundInfoDetailBinding> {

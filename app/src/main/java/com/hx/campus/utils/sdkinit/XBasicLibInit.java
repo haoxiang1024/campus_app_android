@@ -10,9 +10,7 @@ import com.xuexiang.xhttp2.XHttpSDK;
 import com.xuexiang.xpage.PageConfig;
 import com.xuexiang.xrouter.launcher.XRouter;
 import com.xuexiang.xui.XUI;
-import com.xuexiang.xui.utils.XToastUtils;
 import com.xuexiang.xutil.XUtil;
-import com.xuexiang.xutil.common.StringUtils;
 
 
 public final class XBasicLibInit {

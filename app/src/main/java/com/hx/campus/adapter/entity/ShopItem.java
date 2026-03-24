@@ -1,7 +1,5 @@
 package com.hx.campus.adapter.entity;
 
-import com.google.gson.annotations.SerializedName;
-import java.io.Serializable;
 import java.util.Date;
 
 public class ShopItem  {

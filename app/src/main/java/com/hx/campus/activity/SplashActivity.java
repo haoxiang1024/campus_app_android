@@ -1,15 +1,11 @@
 package com.hx.campus.activity;
-import android.content.Context;
+
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
 
 import com.hx.campus.utils.common.TokenUtils;
-import com.xuexiang.xrouter.utils.TextUtils;
 
 public class SplashActivity extends AppCompatActivity {
 

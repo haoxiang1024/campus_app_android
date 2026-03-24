@@ -1,16 +1,11 @@
 package com.hx.campus.fragment.shop;
 
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.google.gson.Gson;
-import com.hx.campus.R;
 import com.hx.campus.adapter.entity.PointHistory;
 import com.hx.campus.adapter.entity.User;
 import com.hx.campus.adapter.shop.PointHistoryAdapter;

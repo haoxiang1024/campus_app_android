@@ -1,7 +1,5 @@
 package com.hx.campus.fragment.shop;
 
-import static com.xuexiang.xui.utils.DrawableUtils.createBitmapFromView;
-
 import android.content.ContentValues;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -11,15 +9,13 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -34,7 +30,6 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.hx.campus.R;
-import com.hx.campus.adapter.entity.PointHistory;
 import com.hx.campus.adapter.entity.ShopItem;
 import com.hx.campus.adapter.entity.User;
 import com.hx.campus.adapter.shop.ShopAdapter;
@@ -46,7 +41,6 @@ import com.hx.campus.utils.api.RetrofitClient;
 import com.scwang.smart.refresh.layout.SmartRefreshLayout;
 import com.xuexiang.xpage.annotation.Page;
 import com.xuexiang.xui.utils.XToastUtils;
-import com.xuexiang.xui.widget.dialog.materialdialog.DialogAction;
 import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog;
 
 import java.io.OutputStream;

@@ -30,7 +30,6 @@ import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
-import com.hx.campus.R;
 import com.hx.campus.adapter.comment.CommentAdapter;
 import com.hx.campus.adapter.entity.Comment;
 import com.hx.campus.adapter.entity.SearchInfo;

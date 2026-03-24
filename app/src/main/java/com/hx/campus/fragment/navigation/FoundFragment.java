@@ -9,7 +9,6 @@ import com.google.android.material.tabs.TabLayoutMediator;
 import com.hx.campus.R;
 import com.hx.campus.adapter.entity.LostFoundType;
 import com.hx.campus.adapter.lostfound.FoundPagerAdapter;
-import com.hx.campus.adapter.lostfound.LostPagerAdapter;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.databinding.FragmentFoundBinding;
 import com.hx.campus.utils.Utils;

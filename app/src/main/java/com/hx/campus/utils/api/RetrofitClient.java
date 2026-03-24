@@ -10,14 +10,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonPrimitive;
-import com.hx.campus.R;
 import com.hx.campus.activity.LoginActivity;
 import com.hx.campus.utils.Utils;
 import com.hx.campus.utils.common.TokenUtils;
 import com.xuexiang.xui.utils.XToastUtils;
 import com.xuexiang.xutil.XUtil;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
