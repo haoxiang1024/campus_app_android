@@ -1,46 +1,45 @@
 # 校园失物招领 App (Android 客户端)
 
-## 📖 项目简介
+本项目是一款基于 Android 平台的校园失物招领应用程序，旨在为高校师生提供一个便捷、高效的失物寻回与信息发布平台。此项目为本科毕业设计系统中的 Android 客户端部分。
 
-本项目是一个专为高校师生打造的**校园失物招领与综合服务 Android 客户端**。通过该应用，用户可以快速发布寻物启事与招领信息，浏览校园动态，并通过内置的即时通讯（IM）功能直接与相关同学取得联系，极大提高校园内物品找回的效率。该客户端与后端的 Spring Boot 服务配合，提供了稳定、流畅的移动端体验。
-修改 \campus_app_android\app\src\main\assets 目录下面的url.properties文件 ip地址为服务器的地址
+## 🌟 主要功能
 
-## ✨ 核心功能
+- **失物/招领**：浏览最新发布的丢失物品和拾取物品信息，支持分类和位置标记。
+- **信息发布**：快速发布寻物启事或招领启事，支持图文描述。
+- **消息互动**：支持用户之间的互动留言与私信沟通，方便核实物品细节。
+- **个人中心**：管理个人发布的信息、查看我的评论与互动记录。
+- **积分商城**：内置积分系统，用户可通过发布有效信息获取积分，并在商城中兑换相关权益或物品。
+- **推荐**：浏览最新的动态信息。
 
-* **失物与招领大厅 (Lost & Found)**：双信息流展示，支持图文列表、详情查看，信息一目了然。
-* **信息发布**：提供便捷的表单，支持上传图片、选择物品分类、填写时间地点等关键信息。
-* **即时通讯 (IM) 互动**：内置聊天会话模块，支持用户间私信沟通、评论留言与消息互动，方便归还物品时取得联系。
-* **高效搜索**：支持关键字检索，快速定位所需找回的物品信息。
-* **个人中心与用户管理**：涵盖注册、登录、密码重置、个人资料管理、我的发布及评论记录查看。
-* **个性化设置**：支持多语言切换（Multi-Language）、全局字体大小调节，以及应用版本自动更新。
+## 🛠️ 技术栈
 
-## 🛠️ 技术栈与开源库
+本项目采用纯粹的 Android 原生开发方式，使用 Java 语言编写，集成了多项主流开源库以提升开发效率和用户体验：
 
-本项目采用 Android 主流开发架构，注重组件化与代码规范，并深度集成了以下优秀的开源组件：
-
-* **UI 框架**：基于 [XUI](https://github.com/xuexiangjys/XUI) 构建了统一、美观的界面体系。
-* **页面路由**：使用 [XPage](https://github.com/xuexiangjys/XPage) 实现了灵活的 Fragment 页面路由与跳转。
-* **网络请求**：Retrofit2 + RxJava，结合自定义的全局 `ApiService` 和加载状态订阅（ProgressLoader）。
-* **Web 容器**：采用 AgentWeb 提供流畅的内置网页浏览体验（服务协议、隐私政策等）。
-* **版本更新**：接入 XUpdate 实现了完善的 App 内更新检测与安装机制。
-* **数据缓存**：基于 MMKV 提供高性能的本地键值缓存。
-* **性能监控**：集成了友盟统计 (UMeng) 和 ANRWatchDog，用于线上异常捕获与体验优化。
+- **开发语言**：Java
+- **网络请求**：[Retrofit](https://github.com/square/retrofit) 结合自定义的 Http 组件进行 RESTful API 请求。
+- **UI 框架**：使用了 [XUI](https://github.com/xuexiangjys/XUI) 打造统一且美观的用户界面，包含丰富的自定义控件。
+- **本地存储**：集成 [MMKV](https://github.com/Tencent/MMKV) 替代传统的 SharedPreferences，实现极速的本地键值对存储。
+- **Web 容器**：使用 [AgentWeb](https://github.com/Justson/AgentWeb) 轻量级集成 WebView，用于展示服务协议和富文本页面。
+- **数据统计/崩溃分析**：集成了友盟 (UMeng) SDK 以及 ANRWatchDog 进行线上的性能监控与日志追踪。
 
 ## 📁 核心目录结构
 
 ```text
 app/src/main/java/com/hx/campus/
-├── activity/      # 全局核心 Activity（如 MainActivity, LoginActivity, SplashActivity）
-├── fragment/      # 业务页面 Fragment
-│   ├── look/      # 失物招领大厅（包含寻物、拾物列表及详情）
-│   ├── message/   # 消息互动、聊天列表及我的评论
-│   ├── navigation/# 底部导航主页面及物品发布模块
-│   ├── personal/  # 个人中心（账号管理、相册照片、反馈建议）
-│   ├── settings/  # 设置模块（通用设置、多语言配置等）
-│   └── other/     # 搜索、登录注册、协议展示等通用页面
-├── adapter/       # RecyclerView 适配器集合（采用委托代理模式，支持复杂多类型列表）
-├── core/          # 核心基础类封装（BaseActivity/Fragment, 统一网络请求回调, 进度条加载器, Web配置）
-└── utils/         # 通用工具类与 SDK 初始化配置
-    ├── api/       # 网络接口封装与 RetrofitClient
-    ├── sdkinit/   # 第三方 SDK 统一初始化入口（XUI, XUpdate, UMeng等）
-    └── common/    # 缓存清理、语言工具、Token管理等常规工具
+├── activity/          # Activity 页面容器 (包含主页、登录注册、启动页等)
+├── fragment/          # 业务 Fragment 模块
+│   ├── dynamic/       # 动态模块
+│   ├── look/          # 寻物/招领
+│   ├── message/       # 消息与互动模块
+│   ├── navigation/    # 信息发布与详情导航模块
+│   ├── personal/      # 个人中心与账号管理
+│   ├── settings/      # 系统设置
+│   └── shop/          # 积分商城模块
+├── adapter/           # 各种 RecyclerView 的数据适配器与实体类 (Entity)
+├── core/              # 项目基类 (BaseActivity, BaseFragment, WebView 封装等)
+├── utils/             # 工具类集合
+│   ├── api/           # Retrofit 接口定义与网络服务封装
+│   ├── common/        # 通用工具 (弹窗、缓存、MMKV 管理等)
+│   ├── sdkinit/       # 第三方 SDK 的统一初始化管理
+│   └── update/        # 自动更新模块相关实现
+└── widget/            # 自定义 UI 控件 (如字体滑动条、上拉加载尾部等)
