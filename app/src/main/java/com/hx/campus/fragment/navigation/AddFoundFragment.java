@@ -155,7 +155,7 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
                 result = Utils.getString(getContext(),R.string.location_not_empty);
                 showResponse(result);
             } else {
-                upload(foundJson);
+                addLostFound(foundJson);
             }
         });
 
@@ -265,16 +265,12 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
      *
      * @param foundJson 招领信息的 JSON 字符串
      */
-    private void upload(String foundJson) {
+    private void addLostFound(String foundJson) {
         RequestBody requestFile = RequestBody.create(MediaType.parse("image/jpeg"), file);
         MultipartBody.Part filePart = MultipartBody.Part.createFormData("upload_file", file.getName(), requestFile);
-        RequestBody opPart = RequestBody.create(MediaType.parse("text/plain"), "招领");
-        RequestBody foundJsonPart = RequestBody.create(MediaType.parse("text/plain"), foundJson);
-        RequestBody lostJsonPart = RequestBody.create(MediaType.parse("text/plain"), "");
-
         RetrofitClient.getInstance()
                 .getApi()
-                .addLostFound(filePart, lostJsonPart, foundJsonPart, opPart)
+                .addLostFound(filePart,foundJson)
                 .enqueue(new retrofit2.Callback<Result<List<LostFound>>>() {
                     @Override
                     public void onResponse(retrofit2.Call<Result<List<LostFound>>> call, retrofit2.Response<Result<List<LostFound>>> response) {

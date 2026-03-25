@@ -155,7 +155,7 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
                 result = Utils.getString(getContext(), R.string.location_not_empty);
                 showResponse(result);
             } else {
-                upload(lostJson);
+                addLostFound(lostJson);
             }
         });
 
@@ -250,15 +250,10 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
         startActivityForResult(intent, CHOOSE_PHOTO);
     }
 
-    private void upload(String lostJson) {
+    private void addLostFound(String lostJson) {
         RequestBody requestFile = RequestBody.create(MediaType.parse("image/jpeg"), file);
         MultipartBody.Part filePart = MultipartBody.Part.createFormData("upload_file", file.getName(), requestFile);
-
-        RequestBody opPart = RequestBody.create(MediaType.parse("text/plain"), "失物");
-        RequestBody lostJsonPart = RequestBody.create(MediaType.parse("text/plain"), lostJson);
-        RequestBody foundJsonPart = RequestBody.create(MediaType.parse("text/plain"), "");
-
-        RetrofitClient.getInstance().getApi().addLostFound(filePart, lostJsonPart, foundJsonPart, opPart)
+        RetrofitClient.getInstance().getApi().addLostFound(filePart, lostJson)
                 .enqueue(new Callback<Result<List<LostFound>>>() {
                     @Override
                     public void onResponse(Call<Result<List<LostFound>>> call, Response<Result<List<LostFound>>> response) {

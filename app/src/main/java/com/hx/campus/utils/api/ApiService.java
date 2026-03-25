@@ -31,9 +31,6 @@ public interface ApiService {
     //获取置顶信息
     @POST("showTopList")
     Call<Result<List<LostFound>>> showTopList(@Query("stick") int stick);
-    // 获取公共列表
-    @POST("showLostFoundList")
-    Call<Result<List<LostFound>>> getLostFoundList(@Query("type") String type);
 
     // 获取指定用户的列表
     @POST("getLostFoundByUserId")
@@ -52,14 +49,10 @@ public interface ApiService {
     @POST("addLostFound")
     Call<Result<List<LostFound>>> addLostFound(
             @Part MultipartBody.Part file,
-            @Part("lostJson") RequestBody lostJson,
-            @Part("foundJson") RequestBody foundJson,
-            @Part("op") RequestBody op
+            @Query("lostFoundJson")String lostFoundJson
+
     );
 
-    //获取分类id
-    @POST("getIdByName")
-    Call<Result<String>>getTypeid(@Query("name") String name);
     // 发送验证码
     @POST("send_code")
     Call<Result<Object>> sendCode(@Query("email") String email);

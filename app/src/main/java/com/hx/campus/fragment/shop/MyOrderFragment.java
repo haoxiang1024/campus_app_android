@@ -1,8 +1,14 @@
 package com.hx.campus.fragment.shop;
 
+import android.content.ContentValues;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +17,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,6 +43,7 @@ import com.hx.campus.utils.api.RetrofitClient;
 import com.xuexiang.xpage.annotation.Page;
 import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog;
 
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -87,7 +95,7 @@ public class MyOrderFragment extends BaseFragment<FragmentMyOrderBinding> {
         adapter.setOnDeleteClickListener(order -> {
             if (order.getStatus() == 0) {
                 Utils.showResponse("待核验的订单不能删除哦");
-                return; // 提前结束，不弹出删除框
+                return;
             }
             new MaterialDialog.Builder(getContext())
                     .title("提示")
@@ -99,6 +107,7 @@ public class MyOrderFragment extends BaseFragment<FragmentMyOrderBinding> {
         });
     }
 
+    // 显示订单详情弹窗
     private void showOrderDetailDialog(ExchangeOrder order) {
         MaterialDialog dialog = new MaterialDialog.Builder(getContext())
                 .customView(R.layout.dialog_order_detail, true)
@@ -119,17 +128,12 @@ public class MyOrderFragment extends BaseFragment<FragmentMyOrderBinding> {
             tvItemName.setText("商品名称：" + order.getItem_name());
             tvOrderNo.setText("订单编号：" + order.getOrder_no());
             tvPointsCost.setText("消耗积分：" + order.getPoints_cost());
-
-            // 优化时间格式
             tvCreateTime.setText("兑换时间：" + formatTime(order.getCreate_time()));
 
-            // 处理状态显示和二维码按钮逻辑
             int status = order.getStatus();
             if (status == 0) {
                 tvStatus.setText("订单状态：待核验");
                 tvStatus.setTextColor(Color.parseColor("#FFA500"));
-
-                // 只有待核验状态才显示获取二维码按钮
                 tvGetQrCode.setVisibility(View.VISIBLE);
                 tvGetQrCode.setOnClickListener(v -> {
                     String verifyCode = order.getVerify_code();
@@ -139,7 +143,6 @@ public class MyOrderFragment extends BaseFragment<FragmentMyOrderBinding> {
                         Utils.showResponse("未找到核验码数据");
                     }
                 });
-
             } else if (status == 1) {
                 tvStatus.setText("订单状态：已核验");
                 tvStatus.setTextColor(Color.parseColor("#008000"));
@@ -150,7 +153,6 @@ public class MyOrderFragment extends BaseFragment<FragmentMyOrderBinding> {
                 tvGetQrCode.setVisibility(View.GONE);
             }
 
-            // 加载图片
             Glide.with(this)
                     .load(order.getItem_image())
                     .placeholder(R.drawable.ic_launcher_background)
@@ -160,15 +162,13 @@ public class MyOrderFragment extends BaseFragment<FragmentMyOrderBinding> {
         dialog.show();
     }
 
-
-    // 弹出包含二维码和核验码的核验凭证弹窗
+    // 弹出包含二维码和核验码的凭证弹窗
     private void showVerifyCodeDialog(String verifyCode, String itemName) {
         LinearLayout layout = new LinearLayout(getContext());
         layout.setOrientation(LinearLayout.VERTICAL);
         layout.setGravity(Gravity.CENTER);
         layout.setPadding(50, 40, 50, 40);
 
-        // 顶部提示文字
         TextView tvTip = new TextView(getContext());
         tvTip.setText("请向管理员出示此二维码或核验码\n领取【" + itemName + "】");
         tvTip.setTextSize(16);
@@ -176,7 +176,6 @@ public class MyOrderFragment extends BaseFragment<FragmentMyOrderBinding> {
         tvTip.setTextColor(Color.parseColor("#333333"));
         layout.addView(tvTip);
 
-        // 二维码 ImageView
         ImageView ivQrCode = new ImageView(getContext());
         int qrSize = (int) (220 * getResources().getDisplayMetrics().density + 0.5f);
         LinearLayout.LayoutParams qrParams = new LinearLayout.LayoutParams(qrSize, qrSize);
@@ -189,7 +188,6 @@ public class MyOrderFragment extends BaseFragment<FragmentMyOrderBinding> {
         }
         layout.addView(ivQrCode);
 
-        // 底部显眼核验码
         TextView tvCode = new TextView(getContext());
         tvCode.setText("核验码：" + verifyCode);
         tvCode.setTextSize(22);
@@ -198,15 +196,74 @@ public class MyOrderFragment extends BaseFragment<FragmentMyOrderBinding> {
         tvCode.setTextColor(Color.parseColor("#FF5722"));
         layout.addView(tvCode);
 
-        // 显示弹窗
         new MaterialDialog.Builder(getContext())
                 .customView(layout, false)
                 .cancelable(true)
-                .positiveText("关闭")
+                .canceledOnTouchOutside(true)
+                .positiveText("保存二维码")
+                .negativeText("关闭")
+                .onPositive((dialog, which) -> {
+                    Bitmap viewBitmap = createBitmapFromView(layout);
+                    if (viewBitmap != null) {
+                        saveBitmapToGallery(viewBitmap);
+                    } else {
+                        Toast.makeText(getContext(), "生成图片失败", Toast.LENGTH_SHORT).show();
+                    }
+                })
                 .show();
     }
 
-    // 使用 ZXing 生成二维码图片数据
+    // 将 View 转换为 Bitmap
+    private Bitmap createBitmapFromView(View view) {
+        int width = view.getWidth();
+        int height = view.getHeight();
+        if (width <= 0 || height <= 0) return null;
+
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        canvas.drawColor(Color.WHITE); // 绘制白色背景防止透明变黑
+        view.draw(canvas);
+        return bitmap;
+    }
+
+    // 将 Bitmap 保存到手机相册
+    private void saveBitmapToGallery(Bitmap bitmap) {
+        String fileName = "VerifyCode_" + System.currentTimeMillis() + ".png";
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
+            values.put(MediaStore.Images.Media.IS_PENDING, 1);
+        }
+
+        Uri uri = getContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+        if (uri != null) {
+            try {
+                OutputStream outputStream = getContext().getContentResolver().openOutputStream(uri);
+                if (outputStream != null) {
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+                    outputStream.close();
+                }
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    values.clear();
+                    values.put(MediaStore.Images.Media.IS_PENDING, 0);
+                    getContext().getContentResolver().update(uri, values, null, null);
+                }
+                Toast.makeText(getContext(), "核验码已保存到相册", Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(getContext(), "保存失败：" + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            Toast.makeText(getContext(), "无法访问相册", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // 生成二维码
     private Bitmap createQRCode(String content, int width, int height) {
         try {
             Hashtable<EncodeHintType, Object> hints = new Hashtable<>();
@@ -230,45 +287,33 @@ public class MyOrderFragment extends BaseFragment<FragmentMyOrderBinding> {
         }
     }
 
-
+    // 格式化时间
     public static String formatTime(Object timeObj) {
         if (timeObj == null) return "";
-
-        // 如果后端直接传的是 String
         if (timeObj instanceof String) {
             String timeStr = (String) timeObj;
-            if (timeStr.contains("T")) {
-                // 处理 2026-03-14T12:51:50
-                return timeStr.replace("T", " ").substring(0, 16);
-            }
-            // 兼容可能已经是格式化好的字符串
-            if (timeStr.matches("\\d{4}-\\d{2}-\\d{2}.*")) {
-                if (timeStr.length() >= 16) {
-                    return timeStr.substring(0, 16);
-                }
-            }
+            if (timeStr.contains("T")) return timeStr.replace("T", " ").substring(0, 16);
+            if (timeStr.matches("\\d{4}-\\d{2}-\\d{2}.*") && timeStr.length() >= 16) return timeStr.substring(0, 16);
             return timeStr;
         }
-
         if (timeObj instanceof Date) {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.CHINA);
-            return sdf.format((Date) timeObj);
+            return new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.CHINA).format((Date) timeObj);
         }
-
         return String.valueOf(timeObj);
     }
 
+    // 加载订单列表
     private void loadOrders(String keyword) {
         User user = Utils.getBeanFromSp(getContext(), "User", "user");
         if (user == null) return;
         ApiService apiService = RetrofitClient.getInstance().getApi();
-        apiService.getMyOrders(user.getId() ,keyword).enqueue(new Callback<Result<List<ExchangeOrder>>>() {
+        apiService.getMyOrders(user.getId(), keyword).enqueue(new Callback<Result<List<ExchangeOrder>>>() {
             @Override
             public void onResponse(Call<Result<List<ExchangeOrder>>> call, Response<Result<List<ExchangeOrder>>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getStatus() == 0) {
                     orderList.clear();
                     orderList.addAll(response.body().getData());
-                    if(orderList.isEmpty()){
+                    if (orderList.isEmpty()) {
                         Utils.showResponse("没有订单");
                     }
                     adapter.notifyDataSetChanged();
@@ -284,6 +329,7 @@ public class MyOrderFragment extends BaseFragment<FragmentMyOrderBinding> {
         });
     }
 
+    // 删除订单
     private void deleteOrder(ExchangeOrder order) {
         ApiService apiService = RetrofitClient.getInstance().getApi();
         User user = Utils.getBeanFromSp(getContext(), "User", "user");
