@@ -194,9 +194,13 @@ public class PersonalFragment extends BaseFragment<FragmentProfileBinding> imple
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if (result != null) {
-            // 获取扫到的内容，并交给智能路由处理
-            String scannedContent = result.getContents().trim();
-            handleScannedResult(scannedContent);
+            if (result.getContents() == null) {
+                XToastUtils.info("已取消扫码");
+            } else {
+                // 获取扫到的内容，并交给智能路由处理
+                String scannedContent = result.getContents().trim();
+                handleScannedResult(scannedContent);
+            }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
