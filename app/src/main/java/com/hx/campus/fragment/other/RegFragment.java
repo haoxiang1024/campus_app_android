@@ -125,7 +125,7 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
      * 最终提交注册请求
      */
     private void doRegisterRequest(String phone, String email, String password) {
-        RetrofitClient.getInstance().getApi().register(phone, email, password).enqueue(new Callback<Result<LoginResponseDTO>>() {
+        RetrofitClient.getInstance().getApi().register(phone, email, password,0).enqueue(new Callback<Result<LoginResponseDTO>>() {
             @Override
             public void onResponse(@NonNull Call<Result<LoginResponseDTO>> call, @NonNull Response<Result<LoginResponseDTO>> response) {
                 if (response.isSuccessful() && response.body() != null) {

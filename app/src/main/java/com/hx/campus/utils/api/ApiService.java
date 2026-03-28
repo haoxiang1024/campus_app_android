@@ -91,7 +91,8 @@ public interface ApiService {
     Call<Result<LoginResponseDTO>> register(
             @Query("phone") String phone,
             @Query("email") String email,
-            @Query("password") String password
+            @Query("password") String password,
+            @Query("role") int role
     );
     //获取IM用户token
     @POST("getIMUserToken")
