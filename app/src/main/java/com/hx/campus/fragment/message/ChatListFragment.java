@@ -16,7 +16,7 @@ import io.rong.imkit.widget.adapter.ViewHolder;
 // 私信聊天列表页面 - 集成融云IMKit实现聊天功能
 @Page
 public class ChatListFragment extends ConversationListFragment {
-    
+
     /**
      * 视图创建完成回调
      * @param view Fragment的根视图
@@ -27,7 +27,6 @@ public class ChatListFragment extends ConversationListFragment {
         // 调用父类的视图创建方法
         super.onViewCreated(view, savedInstanceState);
         background(view);
-
     }
 
     private void background(@NonNull View view) {
@@ -36,18 +35,23 @@ public class ChatListFragment extends ConversationListFragment {
         int backgroundColor = typedValue.data;
         view.setBackgroundColor(backgroundColor);
     }
+
     @Override
     protected ConversationListAdapter onResolveAdapter() {
-        return new ConversationListAdapter() {
+        ConversationListAdapter adapter = new ConversationListAdapter() {
             @Override
             public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
                 super.onBindViewHolder(holder, position);
-                //设置聊天列表项的背景色
+                // 设置聊天列表项的背景色
                 TypedValue typedValue = new TypedValue();
                 getContext().getTheme().resolveAttribute(R.attr.xui_config_color_background, typedValue, true);
                 int backgroundColor = typedValue.data;
                 holder.itemView.setBackgroundColor(backgroundColor);
             }
         };
+
+        adapter.setEmptyView(io.rong.imkit.R.layout.rc_conversationlist_empty_view);
+
+        return adapter;
     }
 }

@@ -144,11 +144,7 @@ public class MyCommentsFragment extends BaseFragment<LayoutCommonListBinding> {
                     if (newData != null && !newData.isEmpty()) {
                         mDataList.addAll(newData);
                         mAdapter.refresh(mDataList); // 刷新适配器
-                    } else {
-                        Utils.showResponse("暂无评论");
                     }
-                } else {
-                    Utils.showResponse("请求失败");
                 }
                 checkEmptyState();
             }

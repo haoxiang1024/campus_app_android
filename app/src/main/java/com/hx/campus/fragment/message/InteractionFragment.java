@@ -152,7 +152,6 @@ public class InteractionFragment extends BaseFragment<LayoutCommonListBinding> {
                     Result<List<Comment>> serverResponse = response.body();
                     if (serverResponse.isSuccess()) {
                         List<Comment> backendComments = serverResponse.getData();
-
                         if (backendComments != null && !backendComments.isEmpty()) {
                             hideEmptyView();
                             // 准备一个新集合，用来装转换后的 UI 数据

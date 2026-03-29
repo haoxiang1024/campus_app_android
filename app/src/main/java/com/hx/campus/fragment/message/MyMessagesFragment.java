@@ -129,8 +129,6 @@ public class MyMessagesFragment extends BaseFragment<LayoutCommonListBinding> {
                     if (newData != null && !newData.isEmpty()) {
                         mDataList.addAll(newData);
                         mAdapter.refresh(mDataList);
-                    } else {
-                        Utils.showResponse("暂无留言");
                     }
                 } else {
                     Utils.showResponse("请求失败");

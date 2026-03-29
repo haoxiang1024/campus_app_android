@@ -34,9 +34,10 @@ import retrofit2.Response;
 public class RegFragment extends BaseFragment<FragmentRegBinding> implements View.OnClickListener {
 
     private CountDownButtonHelper mCountDownHelper;
-    LoadingDialog loadingDialog;//加载动画
+    LoadingDialog loadingDialog; // 加载动画
     // 设置连接超时时间
     private final int timeLimit = 10;
+
     @NonNull
     @Override
     protected FragmentRegBinding viewBindingInflate(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, boolean attachToRoot) {
@@ -72,6 +73,27 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
     }
 
     /**
+     * 显示加载弹窗
+     */
+    private void showLoadingDialog() {
+        if (loadingDialog == null) {
+            loadingDialog = new LoadingDialog(getActivity());
+        }
+        if (!loadingDialog.isShowing()) {
+            loadingDialog.show();
+        }
+    }
+
+    /**
+     * 隐藏加载弹窗
+     */
+    private void hideLoadingDialog() {
+        if (loadingDialog != null && loadingDialog.isShowing()) {
+            loadingDialog.dismiss();
+        }
+    }
+
+    /**
      * 注册前的预校验逻辑
      */
     private void handleRegister() {
@@ -99,6 +121,8 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
      * 校验验证码并执行注册
      */
     private void verifyCodeAndRegister(String phone, String password, String email, String code) {
+        showLoadingDialog(); // 发起请求前显示加载动画
+
         RetrofitClient.getInstance().getApi().verifyCode(email, code).enqueue(new Callback<Result<Object>>() {
             @Override
             public void onResponse(@NonNull Call<Result<Object>> call, @NonNull Response<Result<Object>> response) {
@@ -107,15 +131,18 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
                         // 验证码通过，调用注册接口
                         doRegisterRequest(phone, email, password);
                     } else {
+                        hideLoadingDialog(); // 失败隐藏加载动画
                         Utils.showResponse("验证码错误：" + response.body().getMsg());
                     }
                 } else {
+                    hideLoadingDialog(); // 失败隐藏加载动画
                     Utils.showResponse("服务器验证异常");
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<Result<Object>> call, @NonNull Throwable t) {
+                hideLoadingDialog(); // 失败隐藏加载动画
                 Utils.showResponse("网络异常: " + t.getMessage());
             }
         });
@@ -138,16 +165,22 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
                         String token = loginData.getToken();
                         TokenUtils.handleLoginSuccess(token);
                         fetchIMTokenAndConnect(user);
+                    } else {
+                        hideLoadingDialog(); // 业务逻辑失败隐藏加载动画
                     }
+                } else {
+                    hideLoadingDialog(); // 请求失败隐藏加载动画
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<Result<LoginResponseDTO>> call, @NonNull Throwable t) {
+                hideLoadingDialog(); // 失败隐藏加载动画
                 Utils.showResponse("注册请求失败: " + t.getMessage());
             }
         });
     }
+
     /**
      * 获取 IM Token 并根据本地状态选择连接方式
      */
@@ -160,14 +193,15 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
                     // 执行连接逻辑
                     performIMConnect(imToken);
                     // 登录全流程完成，跳转主页
-                    hideLoadingDialog();
+                    hideLoadingDialog(); // 成功完成所有流程隐藏加载动画
                     ActivityUtils.startActivity(MainActivity.class);
                 } else {
-                    hideLoadingDialog();
+                    hideLoadingDialog(); // 失败隐藏加载动画
                     Utils.showResponse("IM授权获取失败");
                     ActivityUtils.startActivity(MainActivity.class);
                 }
             }
+
             /**
              * 融云连接核心逻辑
              */
@@ -206,17 +240,11 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
 
             @Override
             public void onFailure(retrofit2.Call<Result<String>> call, Throwable t) {
-                hideLoadingDialog();
+                hideLoadingDialog(); // 失败隐藏加载动画
                 Log.e("IM_ERROR", "获取IM Token网络失败", t);
                 ActivityUtils.startActivity(MainActivity.class);
             }
         });
-    }
-
-    private void hideLoadingDialog() {
-        if (loadingDialog != null && loadingDialog.isShowing()) {
-            loadingDialog.dismiss();
-        }
     }
 
     /**
