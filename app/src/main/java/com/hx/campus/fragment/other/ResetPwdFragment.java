@@ -1,5 +1,6 @@
 package com.hx.campus.fragment.other;
 
+import android.text.InputType;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,6 +8,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 
+import com.hx.campus.R;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.databinding.FragmentResetPwdBinding;
 import com.hx.campus.utils.Utils;
@@ -24,6 +26,9 @@ public class ResetPwdFragment extends BaseFragment<FragmentResetPwdBinding> impl
 
     private CountDownButtonHelper mCountDownHelper;
 
+    private boolean isPasswordVisible = false;
+    private boolean isRePasswordVisible = false;
+
     @NonNull
     @Override
     protected FragmentResetPwdBinding viewBindingInflate(@NonNull LayoutInflater inflater, ViewGroup container, boolean attachToRoot) {
@@ -33,6 +38,32 @@ public class ResetPwdFragment extends BaseFragment<FragmentResetPwdBinding> impl
     @Override
     protected void initViews() {
         mCountDownHelper = new CountDownButtonHelper(binding.btnGetVerifyCode, 60);
+
+        // 绑定新密码眼睛图标点击事件
+        binding.ivPwdToggle.setOnClickListener(v -> {
+            isPasswordVisible = !isPasswordVisible;
+            if (isPasswordVisible) {
+                binding.etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                binding.ivPwdToggle.setImageResource(R.drawable.ic_eye_open);
+            } else {
+                binding.etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                binding.ivPwdToggle.setImageResource(R.drawable.ic_eye_closed);
+            }
+            binding.etPassword.setSelection(binding.etPassword.getText().length());
+        });
+
+        // 绑定确认新密码眼睛图标点击事件
+        binding.ivRepwdToggle.setOnClickListener(v -> {
+            isRePasswordVisible = !isRePasswordVisible;
+            if (isRePasswordVisible) {
+                binding.rePassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                binding.ivRepwdToggle.setImageResource(R.drawable.ic_eye_open);
+            } else {
+                binding.rePassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                binding.ivRepwdToggle.setImageResource(R.drawable.ic_eye_closed);
+            }
+            binding.rePassword.setSelection(binding.rePassword.getText().length());
+        });
     }
 
     @Override
@@ -49,9 +80,9 @@ public class ResetPwdFragment extends BaseFragment<FragmentResetPwdBinding> impl
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        if (id == com.hx.campus.R.id.btn_reset) {
+        if (id == R.id.btn_reset) {
             reset();
-        } else if (id == com.hx.campus.R.id.btn_get_verify_code) {
+        } else if (id == R.id.btn_get_verify_code) {
             send();
         }
     }

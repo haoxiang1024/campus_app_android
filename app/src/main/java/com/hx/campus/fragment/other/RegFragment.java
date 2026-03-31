@@ -1,5 +1,6 @@
 package com.hx.campus.fragment.other;
 
+import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.hx.campus.R;
 import com.hx.campus.activity.MainActivity;
 import com.hx.campus.adapter.entity.LoginResponseDTO;
 import com.hx.campus.adapter.entity.User;
@@ -29,7 +31,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-// 注册页面
 @Page
 public class RegFragment extends BaseFragment<FragmentRegBinding> implements View.OnClickListener {
 
@@ -37,6 +38,9 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
     LoadingDialog loadingDialog; // 加载动画
     // 设置连接超时时间
     private final int timeLimit = 10;
+
+    private boolean isPasswordVisible = false;
+    private boolean isRePasswordVisible = false;
 
     @NonNull
     @Override
@@ -53,6 +57,32 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
     protected void initViews() {
         // 初始化验证码倒计时助手，绑定获取验证码按钮，时长60秒
         mCountDownHelper = new CountDownButtonHelper(binding.btnGetVerifyCode, 60);
+
+        // 绑定密码眼睛图标点击事件
+        binding.ivPwdToggle.setOnClickListener(v -> {
+            isPasswordVisible = !isPasswordVisible;
+            if (isPasswordVisible) {
+                binding.etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                binding.ivPwdToggle.setImageResource(R.drawable.ic_eye_open);
+            } else {
+                binding.etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                binding.ivPwdToggle.setImageResource(R.drawable.ic_eye_closed);
+            }
+            binding.etPassword.setSelection(binding.etPassword.getText().length());
+        });
+
+        // 绑定确认密码眼睛图标点击事件
+        binding.ivRepwdToggle.setOnClickListener(v -> {
+            isRePasswordVisible = !isRePasswordVisible;
+            if (isRePasswordVisible) {
+                binding.rePassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                binding.ivRepwdToggle.setImageResource(R.drawable.ic_eye_open);
+            } else {
+                binding.rePassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                binding.ivRepwdToggle.setImageResource(R.drawable.ic_eye_closed);
+            }
+            binding.rePassword.setSelection(binding.rePassword.getText().length());
+        });
     }
 
     @Override
@@ -65,9 +95,9 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        if (id == com.hx.campus.R.id.btn_register) {
+        if (id == R.id.btn_register) {
             handleRegister(); // 执行注册校验
-        } else if (id == com.hx.campus.R.id.btn_get_verify_code) {
+        } else if (id == R.id.btn_get_verify_code) {
             sendVerifyCode(); // 发送验证码
         }
     }

@@ -5,12 +5,14 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatImageView;
 
 import com.hx.campus.R;
 import com.hx.campus.activity.MainActivity;
@@ -31,6 +33,7 @@ import com.xuexiang.xpage.enums.CoreAnim;
 import com.xuexiang.xui.utils.ThemeUtils;
 import com.xuexiang.xui.utils.ViewUtils;
 import com.xuexiang.xui.widget.actionbar.TitleBar;
+import com.xuexiang.xui.widget.edittext.materialedittext.MaterialEditText;
 import com.xuexiang.xutil.app.ActivityUtils;
 
 import io.rong.imkit.IMCenter;
@@ -43,6 +46,10 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements
     LoadingDialog loadingDialog;//加载动画
     // 设置连接超时时间
     private final int timeLimit = 10;
+    // 声明视图变量
+    private MaterialEditText etPassword;
+    private AppCompatImageView ivPwdToggle;
+    private boolean isPasswordVisible = false;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,6 +74,29 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements
         binding.cbProtocol.setOnCheckedChangeListener((buttonView, isChecked) -> {
             SettingUtils.setIsAgreePrivacy(isChecked);
             refreshButton(isChecked);
+        });
+        etPassword = findViewById(R.id.et_password);
+        ivPwdToggle = findViewById(R.id.iv_pwd_toggle);
+
+        ivPwdToggle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 切换可见状态
+                isPasswordVisible = !isPasswordVisible;
+
+                if (isPasswordVisible) {
+                    // 显示密码
+                    etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                    ivPwdToggle.setImageResource(R.drawable.ic_eye_open);
+                } else {
+                    // 隐藏密码
+                    etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                    ivPwdToggle.setImageResource(R.drawable.ic_eye_closed);
+                }
+
+                // 保持光标在末尾
+                etPassword.setSelection(etPassword.getText().length());
+            }
         });
     }
 

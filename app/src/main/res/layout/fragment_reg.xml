@@ -3,10 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-   android:background="?attr/xui_config_color_background"
+    android:background="?attr/xui_config_color_background"
     android:orientation="vertical">
 
-    <!-- 顶部logo -->
     <androidx.appcompat.widget.AppCompatImageView
         android:layout_width="120dp"
         android:layout_height="120dp"
@@ -14,7 +13,6 @@
         android:layout_marginTop="24dp"
         app:srcCompat="@drawable/school_assistant" />
 
-    <!-- 核心表单区域 -->
     <com.scwang.smart.refresh.layout.SmartRefreshLayout
         style="@style/PullDownStyle"
         android:layout_width="match_parent"
@@ -31,7 +29,6 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <!-- 表单卡片 -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -46,7 +43,6 @@
                         android:orientation="vertical"
                         android:padding="16dp">
 
-                        <!-- 手机号 -->
                         <com.xuexiang.xui.widget.layout.XUIFrameLayout
                             style="@style/XUILayout"
                             android:layout_width="match_parent"
@@ -75,7 +71,6 @@
                                 app:met_regexp="@string/regex_phone_number" />
                         </com.xuexiang.xui.widget.layout.XUIFrameLayout>
 
-                        <!-- 密码 -->
                         <com.xuexiang.xui.widget.layout.XUIFrameLayout
                             style="@style/XUILayout"
                             android:layout_width="match_parent"
@@ -94,19 +89,28 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="36dp"
+                                android:layout_marginEnd="40dp"
                                 android:hint="请输入密码"
                                 android:inputType="textPassword"
-                                app:met_clearButton="true"
+                                app:met_clearButton="false"
                                 app:met_errorMessage="@string/tip_password_error"
                                 app:met_floatingLabel="normal"
                                 app:met_floatingLabelText="密码"
                                 app:met_hideUnderline="true"
                                 app:met_maxCharacters="18"
-                                app:met_passWordButton="true"
                                 app:met_regexp="@string/regex_password" />
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/iv_pwd_toggle"
+                                android:layout_width="30dp"
+                                android:layout_height="30dp"
+                                android:layout_gravity="end|center_vertical"
+                                android:layout_marginEnd="8dp"
+                                android:padding="4dp"
+                                android:tint="?attr/colorAccent"
+                                app:srcCompat="@drawable/ic_eye_closed" />
                         </com.xuexiang.xui.widget.layout.XUIFrameLayout>
 
-                        <!-- 确认密码 -->
                         <com.xuexiang.xui.widget.layout.XUIFrameLayout
                             style="@style/XUILayout"
                             android:layout_width="match_parent"
@@ -125,19 +129,28 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="36dp"
+                                android:layout_marginEnd="40dp"
                                 android:hint="请再次确认密码"
                                 android:inputType="textPassword"
-                                app:met_clearButton="true"
+                                app:met_clearButton="false"
                                 app:met_errorMessage="@string/tip_password_error"
                                 app:met_floatingLabel="normal"
                                 app:met_floatingLabelText="确认密码"
                                 app:met_hideUnderline="true"
                                 app:met_maxCharacters="18"
-                                app:met_passWordButton="true"
                                 app:met_regexp="@string/regex_password" />
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/iv_repwd_toggle"
+                                android:layout_width="30dp"
+                                android:layout_height="30dp"
+                                android:layout_gravity="end|center_vertical"
+                                android:layout_marginEnd="8dp"
+                                android:padding="4dp"
+                                android:tint="?attr/colorAccent"
+                                app:srcCompat="@drawable/ic_eye_closed" />
                         </com.xuexiang.xui.widget.layout.XUIFrameLayout>
 
-                        <!-- 邮箱 -->
                         <com.xuexiang.xui.widget.layout.XUIFrameLayout
                             style="@style/XUILayout"
                             android:layout_width="match_parent"
@@ -167,7 +180,6 @@
                                 app:met_regexp="@string/regex_email" />
                         </com.xuexiang.xui.widget.layout.XUIFrameLayout>
 
-                        <!-- 验证码 -->
                         <com.xuexiang.xui.widget.layout.XUIFrameLayout
                             style="@style/XUILayout"
                             android:layout_width="match_parent"
@@ -214,7 +226,6 @@
                                 app:rb_radius="15dp" />
                         </com.xuexiang.xui.widget.layout.XUIFrameLayout>
 
-                        <!-- 注册按钮 -->
                         <com.xuexiang.xui.widget.textview.supertextview.SuperButton
                             android:id="@+id/btn_register"
                             style="@style/SuperButton.Primary.Login"
