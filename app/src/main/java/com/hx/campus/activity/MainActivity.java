@@ -204,6 +204,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
         if (status != RongIMClient.ConnectionStatusListener.ConnectionStatus.CONNECTED) {
             // 从本地获取缓存的 Token 进行连接
             String cachedToken = TokenUtils.getImToken();
+            Log.e( "checkIMStatus: ",cachedToken );
             if (!TextUtils.isEmpty(cachedToken)) {
                 RongIMClient.ConnectCallback connectCallback = new RongIMClient.ConnectCallback() {
                     @Override

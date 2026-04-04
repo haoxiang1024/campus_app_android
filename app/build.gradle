@@ -16,15 +16,22 @@ android {
         versionCode 1
         versionName "1.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
-
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = [moduleName: project.getName()]
             }
         }
+        Properties properties = new Properties()
+        def localPropertiesFile = project.rootProject.file('local.properties')
+        if (localPropertiesFile.exists()) {
+            properties.load(localPropertiesFile.newDataInputStream())
+        }
+        //  读取 Key，并提供一个空的默认值防止崩溃
+        def baiduKey = properties.getProperty("baidu_api_key") ?: ""
+        //  注入资源
+        resValue "string", "baidu_api_key", baiduKey
     }
     signingConfigs {
         if (isNeedPackage.toBoolean()) {

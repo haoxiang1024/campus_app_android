@@ -98,8 +98,6 @@ public class InteractionFragment extends BaseFragment<LayoutCommonListBinding> {
                     } else {
                         Utils.showResponse("回复失败：" + response.body().getMsg());
                     }
-                } else {
-                    Utils.showResponse("响应异常");
                 }
             }
 
@@ -192,8 +190,6 @@ public class InteractionFragment extends BaseFragment<LayoutCommonListBinding> {
                     } else {
                         Utils.showResponse("查询失败");
                     }
-                } else {
-                    Utils.showResponse("响应异常");
                 }
             }
 
