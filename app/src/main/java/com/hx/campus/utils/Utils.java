@@ -70,6 +70,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -418,12 +420,7 @@ public final class Utils {
         Utils.saveBean2Sp(getContext(), user, "User", "user");
     }
 
-    //判断当前语言
-    public static String language(Context context) {
-        //获取app当前语言
-        Locale currentLocale = context.getResources().getConfiguration().locale;
-        return currentLocale.getLanguage();
-    }
+
 
     //根据资源id读取字符串
     public static String getString(Context context, int id) {
@@ -494,36 +491,21 @@ public final class Utils {
             return timeStr;
         }
     }
-
     /**
-     * 判断当前设备是否为模拟器
-     * * @return true: 模拟器, false: 真机
+     * @param oldPic 原图地址
+     * @return 新图地址
      */
-    public static boolean isEmulator() {
-        return (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
-                || Build.FINGERPRINT.startsWith("generic")
-                || Build.FINGERPRINT.startsWith("unknown")
-                || Build.HARDWARE.contains("goldfish")
-                || Build.HARDWARE.contains("ranchu")
-                || Build.MODEL.contains("google_sdk")
-                || Build.MODEL.contains("Emulator")
-                || Build.MODEL.contains("Android SDK built for x86")
-                || Build.MANUFACTURER.contains("Genymotion")
-                || Build.PRODUCT.contains("sdk_google")
-                || Build.PRODUCT.contains("google_sdk")
-                || Build.PRODUCT.contains("sdk")
-                || Build.PRODUCT.contains("sdk_x86")
-                || Build.PRODUCT.contains("vbox86p")
-                || Build.PRODUCT.contains("emulator")
-                || Build.PRODUCT.contains("simulator")
-                || isPipeFileExists();
+    public static String getImageUrl(String oldPic, Context context) {
+        Pattern pattern = Pattern.compile(".*http.*");
+        Matcher matcher = pattern.matcher(oldPic); // 将正则表达式应用到输入字符串上
+        String savePath = getUrlFromAssets(context)+"upload/";
+        //String savePath = "http://123.207.51.104:8081/school/upload/";
+        if (!matcher.matches()) {
+            return savePath+oldPic;
+        }
+        return oldPic;
     }
 
-    /**
-     * 辅助检查：检查是否存在模拟器特有的管道文件
-     */
-    private static boolean isPipeFileExists() {
-        File pipeFile = new File("/dev/socket/qemud");
-        return pipeFile.exists();
-    }
+
+
 }

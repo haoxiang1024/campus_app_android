@@ -41,6 +41,7 @@ import com.hx.campus.databinding.FragmentLostDetailBinding;
 import com.hx.campus.utils.Utils;
 import com.hx.campus.utils.api.Result;
 import com.hx.campus.utils.api.RetrofitClient;
+import com.hx.campus.utils.common.CommentDataUtils;
 import com.xuexiang.xpage.annotation.Page;
 
 import java.io.File;
@@ -169,7 +170,7 @@ public class LostDetailFragment extends BaseFragment<FragmentLostDetailBinding> 
                 if (response.isSuccessful() && response.body() != null) {
                     Result<List<Comment>> serverResponse = response.body();
                     if (serverResponse.getStatus() == 0){
-                        commentAdapter.setNewData(serverResponse.getData());
+                        commentAdapter.setNewData(CommentDataUtils.flattenComments(serverResponse.getData()));
                     }
 
                 }

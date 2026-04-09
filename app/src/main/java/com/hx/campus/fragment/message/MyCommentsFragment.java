@@ -1,5 +1,6 @@
 package com.hx.campus.fragment.message;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -109,6 +110,8 @@ public class MyCommentsFragment extends BaseFragment<LayoutCommonListBinding> {
         public void onResponse(Call<Result<LostFound>> call, Response<Result<LostFound>> response) {
             if (response.isSuccessful() && response.body() != null){
                 LostFound lostFound=response.body().getData();
+                //设置图片路径
+                lostFound.setImg(Utils.getImageUrl(lostFound.getImg(), getContext()));
                 if (lostFound.getType().equals("失物")){
                     openNewPage(LostDetailFragment.class, LostDetailFragment.KEY_LOST, lostFound);
                 }else {

@@ -73,11 +73,8 @@ public class GeneralFragment extends BaseFragment<FragmentGeneralBinding> implem
             Utils.showResponse(Utils.getString(getContext(), R.string.no_cache_to_clear));
         } else {
             CacheClean.clearAllCache(getContext());
-            if ("zh".equals(Utils.language(getContext()))) {
-                Utils.showResponse("共清理" + cacheSize + "缓存");
-            } else {
-                Utils.showResponse("Clean " + cacheSize + " caches");
-            }
+            Utils.showResponse("共清理" + cacheSize + "缓存");
+
         }
     }
 
