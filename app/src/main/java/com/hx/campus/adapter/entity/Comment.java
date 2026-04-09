@@ -39,63 +39,39 @@ public class Comment {
     private int state;
     
     /** 父评论ID，用于构建评论层级关系 */
-    private int parentId;
+    private int parent_id;
     
     /** 被回复用户的ID */
-    private int replyUserId;
+    private int reply_user_id;
     
     /** 被回复用户的昵称 */
-    private String replyNickname;
+    private String reply_nickname;
 
     /** 回复评论列表，用于存储该评论下的所有回复 */
     private List<Comment> replies;
 
-    /**
-     * 获取父评论ID
-     * @return 父评论的ID，0表示顶级评论
-     */
-    public int getParentId() {
-        return parentId;
+    public int getParent_id() {
+        return parent_id;
     }
 
-    /**
-     * 设置父评论ID
-     * @param parentId 父评论ID
-     */
-    public void setParentId(int parentId) {
-        this.parentId = parentId;
+    public void setParent_id(int parent_id) {
+        this.parent_id = parent_id;
     }
 
-    /**
-     * 获取被回复用户ID
-     * @return 被回复用户的ID
-     */
-    public int getReplyUserId() {
-        return replyUserId;
+    public int getReply_user_id() {
+        return reply_user_id;
     }
 
-    /**
-     * 设置被回复用户ID
-     * @param replyUserId 被回复用户ID
-     */
-    public void setReplyUserId(int replyUserId) {
-        this.replyUserId = replyUserId;
+    public void setReply_user_id(int reply_user_id) {
+        this.reply_user_id = reply_user_id;
     }
 
-    /**
-     * 获取被回复用户昵称
-     * @return 被回复用户昵称
-     */
-    public String getReplyNickname() {
-        return replyNickname;
+    public String getReply_nickname() {
+        return reply_nickname;
     }
 
-    /**
-     * 设置被回复用户昵称
-     * @param replyNickname 被回复用户昵称
-     */
-    public void setReplyNickname(String replyNickname) {
-        this.replyNickname = replyNickname;
+    public void setReply_nickname(String reply_nickname) {
+        this.reply_nickname = reply_nickname;
     }
 
     /**
@@ -128,9 +104,9 @@ public class Comment {
                 ", photo='" + photo + '\'' +
                 ", content='" + content + '\'' +
                 ", state=" + state +
-                ", parentId=" + parentId +
-                ", replyUserId=" + replyUserId +
-                ", replyNickname='" + replyNickname + '\'' +
+                ", parent_id=" + parent_id +
+                ", reply_user_id=" + reply_user_id +
+                ", reply_nickname='" + reply_nickname + '\'' +
                 ", replies=" + replies +
                 ", create_time=" + create_time +
                 '}';

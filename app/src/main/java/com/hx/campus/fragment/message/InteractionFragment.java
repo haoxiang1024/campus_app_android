@@ -169,10 +169,10 @@ public class InteractionFragment extends BaseFragment<LayoutCommonListBinding> {
                                 );
                                 msg.lostfoundId = comment.getLostfound_id();
                                 int targetParentId = 0;
-                                if (comment.getParentId() == 0) {
+                                if (comment.getParent_id() == 0) {
                                     targetParentId = comment.getId();
                                 } else {
-                                    targetParentId = comment.getParentId();
+                                    targetParentId = comment.getParent_id();
                                 }
                                 msg.commentId = targetParentId;
                                 msg.userId = comment.getUser_id();

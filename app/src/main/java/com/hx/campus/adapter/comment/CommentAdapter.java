@@ -181,10 +181,10 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                 
                 // 构造用户名显示文本
                 String namePart;
-                if (TextUtils.isEmpty(reply.getReplyNickname())) {
+                if (TextUtils.isEmpty(reply.getReply_nickname())) {
                     namePart = reply.getNickname();
                 } else {
-                    namePart = reply.getNickname() + " ▸ " + reply.getReplyNickname();
+                    namePart = reply.getNickname() + " ▸ " + reply.getReply_nickname();
                 }
 
                 // 使用HTML格式化用户名和内容
