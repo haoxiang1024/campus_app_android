@@ -239,7 +239,6 @@ public class PersonalFragment extends BaseFragment<FragmentProfileBinding> imple
      * 调用 ApiService 发起核验请求
      */
     private void requestVerifyOrder(String verifyCode, int adminId) {
-        Utils.showResponse("正在核验中...");
 
         RetrofitClient.getInstance().getApi().verifyOrder(verifyCode, adminId).enqueue(new Callback<Result<String>>() {
             @Override
