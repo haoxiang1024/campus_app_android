@@ -294,16 +294,24 @@ public class FoundInfoDetailFragment extends BaseFragment<FragmentFoundInfoDetai
         binding.tvAuthor.setText(found.getNickname());
         binding.tvPhonenum.setText(found.getPhone());
         binding.location.setText(found.getPlace());
+
         String[] statuses = {"待审核","已驳回","已认领", "待认领"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_spinner_item, statuses);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         binding.state.setAdapter(adapter);
+
         int position = Arrays.asList(statuses).indexOf(found.getState());
         if (position >= 0) binding.state.setSelection(position);
         binding.tvDate.setText(Utils.dateFormat(found.getPubDate()));
-    }
 
+        // 根据当前状态判断是否禁用下拉框
+        if ("待审核".equals(found.getState()) || "已驳回".equals(found.getState())) {
+            binding.state.setEnabled(false);
+        } else {
+            binding.state.setEnabled(true);
+        }
+    }
     private void submitState(String selectedState) {
         RetrofitClient.getInstance().getApi()
                 .updateState(found.getId(), selectedState, found.getUserId())
