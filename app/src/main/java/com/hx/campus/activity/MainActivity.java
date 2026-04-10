@@ -154,6 +154,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
                 if (response.isSuccessful() && response.body() != null) {
                     if (response.body().isSuccess() && response.body().getData() != null) {
                         LostFound lostFound = response.body().getData();
+                        lostFound.setImg(Utils.getImageUrl(lostFound.getImg(), MainActivity.this));
                         if ("失物".equals(lostFound.getType())) {
                             // 跳转到失物详情页面
                             openLost(lostFound);
