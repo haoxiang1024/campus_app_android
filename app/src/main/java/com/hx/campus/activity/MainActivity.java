@@ -59,6 +59,7 @@ import com.xuexiang.xutil.display.Colors;
 
 import io.rong.imkit.IMCenter;
 import io.rong.imkit.RongIM;
+import io.rong.imkit.userinfo.RongUserInfoManager;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.UserInfo;
 import retrofit2.Call;
@@ -72,6 +73,15 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
     @Override
     protected ActivityMainBinding viewBindingInflate(LayoutInflater inflater) {
         return ActivityMainBinding.inflate(inflater);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        User user = Utils.getBeanFromSp(MainActivity.this, "User", "user");
+        if (user != null) {
+            fetchUserInfoFromServer(String.valueOf(user.getId()));
+        }
     }
 
     @Override
@@ -204,7 +214,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
         if (status != RongIMClient.ConnectionStatusListener.ConnectionStatus.CONNECTED) {
             // 从本地获取缓存的 Token 进行连接
             String cachedToken = TokenUtils.getImToken();
-            Log.e( "checkIMStatus: ",cachedToken );
             if (!TextUtils.isEmpty(cachedToken)) {
                 RongIMClient.ConnectCallback connectCallback = new RongIMClient.ConnectCallback() {
                     @Override
@@ -438,7 +447,43 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
             side.setChecked(true);
         }
     }
+    /**
+     * 从服务器获取用户信息
+     * 用于即时通讯中动态更新用户资料
+     * @param userId 用户唯一标识符
+     */
+    private void fetchUserInfoFromServer(String userId) {
+        RetrofitClient.getInstance().getApi().getUserInfo(Integer.parseInt(userId)).enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    User user = response.body();
+                    String fullAvatarUrl = "";
+                    String photo = user.getPhoto();
+                    if (!TextUtils.isEmpty(photo)) {
+                        if (photo.startsWith("http")) {
+                            fullAvatarUrl = photo;
+                        } else {
+                            fullAvatarUrl = Utils.rebuildUrl("upload/" + photo, getApplicationContext());
+                        }
+                    }
+                    // 构建融云用户信息对象
+                    UserInfo userInfo = new UserInfo(
+                            userId,
+                            user.getNickname(),
+                            Uri.parse(fullAvatarUrl) // 如果 fullAvatarUrl 是空字符串，融云会显示你设置的默认头像
+                    );
+                    // 刷新本地用户信息缓存
+                    RongUserInfoManager.getInstance().refreshUserInfoCache(userInfo);
+                }
+            }
 
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                Utils.showResponse("用户请求失败: " + t.getMessage());
+            }
+        });
+    }
     /**
      * 菜单、返回键响应
      */

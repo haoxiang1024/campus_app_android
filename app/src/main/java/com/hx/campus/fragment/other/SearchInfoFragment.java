@@ -267,7 +267,6 @@ public class SearchInfoFragment extends BaseFragment<FragmentSearchInfoBinding> 
 
                                 // 刷新评论列表
                                 loadComments();
-                                Utils.showResponse("评论发布成功");
                             } else {
                                 Utils.showResponse(result.getMsg());
                             }
