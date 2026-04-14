@@ -124,7 +124,7 @@ public class ResetPwdFragment extends BaseFragment<FragmentResetPwdBinding> impl
             public void onResponse(@NonNull Call<Result<Object>> call, @NonNull Response<Result<Object>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     if (response.body().isSuccess()) {
-                        resetPassword(number, password, email, code);
+                        resetPassword(number, password);
                     } else {
                         Utils.showResponse(response.body().getMsg());
                     }
@@ -140,9 +140,14 @@ public class ResetPwdFragment extends BaseFragment<FragmentResetPwdBinding> impl
         });
     }
 
-    private void resetPassword(String number, String password, String email, String code) {
+    private void resetPassword(String number, String password) {
+        User user = Utils.getBeanFromSp(getContext(), "User", "user");
+        if(!number.equals(user.getPhone())){
+            Utils.showResponse("请输入你自己的手机号");
+            return;
+        }
         // 执行重置
-        RetrofitClient.getInstance().getApi().resetPwd(number, password, email, code).enqueue(new Callback<Result<Object>>() {
+        RetrofitClient.getInstance().getApi().resetPwd(number, password).enqueue(new Callback<Result<Object>>() {
             @Override
             public void onResponse(@NonNull Call<Result<Object>> call, @NonNull Response<Result<Object>> response) {
                 if (response.isSuccessful() && response.body() != null) {

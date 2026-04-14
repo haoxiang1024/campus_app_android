@@ -65,9 +65,7 @@ public interface ApiService {
     @POST("resetPwd")
     Call<Result<Object>> resetPwd(
             @Query("phone") String phone,
-            @Query("newPwd") String password,
-            @Query("email") String email,
-            @Query("email_code") String code
+            @Query("newPwd") String password
     );
     //搜索
     @POST("searchInfo")

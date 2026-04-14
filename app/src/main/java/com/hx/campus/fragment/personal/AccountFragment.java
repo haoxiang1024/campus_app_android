@@ -137,27 +137,12 @@ public class AccountFragment extends BaseFragment<FragmentAccountBinding> implem
 
     // 发送验证码校验与执行
     private void sendVerifyCodeToOldEmail() {
-        // 获取用户输入的验证邮箱
-        String inputEmail = binding.etNewAccountValue.getText().toString().trim();
-
-        if (TextUtils.isEmpty(inputEmail)) {
-            Utils.showResponse("请输入验证邮箱");
-            return;
-        }
-
         // 实时获取缓存校验邮箱绑定状态
         User user = Utils.getBeanFromSp(getContext(), "User", "user");
         if (user == null || TextUtils.isEmpty(user.getEmail())) {
             Utils.showResponse("当前账号未绑定邮箱，无法验证！");
             return;
         }
-
-        // 安全验证：校验输入邮箱与绑定邮箱是否一致
-        if (!TextUtils.equals(user.getEmail(), inputEmail)) {
-            Utils.showResponse("只能输入您当前绑定的邮箱");
-            return;
-        }
-
         String oldEmail = user.getEmail();
 
         // 发送验证码
