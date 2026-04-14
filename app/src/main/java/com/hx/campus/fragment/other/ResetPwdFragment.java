@@ -158,7 +158,11 @@ public class ResetPwdFragment extends BaseFragment<FragmentResetPwdBinding> impl
                     Utils.showResponse(response.body().getMsg());
                     if (response.body().isSuccess()) {
                         Utils.showResponse("密码重置成功，请重新登录");
-                        handlePostResetLogic();
+                        binding.getRoot().postDelayed(() -> {
+                            if (isAdded()) { // 检查 Fragment 是否还依附在 Activity 上
+                                handlePostResetLogic();
+                            }
+                        }, 1500); // 延迟 1.5 秒
                     }
                 }
             }
