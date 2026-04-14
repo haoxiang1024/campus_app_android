@@ -1,5 +1,6 @@
 package com.hx.campus.fragment.other;
 
+import android.content.Intent;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -9,14 +10,17 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 
 import com.hx.campus.R;
+import com.hx.campus.activity.MainActivity;
 import com.hx.campus.adapter.entity.User;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.databinding.FragmentResetPwdBinding;
 import com.hx.campus.utils.Utils;
 import com.hx.campus.utils.api.Result;
 import com.hx.campus.utils.api.RetrofitClient;
+import com.hx.campus.utils.common.TokenUtils;
 import com.xuexiang.xpage.annotation.Page;
 import com.xuexiang.xui.utils.CountDownButtonHelper;
+import com.xuexiang.xutil.app.ActivityUtils;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -153,7 +157,8 @@ public class ResetPwdFragment extends BaseFragment<FragmentResetPwdBinding> impl
                 if (response.isSuccessful() && response.body() != null) {
                     Utils.showResponse(response.body().getMsg());
                     if (response.body().isSuccess()) {
-                        openPage(LoginFragment.class);
+                        Utils.showResponse("密码重置成功，请重新登录");
+                        handlePostResetLogic();
                     }
                 }
             }
@@ -164,7 +169,28 @@ public class ResetPwdFragment extends BaseFragment<FragmentResetPwdBinding> impl
             }
         });
     }
-
+    /**
+     * 重置成功后的后续逻辑处理
+     */
+    private void handlePostResetLogic() {
+        User user = Utils.getBeanFromSp(getContext(), "User", "user");
+        if (user != null) {
+            // 如果原本是登录状态，说明是从主页里进来的，需要彻底清空栈重启
+            TokenUtils.handleLogoutSuccess();
+            gotoLogin();
+        } else {
+            // 如果原本就是未登录（忘记密码进来的），直接回退到 LoginFragment 即可
+            popToBack();
+        }
+    }
+    private void gotoLogin() {
+        if (getActivity() == null) return;
+        Intent intent = new Intent(getActivity(), MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        // 销毁当前页面所在的 Activity
+        getActivity().finish();
+    }
     private void send() {
         String email = binding.inputEmail.getEditValue();
 

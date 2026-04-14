@@ -36,6 +36,7 @@ import com.hx.campus.fragment.look.LookFragment;
 import com.hx.campus.fragment.look.LostInfoDetailFragment;
 import com.hx.campus.fragment.message.MessageMainFragment;
 import com.hx.campus.fragment.other.AboutFragment;
+import com.hx.campus.fragment.other.LoginFragment;
 import com.hx.campus.fragment.other.SearchFragment;
 import com.hx.campus.fragment.personal.AccountFragment;
 import com.hx.campus.fragment.personal.PersonalFragment;
@@ -87,6 +88,9 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (!checkLoginStatus()) {
+            return; // 如果未登录，跳转后直接结束，不再初始化后面的组件
+        }
         initViews();
         initData();
         initListeners();
@@ -97,6 +101,20 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
         handleDeepLinkIntent(getIntent());
 
     }
+
+    private boolean checkLoginStatus() {
+        String token = TokenUtils.getToken();
+        User user = Utils.getBeanFromSp(this, "User", "user");
+
+        // 如果 Token 没了或者 User 信息没了，都视为未登录
+        if (TextUtils.isEmpty(token) || user == null) {
+            // 使用 openNewPage 弹出登录，并拦截掉 MainActivity 后续逻辑
+            openNewPage(LoginFragment.class);
+            return false;
+        }
+        return true;
+    }
+
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
