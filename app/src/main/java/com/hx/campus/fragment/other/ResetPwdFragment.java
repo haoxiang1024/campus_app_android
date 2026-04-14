@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 
 import com.hx.campus.R;
+import com.hx.campus.adapter.entity.User;
 import com.hx.campus.core.BaseFragment;
 import com.hx.campus.databinding.FragmentResetPwdBinding;
 import com.hx.campus.utils.Utils;
@@ -94,16 +95,30 @@ public class ResetPwdFragment extends BaseFragment<FragmentResetPwdBinding> impl
         String code = binding.inputCode.getEditValue();
         String email = binding.inputEmail.getEditValue();
 
+        // 校验输入非空
         if (TextUtils.isEmpty(number) || TextUtils.isEmpty(password) || TextUtils.isEmpty(repassword) || TextUtils.isEmpty(code) || TextUtils.isEmpty(email)) {
             Utils.showResponse("请填写完整信息");
             return;
         }
+
+        // 校验密码一致性
         if (!password.equals(repassword)) {
             Utils.showResponse("两次密码不一致");
             return;
         }
 
-        //  校验验证码
+        // 校验提交的邮箱是否为当前用户绑定的邮箱
+        User user = Utils.getBeanFromSp(getContext(), "User", "user");
+        if (user == null || TextUtils.isEmpty(user.getEmail())) {
+            Utils.showResponse("未获取到用户信息，请重新登录");
+            return;
+        }
+        if (!TextUtils.equals(user.getEmail(), email)) {
+            Utils.showResponse("提交的邮箱与绑定邮箱不一致");
+            return;
+        }
+
+        // 校验验证码
         RetrofitClient.getInstance().getApi().verifyCode(email, code).enqueue(new Callback<Result<Object>>() {
             @Override
             public void onResponse(@NonNull Call<Result<Object>> call, @NonNull Response<Result<Object>> response) {
@@ -147,12 +162,26 @@ public class ResetPwdFragment extends BaseFragment<FragmentResetPwdBinding> impl
 
     private void send() {
         String email = binding.inputEmail.getEditValue();
+
+        // 校验输入非空
         if (TextUtils.isEmpty(email)) {
             Utils.showResponse("请输入邮箱");
             return;
         }
 
+        // 校验发送验证码的邮箱是否为当前登录用户绑定的邮箱
+        User user = Utils.getBeanFromSp(getContext(), "User", "user");
+        if (user == null || TextUtils.isEmpty(user.getEmail())) {
+            Utils.showResponse("未获取到用户信息，请重新登录");
+            return;
+        }
+        if (!TextUtils.equals(user.getEmail(), email)) {
+            Utils.showResponse("只能向您绑定的邮箱发送验证码");
+            return;
+        }
+
         mCountDownHelper.start();
+
         // 发送验证码
         RetrofitClient.getInstance().getApi().sendCode(email).enqueue(new Callback<Result<Object>>() {
             @Override
