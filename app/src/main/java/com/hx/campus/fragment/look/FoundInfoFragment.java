@@ -1,5 +1,6 @@
 package com.hx.campus.fragment.look;
 
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +29,10 @@ import retrofit2.Response;
 @Page()
 public class FoundInfoFragment extends BaseFragment<FragmentFoundInfoBinding> implements AdapterView.OnItemClickListener {
 
+    // 列表适配器
     private LostFoundDetailAdapter adapter;
+    // 缓存原始数据
+    private List<LostFound> originalFoundList = new ArrayList<>();
 
     @NonNull
     @Override
@@ -57,13 +61,32 @@ public class FoundInfoFragment extends BaseFragment<FragmentFoundInfoBinding> im
     protected void initListeners() {
         super.initListeners();
         binding.listview.setOnItemClickListener(this);
+
+        // 搜索按钮点击事件
+        binding.searchButton.setOnClickListener(v -> {
+            String keyword = binding.searchEdittext.getText().toString().trim();
+            // 关键字为空恢复全量数据
+            if (TextUtils.isEmpty(keyword)) {
+                setAdapter(originalFoundList);
+                return;
+            }
+
+            // 过滤包含关键字的项
+            List<LostFound> searchResult = new ArrayList<>();
+            for (LostFound item : originalFoundList) {
+                if ((item.getTitle() != null && item.getTitle().contains(keyword)) ||
+                        (item.getContent() != null && item.getContent().contains(keyword))) {
+                    searchResult.add(item);
+                }
+            }
+            setAdapter(searchResult);
+        });
     }
 
     private void getData() {
         User user = Utils.getBeanFromSp(getContext(), "User", "user");
         if (user == null) return;
 
-        // 使用 Retrofit 请求招领数据 (type="招领")
         RetrofitClient.getInstance().getApi()
                 .getLostFoundListByUserId(user.getId())
                 .enqueue(new Callback<Result<List<LostFound>>>() {
@@ -74,16 +97,15 @@ public class FoundInfoFragment extends BaseFragment<FragmentFoundInfoBinding> im
                             Result<List<LostFound>> result = response.body();
                             if (result.isSuccess()) {
                                 List<LostFound> allData = result.getData();
-                                // 手动过滤 type 为 招领的数据
-                                List<LostFound> foundList = new ArrayList<>();
+                                originalFoundList.clear();
                                 if (allData != null) {
                                     for (LostFound item : allData) {
                                         if ("招领".equals(item.getType())) {
-                                            foundList.add(item);
+                                            originalFoundList.add(item);
                                         }
                                     }
                                 }
-                                setAdapter(foundList);
+                                setAdapter(originalFoundList);
                             } else {
                                 Utils.showResponse(result.getMsg());
                             }
@@ -99,8 +121,13 @@ public class FoundInfoFragment extends BaseFragment<FragmentFoundInfoBinding> im
     }
 
     private void setAdapter(List<LostFound> list) {
+        // 重新实例化适配器避免数据追加
+        adapter = new LostFoundDetailAdapter(getContext());
+        binding.listview.setAdapter(adapter);
+
         if (list == null || list.isEmpty()) {
             Utils.showResponse(Utils.getString(getContext(), R.string.no_info_posted_yet));
+            adapter.setData(new ArrayList<>(), 1);
             return;
         }
         adapter.setData(list, 1);
