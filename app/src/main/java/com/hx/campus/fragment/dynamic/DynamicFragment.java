@@ -233,9 +233,9 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
     }
 
     private void baiduMap() {
+        //初始化控件
         mMapView = binding.bmapView;
         mBaiduMap = mMapView.getMap();
-
         mBaiduMap.setOnMarkerClickListener(marker -> {
             Bundle bundle = marker.getExtraInfo();
             if (bundle != null) {
@@ -246,26 +246,22 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
             }
             return true;
         });
-
         // 切换到地图模式
         binding.fabSwitchMode.setOnClickListener(v -> {
             isMapMode = true;
             // 隐藏整个主界面内容(包括Banner, Grid和列表)
             findViewById(R.id.ll_main_content).setVisibility(View.GONE);
             mMapView.setVisibility(View.VISIBLE);
-
             binding.fabMapBack.setVisibility(View.VISIBLE);
             binding.llMapControls.setVisibility(View.VISIBLE);
             binding.fabSwitchMode.setVisibility(View.GONE);
         });
-
         // 退出地图模式
         binding.fabMapBack.setOnClickListener(v -> {
             isMapMode = false;
             // 恢复主界面内容
             findViewById(R.id.ll_main_content).setVisibility(View.VISIBLE);
             mMapView.setVisibility(View.GONE);
-
             binding.fabMapBack.setVisibility(View.GONE);
             binding.llMapControls.setVisibility(View.GONE);
             binding.fabSwitchMode.setVisibility(View.VISIBLE);
@@ -385,24 +381,20 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
         BitmapDescriptor foundIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_location_marker_found);
         boolean isFirstPoint = true;
         List<String> drawnPoints = new ArrayList<>();
-
         for (LostFound item : dataList) {
             double lat = item.getLatitude();
             double lng = item.getLongitude();
             if (lat == 0 && lng == 0) continue;
             if (lat > 90 || lat < -90) continue;
-
             String locKey = String.format(Locale.getDefault(), "%.5f,%.5f", lat, lng);
             if (drawnPoints.contains(locKey)) continue;
             drawnPoints.add(locKey);
-
             LatLng point = new LatLng(lat, lng);
             BitmapDescriptor currentIcon = item.getType().equals("失物") ? lostIcon : foundIcon;
             OverlayOptions option = new MarkerOptions()
                     .position(point)
                     .icon(currentIcon)
                     .title(item.getTitle());
-
             Marker marker = (Marker) mBaiduMap.addOverlay(option);
             Bundle bundle = new Bundle();
             bundle.putSerializable("info", item);

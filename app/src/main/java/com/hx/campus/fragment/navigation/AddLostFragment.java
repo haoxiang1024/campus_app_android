@@ -203,12 +203,10 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
         @Override
         public void onReceiveLocation(BDLocation bdLocation) {
             hideLoadingDialog();
-
             if (bdLocation == null) {
                 XToast.error(getContext(), "定位失败：返回数据为空").show();
                 return;
             }
-
             int code = bdLocation.getLocType();
             if (code == BDLocation.TypeGpsLocation || code == BDLocation.TypeNetWorkLocation) {
                 currentLat = bdLocation.getLatitude();
@@ -218,7 +216,6 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
                 if (poiList != null && !poiList.isEmpty()) {
                     List<String> poiNames = new ArrayList<>();
                     for (com.baidu.location.Poi p : poiList) {
-                        poiNames.add(p.getName());
                         poiNames.add(p.getName());
                     }
                     new MaterialDialog.Builder(getContext())
@@ -237,7 +234,6 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
                 XToast.error(getContext(), "定位失败，错误码：" + code).show();
                 Log.e("百度定位", "错误码：" + code + " 信息：" + bdLocation.getLocTypeDescription());
             }
-
             if (mLocationClient != null) {
                 mLocationClient.stop();
             }

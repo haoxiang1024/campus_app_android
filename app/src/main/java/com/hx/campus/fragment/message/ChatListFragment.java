@@ -49,9 +49,7 @@ public class ChatListFragment extends ConversationListFragment {
                 holder.itemView.setBackgroundColor(backgroundColor);
             }
         };
-
         adapter.setEmptyView(io.rong.imkit.R.layout.rc_conversationlist_empty_view);
-
         return adapter;
     }
 }

@@ -54,7 +54,6 @@ public class ConversationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_conversation);
-        
         // 挂载聊天Fragment
         if (savedInstanceState == null) {
             fragment  = new ConversationFragment();
@@ -75,19 +74,16 @@ public class ConversationActivity extends AppCompatActivity {
         // 配置标题栏
         TitleBar titleBar = findViewById(R.id.title_bar);
         titleBar.setLeftClickListener(v -> finish());
-        
         // 获取目标用户ID
         Bundle bundle = getIntent().getExtras();
         if (bundle == null) return;
         String targetId = bundle.getString("targetId");
-        
         // 验证目标ID的有效性
         if (TextUtils.isEmpty(targetId)) {
             // 目标ID无效，关闭页面避免空指针异常
             finish();
             return;
         }
-        
         // 设置初始标题
         UserInfo userInfo = RongUserInfoManager.getInstance().getUserInfo(targetId);
         if (userInfo != null && !TextUtils.isEmpty(userInfo.getName())) {
@@ -108,19 +104,15 @@ public class ConversationActivity extends AppCompatActivity {
                     });
                 }
             }
-
             @Override
             public void onGroupUpdate(Group group) {
             }
-
             @Override
             public void onGroupUserInfoUpdate(GroupUserInfo groupUserInfo) {
             }
         };
-        
         // 注册用户信息观察者
         RongUserInfoManager.getInstance().addUserDataObserver(userDataObserver);
-        
         // 自定义发送按钮样式
         setBtn();
     }
