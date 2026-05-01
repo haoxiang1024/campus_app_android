@@ -3,6 +3,7 @@ package com.hx.campus.fragment.navigation;
 import static com.xuexiang.xutil.XUtil.runOnUiThread;
 
 import android.Manifest;
+import com.baidu.mapapi.search.core.SearchResult;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -16,6 +17,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -30,6 +33,19 @@ import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
+import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.BitmapDescriptorFactory;
+import com.baidu.mapapi.map.MapPoi;
+import com.baidu.mapapi.map.MapStatusUpdateFactory;
+import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.MarkerOptions;
+import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.search.geocode.GeoCodeOption;
+import com.baidu.mapapi.search.geocode.GeoCodeResult;
+import com.baidu.mapapi.search.geocode.GeoCoder;
+import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
+import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
+import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import com.hx.campus.R;
 import com.hx.campus.adapter.entity.LostFound;
 import com.hx.campus.adapter.entity.LostFoundType;
@@ -81,7 +97,9 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
 
     private LocationClient mLocationClient;
     private final MyLocationListener mListener = new MyLocationListener();
-
+    private double tempLat = 0.0;
+    private double tempLng = 0.0;
+    private String tempAddress = "";
 
     @NonNull
     @Override
@@ -92,6 +110,11 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
     @Override
     protected void initViews() {
         initData();
+        // 设置地点输入框为只读，只能通过定位按钮获取
+        binding.etLocation.setFocusable(false);
+        binding.etLocation.setClickable(false);
+        binding.etLocation.setCursorVisible(false);
+        binding.etLocation.setKeyListener(null);  // 禁止键盘输入
     }
 
     @Override
@@ -172,8 +195,114 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
                 startLocation();
             }
         });
+        // 绑定打开地图选点弹窗的事件
+        binding.btnChooseMapLocation.setOnClickListener(v -> showMapChooseDialog());
     }
 
+
+    private void showMapChooseDialog() {
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_map_choose, null);
+        EditText etSearch = view.findViewById(R.id.et_map_search);
+        Button btnSearch = view.findViewById(R.id.btn_map_search);
+        TextView tvAddress = view.findViewById(R.id.tv_temp_address);
+        MapView mapView = view.findViewById(R.id.bmapView);
+
+        BaiduMap baiduMap = mapView.getMap();
+        tvAddress.setText("当前选中位置：请搜索或点击地图");
+
+        if (currentLat != 0.0 && currentLng != 0.0) {
+            baiduMap.setMapStatus(MapStatusUpdateFactory.newLatLngZoom(new LatLng(currentLat, currentLng), 16.0f));
+        }
+
+        GeoCoder geoCoder = GeoCoder.newInstance();
+        geoCoder.setOnGetGeoCodeResultListener(new OnGetGeoCoderResultListener() {
+            @Override
+            public void onGetGeoCodeResult(GeoCodeResult result) {
+                if (result == null || result.error != SearchResult.ERRORNO.NO_ERROR || result.getLocation() == null) {
+                    XToast.error(getContext(), "未找到该地点").show();
+                    return;
+                }
+                baiduMap.clear();
+                baiduMap.addOverlay(new MarkerOptions().position(result.getLocation()).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher)));
+                baiduMap.setMapStatus(MapStatusUpdateFactory.newLatLng(result.getLocation()));
+
+                tempLat = result.getLocation().latitude;
+                tempLng = result.getLocation().longitude;
+                tempAddress = result.getAddress() == null ? "未知地址" : result.getAddress();
+                tvAddress.setText("当前选中位置：" + tempAddress);
+            }
+
+            @Override
+            public void onGetReverseGeoCodeResult(ReverseGeoCodeResult result) {
+
+                if (result == null || result.error != SearchResult.ERRORNO.NO_ERROR || result.getLocation() == null) {
+                    XToast.warning(getContext(), "无法获取该位置的具体信息").show();
+                    return;
+                }
+
+                tempLat = result.getLocation().latitude;
+                tempLng = result.getLocation().longitude;
+                tempAddress = result.getAddress() == null ? "未知地址" : result.getAddress();
+
+                if (result.getPoiList() != null && !result.getPoiList().isEmpty()) {
+                    tempAddress += "（" + result.getPoiList().get(0).getName() + "）";
+                }
+                tvAddress.setText("当前选中位置：" + tempAddress);
+            }
+        });
+
+        baiduMap.setOnMapClickListener(new BaiduMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                if (latLng == null) return;
+                baiduMap.clear();
+                baiduMap.addOverlay(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher)));
+                geoCoder.reverseGeoCode(new ReverseGeoCodeOption().location(latLng));
+            }
+
+            @Override
+            public void onMapPoiClick(MapPoi mapPoi) {
+                if (mapPoi == null || mapPoi.getPosition() == null) return;
+                baiduMap.clear();
+                baiduMap.addOverlay(new MarkerOptions().position(mapPoi.getPosition()).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher)));
+                baiduMap.setMapStatus(MapStatusUpdateFactory.newLatLng(mapPoi.getPosition()));
+
+                tempLat = mapPoi.getPosition().latitude;
+                tempLng = mapPoi.getPosition().longitude;
+                tempAddress = mapPoi.getName() == null ? "未知兴趣点" : mapPoi.getName();
+                tvAddress.setText("当前选中位置：" + tempAddress);
+            }
+        });
+
+        btnSearch.setOnClickListener(v -> {
+            String keyword = etSearch.getText().toString().trim();
+            if (!TextUtils.isEmpty(keyword)) {
+                geoCoder.geocode(new GeoCodeOption().city("全国").address(keyword));
+            }
+        });
+
+        MaterialDialog dialog = new MaterialDialog.Builder(getContext())
+                .title("在地图上选择地点")
+                .customView(view, false)
+                .positiveText("确认位置")
+                .negativeText("取消")
+                .onPositive((d, which) -> {
+                    if (TextUtils.isEmpty(tempAddress)) {
+                        XToast.warning(getContext(), "请先在地图上选择位置").show();
+                    } else {
+                        binding.etLocation.setText(tempAddress);
+                        currentLat = tempLat;
+                        currentLng = tempLng;
+                    }
+                })
+                .dismissListener(d -> {
+                    if(mapView != null) mapView.onDestroy();
+                    if(geoCoder != null) geoCoder.destroy();
+                })
+                .build();
+
+        dialog.show();
+    }
     private void startLocation() {
         showLoadingDialog();
         try {

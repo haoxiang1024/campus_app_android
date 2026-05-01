@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp"
+        android:gravity="center_vertical">
+
+        <EditText
+            android:id="@+id/et_map_search"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_card_white_radius"
+            android:hint="输入关键字搜索地点，例如：图书馆"
+            android:singleLine="true"
+            android:paddingStart="8dp"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/btn_map_search"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_marginStart="8dp"
+            android:backgroundTint="#0099FF"
+            android:textColor="@color/white"
+            android:text="搜索" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_temp_address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="当前选中：正在请求地图组件..."
+        android:textColor="#0099FF"
+        android:textStyle="bold"
+        android:textSize="14sp"
+        android:layout_marginBottom="8dp"/>
+
+    <com.baidu.mapapi.map.MapView
+        android:id="@+id/bmapView"
+        android:layout_width="match_parent"
+        android:layout_height="350dp" />
+</LinearLayout>

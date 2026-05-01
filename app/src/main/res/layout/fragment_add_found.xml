@@ -124,14 +124,32 @@
                     android:layout_marginTop="4dp"
                     android:layout_marginBottom="12dp"/>
 
-                <Button
-                    android:id="@+id/btnGetLocation"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:backgroundTint="#0099FF"
-                    android:textColor="@color/white"
-                    android:text="@string/location"
-                    app:cornerRadius="6dp" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+
+                    <Button
+                        android:id="@+id/btnGetLocation"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="#0099FF"
+                        android:textColor="@color/white"
+                        android:text="获取当前定位"
+                        app:cornerRadius="6dp" />
+
+                    <Button
+                        android:id="@+id/btnChooseMapLocation"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:backgroundTint="#0099FF"
+                        android:textColor="@color/white"
+                        android:text="选择其他位置"
+                        app:cornerRadius="6dp" />
+                </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"

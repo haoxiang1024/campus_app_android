@@ -82,7 +82,9 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
 
     private LocationClient mLocationClient;
     private final MyLocationListener mListener = new MyLocationListener();
-
+    private double tempLat = 0.0;
+    private double tempLng = 0.0;
+    private String tempAddress = "";
     @NonNull
     @Override
     protected FragmentAddLostBinding viewBindingInflate(@NonNull LayoutInflater inflater, ViewGroup container, boolean attachToRoot) {
@@ -92,6 +94,11 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
     @Override
     protected void initViews() {
         initData();
+        // 设置地点输入框为只读，只能通过定位按钮获取
+        binding.etLocation.setFocusable(false);
+        binding.etLocation.setClickable(false);
+        binding.etLocation.setCursorVisible(false);
+        binding.etLocation.setKeyListener(null);  // 禁止键盘输入
     }
 
     @Override
