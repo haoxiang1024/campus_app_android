@@ -37,6 +37,7 @@ import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.ColorInt;
@@ -420,7 +421,23 @@ public final class Utils {
         Utils.saveBean2Sp(getContext(), user, "User", "user");
     }
 
-
+    /**
+     * 从 assets/config.properties 文件中读取指定的 key 值
+     */
+    public static String getPropertyFromAssets(Context context, String key) {
+        String value = "";
+        try {
+            java.util.Properties properties = new java.util.Properties();
+            java.io.InputStream inputStream = context.getAssets().open("config.properties");
+            properties.load(inputStream);
+            value = properties.getProperty(key);
+            inputStream.close();
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+            Log.e("Utils", "读取 config.properties 失败");
+        }
+        return value;
+    }
 
     //根据资源id读取字符串
     public static String getString(Context context, int id) {

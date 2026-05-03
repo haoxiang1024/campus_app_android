@@ -110,7 +110,7 @@
                     style="@style/XUILayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="请点击获取定位或手动输入详细地址"
+                    android:hint="请点击获取当前定位或选择其他位置"
                     android:textSize="15sp"
                     android:minLines="2"
                     android:maxLines="5"

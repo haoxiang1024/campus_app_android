@@ -5,6 +5,7 @@ import static com.xuexiang.xutil.XUtil.runOnUiThread;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -42,7 +43,6 @@ import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.search.core.PoiInfo;
 import com.baidu.mapapi.search.core.SearchResult;
-import com.baidu.mapapi.search.geocode.GeoCodeOption;
 import com.baidu.mapapi.search.geocode.GeoCodeResult;
 import com.baidu.mapapi.search.geocode.GeoCoder;
 import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
@@ -71,9 +71,11 @@ import com.xuexiang.xui.widget.imageview.ImageLoader;
 import com.xuexiang.xui.widget.toast.XToast;
 
 import java.io.File;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -200,24 +202,17 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
             }
         });
     }
-
     // 初始化弹窗与地图检索
     private void showMapChooseDialog() {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_map_choose, null);
-        Spinner spinnerCity = view.findViewById(R.id.spinner_city);
         EditText etSearch = view.findViewById(R.id.et_map_search);
         Button btnSearch = view.findViewById(R.id.btn_map_search);
         TextView tvAddress = view.findViewById(R.id.tv_temp_address);
         MapView mapView = view.findViewById(R.id.bmapView);
-
-        // 设置下拉框默认城市范围数据
-        String[] cities = new String[]{"绵阳市", "成都市", "重庆市", "北京市", "上海市", "广州市", "深圳市"};
-        ArrayAdapter<String> cityAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, cities);
-        spinnerCity.setAdapter(cityAdapter);
-
         BaiduMap baiduMap = mapView.getMap();
         tvAddress.setText("当前选中位置：请搜索或点击地图");
 
+        // 反地理编码
         GeoCoder geoCoder = GeoCoder.newInstance();
         geoCoder.setOnGetGeoCodeResultListener(new OnGetGeoCoderResultListener() {
             @Override
@@ -228,30 +223,6 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
                 if (result == null || result.error != SearchResult.ERRORNO.NO_ERROR) return;
                 updateSelection(result.getLocation(), result.getAddress(), tvAddress, baiduMap);
             }
-        });
-
-        PoiSearch poiSearch = PoiSearch.newInstance();
-        poiSearch.setOnGetPoiSearchResultListener(new OnGetPoiSearchResultListener() {
-            @Override
-            public void onGetPoiResult(PoiResult poiResult) {
-                Log.e("onGetPoiResult: ", String.valueOf(poiResult));
-                if (poiResult == null || poiResult.error != SearchResult.ERRORNO.NO_ERROR) {
-                    String errorMsg = (poiResult == null) ? "未找到地点，返回结果为空" : "未找到地点，错误码：" + poiResult.error;
-                    XToast.error(getContext(), errorMsg).show();
-                    if (poiResult != null) Log.e("BaiduMapSDK", "POI检索失败，错误枚举值：" + poiResult.error.name());
-                    return;
-                }
-                if (poiResult.getAllPoi() != null && !poiResult.getAllPoi().isEmpty()) {
-                    PoiInfo poi = poiResult.getAllPoi().get(0);
-                    updateSelection(poi.getLocation(), poi.getAddress() + "（" + poi.getName() + "）", tvAddress, baiduMap);
-                }
-            }
-            @Override
-            public void onGetPoiDetailResult(PoiDetailResult poiDetailResult) {}
-            @Override
-            public void onGetPoiDetailResult(PoiDetailSearchResult poiDetailSearchResult) {}
-            @Override
-            public void onGetPoiIndoorResult(PoiIndoorResult poiIndoorResult) {}
         });
 
         baiduMap.setOnMapClickListener(new BaiduMap.OnMapClickListener() {
@@ -265,18 +236,41 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
             }
         });
 
-        // 动态传递选中城市执行检索
         btnSearch.setOnClickListener(v -> {
             String keyword = etSearch.getText().toString().trim();
-            String selectedCity = (String) spinnerCity.getSelectedItem();
+
             if (!TextUtils.isEmpty(keyword)) {
-                boolean isSuccess = poiSearch.searchInCity(new PoiCitySearchOption().city(selectedCity).keyword(keyword).pageNum(0));
-                if (!isSuccess) {
-                    Log.e("BaiduTest", "🚨 searchInCity 返回了 false，说明鉴权没过，根本没发网请求！");
-                } else {
-                    Log.d("BaiduTest", "✅ 请求成功发出，等待回调...");
-                }
-                poiSearch.searchInCity(new PoiCitySearchOption().city(selectedCity).keyword(keyword).pageNum(0));
+                String url = "https://api.map.baidu.com/place/v2/search";
+                String serverAk = Utils.getPropertyFromAssets(getContext(), "baidu_api_key");
+                RetrofitClient.getInstance().getApi().searchPlaceBaidu(url, keyword, "全国", "json", serverAk)
+                        .enqueue(new Callback<com.hx.campus.adapter.entity.BaiduPoiResponse>() {
+                            @Override
+                            public void onResponse(retrofit2.Call<com.hx.campus.adapter.entity.BaiduPoiResponse> call, retrofit2.Response<com.hx.campus.adapter.entity.BaiduPoiResponse> response) {
+                                if (response.isSuccessful() && response.body() != null) {
+                                    com.hx.campus.adapter.entity.BaiduPoiResponse poiResponse = response.body();
+
+                                    // 百度Web API 状态码 0 表示成功
+                                    if (poiResponse.getStatus() == 0 && poiResponse.getResults() != null && !poiResponse.getResults().isEmpty()) {
+                                        // 取第一条检索结果
+                                        com.hx.campus.adapter.entity.BaiduPoiResponse.BaiduPoiResult firstResult = poiResponse.getResults().get(0);
+
+                                        LatLng latLng = new LatLng(firstResult.getLocation().getLat(), firstResult.getLocation().getLng());
+                                        // 更新地图和选中地址显示
+                                        updateSelection(latLng, firstResult.getAddress() + "（" + firstResult.getName() + "）", tvAddress, baiduMap);
+                                    } else {
+                                        String errMsg = poiResponse.getStatus() == 0 ? "未找到该地点" : "检索失败，错误码: " + poiResponse.getStatus();
+                                        XToast.warning(getContext(), errMsg).show();
+                                    }
+                                } else {
+                                    XToast.error(getContext(), "网络请求异常，请稍后重试").show();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(retrofit2.Call<com.hx.campus.adapter.entity.BaiduPoiResponse> call, Throwable t) {
+                                XToast.error(getContext(), "网络错误：" + t.getMessage()).show();
+                            }
+                        });
             } else {
                 XToast.warning(getContext(), "请输入搜索关键字").show();
             }
@@ -294,21 +288,21 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
                 .dismissListener(d -> {
                     mapView.onDestroy();
                     geoCoder.destroy();
-                    poiSearch.destroy();
                 })
                 .show();
     }
-
+    // 更新地图标记点
     private void updateSelection(LatLng latLng, String address, TextView tvAddress, BaiduMap baiduMap) {
         baiduMap.clear();
         baiduMap.addOverlay(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.fromResource(android.R.drawable.ic_menu_mylocation)));
         baiduMap.setMapStatus(MapStatusUpdateFactory.newLatLngZoom(latLng, 17.0f));
 
-        tempLat = latLng.latitude;
-        tempLng = latLng.longitude;
+        tempLat = formatLocation(latLng.latitude);
+        tempLng = formatLocation(latLng.longitude);
         tempAddress = address;
         tvAddress.setText("当前选中位置：" + tempAddress);
     }
+
 
     private void startLocation() {
         showLoadingDialog();
@@ -339,12 +333,10 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
         @Override
         public void onReceiveLocation(BDLocation bdLocation) {
             hideLoadingDialog();
-
             if (bdLocation == null) {
                 XToast.error(getContext(), "定位失败：返回数据为空").show();
                 return;
             }
-
             int code = bdLocation.getLocType();
             if (code == BDLocation.TypeGpsLocation || code == BDLocation.TypeNetWorkLocation) {
                 currentLat = bdLocation.getLatitude();
@@ -371,9 +363,7 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
                 }
             } else {
                 XToast.error(getContext(), "定位失败，错误码：" + code).show();
-                Log.e("百度定位", "错误码：" + code + " 信息：" + bdLocation.getLocTypeDescription());
             }
-
             if (mLocationClient != null) {
                 mLocationClient.stop();
             }
@@ -397,8 +387,8 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
                     public void onResponse(retrofit2.Call<Result<List<LostFound>>> call, retrofit2.Response<Result<List<LostFound>>> response) {
                         hideLoadingDialog();
                         if (response.isSuccessful() && response.body() != null) {
+                            showResponse(response.body().getMsg());
                             if (response.body().getStatus() == 0) {
-                                showResponse(response.body().getMsg());
                                 List<LostFound> matchData = response.body().getData();
                                 if (matchData != null && !matchData.toString().equals("[]")) {
                                     List<LostFound> matchList = JSON.parseArray(JSON.toJSONString(matchData), LostFound.class);
@@ -411,7 +401,6 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
                                     runOnUiThread(() -> clearUI());
                                 }
                             } else {
-                                showResponse(response.body().getMsg());
                                 runOnUiThread(() -> clearUI());
                             }
                         }
@@ -420,7 +409,6 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
                     @Override
                     public void onFailure(retrofit2.Call<Result<List<LostFound>>> call, Throwable t) {
                         hideLoadingDialog();
-                        t.printStackTrace();
                         showResponse("网络异常，请稍后再试");
                     }
                 });
@@ -536,25 +524,19 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
     }
 
     private void showLoadingDialog() {
-        if (loadingDialog == null) {
-            loadingDialog = new LoadingDialog(getContext());
-        }
+        if (loadingDialog == null) loadingDialog = new LoadingDialog(getContext());
         loadingDialog.show();
     }
 
     private void hideLoadingDialog() {
-        if (loadingDialog != null && loadingDialog.isShowing()) {
-            loadingDialog.dismiss();
-        }
+        if (loadingDialog != null && loadingDialog.isShowing()) loadingDialog.dismiss();
     }
 
     private void clearUI() {
         binding.etLostTitle.setText("");
         binding.addContent.setText("");
         binding.etLocation.setText("");
-        if (!categoryList.isEmpty()) {
-            binding.spinnerCategory.setSelection(0);
-        }
+        if (!categoryList.isEmpty()) binding.spinnerCategory.setSelection(0);
         binding.ivImage.setImageDrawable(null);
         this.file = null;
         this.fileName = "";
@@ -574,26 +556,21 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
         float density = context.getResources().getDisplayMetrics().density;
         return (int) (dp * density + 0.5f);
     }
-
+    private double formatLocation(double value) {
+        return Double.parseDouble(String.format(Locale.US, "%.6f", value));
+    }
     private void showImagePreviewDialog(String imageUrl) {
         if (getContext() == null || imageUrl == null || imageUrl.isEmpty()) return;
-
         android.app.Dialog previewDialog = new android.app.Dialog(getContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen);
         android.widget.ImageView fullImageView = new android.widget.ImageView(getContext());
-        fullImageView.setLayoutParams(new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));
+        fullImageView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         fullImageView.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
         fullImageView.setBackgroundColor(0xFF000000);
-
         ImageLoader.get().loadImage(fullImageView, imageUrl);
         fullImageView.setOnClickListener(v -> previewDialog.dismiss());
-
         previewDialog.setContentView(fullImageView);
         Window window = previewDialog.getWindow();
-        if (window != null) {
-            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
-        }
+        if (window != null) window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
         previewDialog.show();
     }
 
@@ -601,13 +578,8 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
         private List<LostFound> mData;
         private MaterialDialog mDialog;
 
-        public MatchAggregateAdapter(List<LostFound> data) {
-            this.mData = data;
-        }
-
-        public void setDialog(MaterialDialog dialog) {
-            this.mDialog = dialog;
-        }
+        public MatchAggregateAdapter(List<LostFound> data) { this.mData = data; }
+        public void setDialog(MaterialDialog dialog) { this.mDialog = dialog; }
 
         @NonNull
         @Override
@@ -615,9 +587,7 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
             Context context = parent.getContext();
             android.widget.LinearLayout layout = new android.widget.LinearLayout(context);
             layout.setOrientation(android.widget.LinearLayout.HORIZONTAL);
-            layout.setLayoutParams(new ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT));
+            layout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             int padding = dpToPx(context, 16);
             layout.setPadding(padding, padding, padding, padding);
             layout.setGravity(Gravity.CENTER_VERTICAL);
@@ -626,8 +596,7 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
             tvDesc.setTextSize(15);
             tvDesc.setTextColor(0xFF333333);
             tvDesc.setLineSpacing(0, 1.2f);
-            android.widget.LinearLayout.LayoutParams tvParams = new android.widget.LinearLayout.LayoutParams(
-                    0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f);
+            android.widget.LinearLayout.LayoutParams tvParams = new android.widget.LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f);
             tvDesc.setLayoutParams(tvParams);
 
             com.xuexiang.xui.widget.imageview.RadiusImageView ivThumb = new com.xuexiang.xui.widget.imageview.RadiusImageView(context);
@@ -637,7 +606,6 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
             ivThumb.setLayoutParams(ivParams);
             ivThumb.setCornerRadius(dpToPx(context, 6));
             ivThumb.setScaleType(android.widget.ImageView.ScaleType.CENTER_CROP);
-
             android.util.TypedValue outValue = new android.util.TypedValue();
             context.getTheme().resolveAttribute(android.R.attr.selectableItemBackgroundBorderless, outValue, true);
             ivThumb.setBackgroundResource(outValue.resourceId);
@@ -652,9 +620,7 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             LostFound item = mData.get(position);
             String typeIcon = "招领".equals(item.getType()) ? "🎁" : "🔍";
-            String formattedText = String.format("%s [%s] %s \n📍 %s",
-                    typeIcon, item.getType(), item.getTitle(), item.getPlace());
-
+            String formattedText = String.format("%s [%s] %s \n📍 %s", typeIcon, item.getType(), item.getTitle(), item.getPlace());
             holder.tvDesc.setText(formattedText);
 
             if (item.getImg() != null && !item.getImg().isEmpty()) {
@@ -678,14 +644,11 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
         }
 
         @Override
-        public int getItemCount() {
-            return mData == null ? 0 : mData.size();
-        }
+        public int getItemCount() { return mData == null ? 0 : mData.size(); }
 
         class ViewHolder extends RecyclerView.ViewHolder {
             TextView tvDesc;
             com.xuexiang.xui.widget.imageview.RadiusImageView ivThumb;
-
             public ViewHolder(@NonNull View itemView, TextView tvDesc, com.xuexiang.xui.widget.imageview.RadiusImageView ivThumb) {
                 super(itemView);
                 this.tvDesc = tvDesc;

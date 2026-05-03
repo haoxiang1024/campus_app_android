@@ -1,5 +1,6 @@
 package com.hx.campus.utils.api;
 
+import com.hx.campus.adapter.entity.BaiduPoiResponse;
 import com.hx.campus.adapter.entity.Comment;
 import com.hx.campus.adapter.entity.ExchangeOrder;
 import com.hx.campus.adapter.entity.LoginResponseDTO;
@@ -193,4 +194,16 @@ public interface ApiService {
     @FormUrlEncoded
     @POST("shop/deleteOrder")
     Call<Result<String>> deleteOrder(@Field("id") Integer id, @Field("userId")Integer userId);
+
+    /**
+     * 百度地图地点检索 Web API
+     */
+    @GET
+    Call<BaiduPoiResponse> searchPlaceBaidu(
+            @retrofit2.http.Url String url,
+            @Query("query") String query,
+            @Query("region") String region,
+            @Query("output") String output,
+            @Query("ak") String ak
+    );
 }

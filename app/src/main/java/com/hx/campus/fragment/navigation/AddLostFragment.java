@@ -16,6 +16,9 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -30,6 +33,19 @@ import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
+import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.BitmapDescriptorFactory;
+import com.baidu.mapapi.map.MapPoi;
+import com.baidu.mapapi.map.MapStatusUpdateFactory;
+import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.MarkerOptions;
+import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.search.core.SearchResult;
+import com.baidu.mapapi.search.geocode.GeoCodeResult;
+import com.baidu.mapapi.search.geocode.GeoCoder;
+import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
+import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
+import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import com.hx.campus.R;
 import com.hx.campus.adapter.entity.LostFound;
 import com.hx.campus.adapter.entity.LostFoundType;
@@ -49,6 +65,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -63,6 +80,7 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
     public static final int CHOOSE_PHOTO = 1;
     public static final int STORAGE_PERMISSION = 1;
     private static final int LOCATION_PERMISSION = 100;
+    private static final int MAP_LOCATION_PERMISSION = 101;
 
     int id = 0;
     private File file = null;
@@ -85,6 +103,7 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
     private double tempLat = 0.0;
     private double tempLng = 0.0;
     private String tempAddress = "";
+
     @NonNull
     @Override
     protected FragmentAddLostBinding viewBindingInflate(@NonNull LayoutInflater inflater, ViewGroup container, boolean attachToRoot) {
@@ -94,7 +113,6 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
     @Override
     protected void initViews() {
         initData();
-
     }
 
     @Override
@@ -175,6 +193,117 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
                 startLocation();
             }
         });
+
+        binding.btnChooseMapLocation.setOnClickListener(v -> {
+            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_PHONE_STATE}, MAP_LOCATION_PERMISSION);
+            } else {
+                showMapChooseDialog();
+            }
+        });
+    }
+
+    // 初始化弹窗与地图检索
+    private void showMapChooseDialog() {
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_map_choose, null);
+        EditText etSearch = view.findViewById(R.id.et_map_search);
+        Button btnSearch = view.findViewById(R.id.btn_map_search);
+        TextView tvAddress = view.findViewById(R.id.tv_temp_address);
+        MapView mapView = view.findViewById(R.id.bmapView);
+        BaiduMap baiduMap = mapView.getMap();
+        tvAddress.setText("当前选中位置：请搜索或点击地图");
+
+        // 反地理编码
+        GeoCoder geoCoder = GeoCoder.newInstance();
+        geoCoder.setOnGetGeoCodeResultListener(new OnGetGeoCoderResultListener() {
+            @Override
+            public void onGetGeoCodeResult(GeoCodeResult result) {}
+
+            @Override
+            public void onGetReverseGeoCodeResult(ReverseGeoCodeResult result) {
+                if (result == null || result.error != SearchResult.ERRORNO.NO_ERROR) return;
+                updateSelection(result.getLocation(), result.getAddress(), tvAddress, baiduMap);
+            }
+        });
+
+        baiduMap.setOnMapClickListener(new BaiduMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                geoCoder.reverseGeoCode(new ReverseGeoCodeOption().location(latLng));
+            }
+            @Override
+            public void onMapPoiClick(MapPoi mapPoi) {
+                updateSelection(mapPoi.getPosition(), mapPoi.getName(), tvAddress, baiduMap);
+            }
+        });
+
+        btnSearch.setOnClickListener(v -> {
+            String keyword = etSearch.getText().toString().trim();
+
+            if (!TextUtils.isEmpty(keyword)) {
+                String url = "https://api.map.baidu.com/place/v2/search";
+                String serverAk = Utils.getPropertyFromAssets(getContext(), "baidu_api_key");
+                RetrofitClient.getInstance().getApi().searchPlaceBaidu(url, keyword, "全国", "json", serverAk)
+                        .enqueue(new Callback<com.hx.campus.adapter.entity.BaiduPoiResponse>() {
+                            @Override
+                            public void onResponse(retrofit2.Call<com.hx.campus.adapter.entity.BaiduPoiResponse> call, retrofit2.Response<com.hx.campus.adapter.entity.BaiduPoiResponse> response) {
+                                if (response.isSuccessful() && response.body() != null) {
+                                    com.hx.campus.adapter.entity.BaiduPoiResponse poiResponse = response.body();
+
+                                    if (poiResponse.getStatus() == 0 && poiResponse.getResults() != null && !poiResponse.getResults().isEmpty()) {
+                                        com.hx.campus.adapter.entity.BaiduPoiResponse.BaiduPoiResult firstResult = poiResponse.getResults().get(0);
+                                        LatLng latLng = new LatLng(firstResult.getLocation().getLat(), firstResult.getLocation().getLng());
+                                        updateSelection(latLng, firstResult.getAddress() + "（" + firstResult.getName() + "）", tvAddress, baiduMap);
+                                    } else {
+                                        String errMsg = poiResponse.getStatus() == 0 ? "未找到该地点" : "检索失败，错误码: " + poiResponse.getStatus();
+                                        XToast.warning(getContext(), errMsg).show();
+                                    }
+                                } else {
+                                    XToast.error(getContext(), "网络请求异常，请稍后重试").show();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(retrofit2.Call<com.hx.campus.adapter.entity.BaiduPoiResponse> call, Throwable t) {
+                                XToast.error(getContext(), "网络错误：" + t.getMessage()).show();
+                            }
+                        });
+            } else {
+                XToast.warning(getContext(), "请输入搜索关键字").show();
+            }
+        });
+
+        new MaterialDialog.Builder(getContext())
+                .title("在地图上选择地点")
+                .customView(view, false)
+                .positiveText("确认位置")
+                .onPositive((d, which) -> {
+                    binding.etLocation.setText(tempAddress);
+                    currentLat = tempLat;
+                    currentLng = tempLng;
+                })
+                .dismissListener(d -> {
+                    mapView.onDestroy();
+                    geoCoder.destroy();
+                })
+                .show();
+    }
+
+    // 更新地图标记点
+    private void updateSelection(LatLng latLng, String address, TextView tvAddress, BaiduMap baiduMap) {
+        baiduMap.clear();
+        baiduMap.addOverlay(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.fromResource(android.R.drawable.ic_menu_mylocation)));
+        baiduMap.setMapStatus(MapStatusUpdateFactory.newLatLngZoom(latLng, 17.0f));
+
+        tempLat = formatLocation(latLng.latitude);
+        tempLng = formatLocation(latLng.longitude);
+        tempAddress = address;
+        tvAddress.setText("当前选中位置：" + tempAddress);
+    }
+
+    // 格式化经纬度
+    private double formatLocation(double value) {
+        return Double.parseDouble(String.format(Locale.US, "%.6f", value));
     }
 
     private void startLocation() {
@@ -259,7 +388,6 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
                         hideLoadingDialog();
                         if (response.isSuccessful() && response.body() != null) {
                             if (response.body().getStatus() == 0) {
-                                // 统一在这里提示一次即可
                                 showResponse(response.body().getMsg());
 
                                 List<LostFound> matchData = response.body().getData();
@@ -304,7 +432,6 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
 
         adapter.setDialog(dialog);
 
-        // 限制弹窗高度
         Window window = dialog.getWindow();
         if (window != null) {
             WindowManager.LayoutParams lp = window.getAttributes();
@@ -378,6 +505,12 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
             } else {
                 XToast.error(getContext(), "定位权限被拒绝").show();
             }
+        } else if (requestCode == MAP_LOCATION_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                showMapChooseDialog();
+            } else {
+                XToast.error(getContext(), "定位权限被拒绝，无法选择位置").show();
+            }
         }
     }
 
@@ -424,8 +557,6 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
             mLocationClient.unRegisterLocationListener(mListener);
         }
     }
-
-    // 弹窗相关辅助方法和适配器
 
     private int dpToPx(Context context, float dp) {
         if (context == null) return 0;

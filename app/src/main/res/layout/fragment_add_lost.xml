@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-   android:background="?attr/xui_config_color_background"
+    android:background="?attr/xui_config_color_background"
     style="@style/PullDownStyle">
 
     <androidx.core.widget.NestedScrollView
@@ -32,7 +32,6 @@
                     android:id="@+id/iv_image"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
-
                     android:scaleType="centerCrop"
                     android:contentDescription="@string/todo" />
 
@@ -78,7 +77,6 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="0.5dp"
-
                     android:layout_marginTop="4dp"
                     android:layout_marginBottom="4dp"/>
 
@@ -101,7 +99,6 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="0.5dp"
-
                     android:layout_marginTop="4dp"
                     android:layout_marginBottom="4dp"/>
 
@@ -110,18 +107,16 @@
                     style="@style/XUILayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="请点击获取定位或手动输入详细地址"
+                    android:hint="请点击获取当前定位或选择其他位置"
                     android:textSize="15sp"
                     android:minLines="2"
                     android:maxLines="5"
                     app:met_clearButton="true"
                     app:met_hideUnderline="true" />
 
-
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="0.5dp"
-
                     android:layout_marginTop="4dp"
                     android:layout_marginBottom="12dp"/>
                 <LinearLayout
