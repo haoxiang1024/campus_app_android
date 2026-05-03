@@ -3,7 +3,6 @@ package com.hx.campus.fragment.navigation;
 import static com.xuexiang.xutil.XUtil.runOnUiThread;
 
 import android.Manifest;
-import com.baidu.mapapi.search.core.SearchResult;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -19,6 +18,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -40,12 +40,21 @@ import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.search.core.PoiInfo;
+import com.baidu.mapapi.search.core.SearchResult;
 import com.baidu.mapapi.search.geocode.GeoCodeOption;
 import com.baidu.mapapi.search.geocode.GeoCodeResult;
 import com.baidu.mapapi.search.geocode.GeoCoder;
 import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
+import com.baidu.mapapi.search.poi.OnGetPoiSearchResultListener;
+import com.baidu.mapapi.search.poi.PoiCitySearchOption;
+import com.baidu.mapapi.search.poi.PoiDetailResult;
+import com.baidu.mapapi.search.poi.PoiDetailSearchResult;
+import com.baidu.mapapi.search.poi.PoiIndoorResult;
+import com.baidu.mapapi.search.poi.PoiResult;
+import com.baidu.mapapi.search.poi.PoiSearch;
 import com.hx.campus.R;
 import com.hx.campus.adapter.entity.LostFound;
 import com.hx.campus.adapter.entity.LostFoundType;
@@ -72,15 +81,16 @@ import okhttp3.RequestBody;
 import retrofit2.Callback;
 
 /**
- * AddFoundFragment 类用于处理用户发布招领信息的功能。
+ * 处理用户发布招领信息功能
  */
 @Page
 public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
     public static final int CHOOSE_PHOTO = 1;
     public static final int STORAGE_PERMISSION = 1;
-    private static final int LOCATION_PERMISSION = 100; // 新增定位权限码
+    private static final int LOCATION_PERMISSION = 100;
+    private static final int MAP_LOCATION_PERMISSION = 101;
 
-    int id = 0; // 分类id
+    int id = 0;
     private File file = null;
     private String fileName = "";
     private String foundJson;
@@ -89,7 +99,7 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
     private String locationEditValue;
     private String result;
     LoadingDialog loadingDialog;
-    //经纬度
+
     private double currentLat = 0.0;
     private double currentLng = 0.0;
     private List<LostFoundType> categoryList = new ArrayList<>();
@@ -110,11 +120,6 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
     @Override
     protected void initViews() {
         initData();
-        // 设置地点输入框为只读，只能通过定位按钮获取
-        binding.etLocation.setFocusable(false);
-        binding.etLocation.setClickable(false);
-        binding.etLocation.setCursorVisible(false);
-        binding.etLocation.setKeyListener(null);  // 禁止键盘输入
     }
 
     @Override
@@ -126,7 +131,6 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
     protected void initListeners() {
         super.initListeners();
 
-        // 选择图片按钮点击事件
         binding.chooseImage.setOnClickListener(v -> {
             if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, STORAGE_PERMISSION);
@@ -135,7 +139,6 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
             }
         });
 
-        // 提交按钮点击事件
         binding.btnSubmitLost.setOnClickListener(v -> {
             if (id == 0) {
                 XToast.warning(getContext(), "请稍后，正在获取分类信息...").show();
@@ -154,28 +157,27 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
             contentEditValue = binding.addContent.getEditValue();
             locationEditValue = binding.etLocation.getEditValue();
 
-            LostFound lostFound=new LostFound(foundTitleEditValue, "", date, contentEditValue, locationEditValue, phone, state, stick, id, userId);
+            LostFound lostFound = new LostFound(foundTitleEditValue, "", date, contentEditValue, locationEditValue, phone, state, stick, id, userId);
             lostFound.setType("招领");
-            //添加经纬度
             lostFound.setLatitude(currentLat);
             lostFound.setLongitude(currentLng);
             foundJson = JSON.toJSONString(lostFound);
 
             if (file == null) {
                 hideLoadingDialog();
-                result = Utils.getString(getContext(),R.string.no_image_selected_yet);
+                result = Utils.getString(getContext(), R.string.no_image_selected_yet);
                 showResponse(result);
             } else if (TextUtils.isEmpty(foundTitleEditValue.trim())) {
                 hideLoadingDialog();
-                result = Utils.getString(getContext(),R.string.title_not_empty);
+                result = Utils.getString(getContext(), R.string.title_not_empty);
                 showResponse(result);
             } else if (TextUtils.isEmpty(contentEditValue.trim())) {
                 hideLoadingDialog();
-                result = Utils.getString(getContext(),R.string.content_not_empty);
+                result = Utils.getString(getContext(), R.string.content_not_empty);
                 showResponse(result);
             } else if (TextUtils.isEmpty(locationEditValue.trim())) {
                 hideLoadingDialog();
-                result = Utils.getString(getContext(),R.string.location_not_empty);
+                result = Utils.getString(getContext(), R.string.location_not_empty);
                 showResponse(result);
             } else {
                 addLostFound(foundJson);
@@ -183,126 +185,131 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
         });
 
         binding.btnGetLocation.setOnClickListener(v -> {
-            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(getActivity(),
-                        new String[]{
-                                Manifest.permission.ACCESS_FINE_LOCATION,
-                                Manifest.permission.READ_PHONE_STATE
-                        },
-                        LOCATION_PERMISSION);
+            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_PHONE_STATE}, LOCATION_PERMISSION);
             } else {
                 startLocation();
             }
         });
-        // 绑定打开地图选点弹窗的事件
-        binding.btnChooseMapLocation.setOnClickListener(v -> showMapChooseDialog());
+
+        binding.btnChooseMapLocation.setOnClickListener(v -> {
+            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_PHONE_STATE}, MAP_LOCATION_PERMISSION);
+            } else {
+                showMapChooseDialog();
+            }
+        });
     }
 
-
+    // 初始化弹窗与地图检索
     private void showMapChooseDialog() {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_map_choose, null);
+        Spinner spinnerCity = view.findViewById(R.id.spinner_city);
         EditText etSearch = view.findViewById(R.id.et_map_search);
         Button btnSearch = view.findViewById(R.id.btn_map_search);
         TextView tvAddress = view.findViewById(R.id.tv_temp_address);
         MapView mapView = view.findViewById(R.id.bmapView);
 
+        // 设置下拉框默认城市范围数据
+        String[] cities = new String[]{"绵阳市", "成都市", "重庆市", "北京市", "上海市", "广州市", "深圳市"};
+        ArrayAdapter<String> cityAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, cities);
+        spinnerCity.setAdapter(cityAdapter);
+
         BaiduMap baiduMap = mapView.getMap();
         tvAddress.setText("当前选中位置：请搜索或点击地图");
-
-        if (currentLat != 0.0 && currentLng != 0.0) {
-            baiduMap.setMapStatus(MapStatusUpdateFactory.newLatLngZoom(new LatLng(currentLat, currentLng), 16.0f));
-        }
 
         GeoCoder geoCoder = GeoCoder.newInstance();
         geoCoder.setOnGetGeoCodeResultListener(new OnGetGeoCoderResultListener() {
             @Override
-            public void onGetGeoCodeResult(GeoCodeResult result) {
-                if (result == null || result.error != SearchResult.ERRORNO.NO_ERROR || result.getLocation() == null) {
-                    XToast.error(getContext(), "未找到该地点").show();
-                    return;
-                }
-                baiduMap.clear();
-                baiduMap.addOverlay(new MarkerOptions().position(result.getLocation()).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher)));
-                baiduMap.setMapStatus(MapStatusUpdateFactory.newLatLng(result.getLocation()));
-
-                tempLat = result.getLocation().latitude;
-                tempLng = result.getLocation().longitude;
-                tempAddress = result.getAddress() == null ? "未知地址" : result.getAddress();
-                tvAddress.setText("当前选中位置：" + tempAddress);
-            }
+            public void onGetGeoCodeResult(GeoCodeResult result) {}
 
             @Override
             public void onGetReverseGeoCodeResult(ReverseGeoCodeResult result) {
+                if (result == null || result.error != SearchResult.ERRORNO.NO_ERROR) return;
+                updateSelection(result.getLocation(), result.getAddress(), tvAddress, baiduMap);
+            }
+        });
 
-                if (result == null || result.error != SearchResult.ERRORNO.NO_ERROR || result.getLocation() == null) {
-                    XToast.warning(getContext(), "无法获取该位置的具体信息").show();
+        PoiSearch poiSearch = PoiSearch.newInstance();
+        poiSearch.setOnGetPoiSearchResultListener(new OnGetPoiSearchResultListener() {
+            @Override
+            public void onGetPoiResult(PoiResult poiResult) {
+                Log.e("onGetPoiResult: ", String.valueOf(poiResult));
+                if (poiResult == null || poiResult.error != SearchResult.ERRORNO.NO_ERROR) {
+                    String errorMsg = (poiResult == null) ? "未找到地点，返回结果为空" : "未找到地点，错误码：" + poiResult.error;
+                    XToast.error(getContext(), errorMsg).show();
+                    if (poiResult != null) Log.e("BaiduMapSDK", "POI检索失败，错误枚举值：" + poiResult.error.name());
                     return;
                 }
-
-                tempLat = result.getLocation().latitude;
-                tempLng = result.getLocation().longitude;
-                tempAddress = result.getAddress() == null ? "未知地址" : result.getAddress();
-
-                if (result.getPoiList() != null && !result.getPoiList().isEmpty()) {
-                    tempAddress += "（" + result.getPoiList().get(0).getName() + "）";
+                if (poiResult.getAllPoi() != null && !poiResult.getAllPoi().isEmpty()) {
+                    PoiInfo poi = poiResult.getAllPoi().get(0);
+                    updateSelection(poi.getLocation(), poi.getAddress() + "（" + poi.getName() + "）", tvAddress, baiduMap);
                 }
-                tvAddress.setText("当前选中位置：" + tempAddress);
             }
+            @Override
+            public void onGetPoiDetailResult(PoiDetailResult poiDetailResult) {}
+            @Override
+            public void onGetPoiDetailResult(PoiDetailSearchResult poiDetailSearchResult) {}
+            @Override
+            public void onGetPoiIndoorResult(PoiIndoorResult poiIndoorResult) {}
         });
 
         baiduMap.setOnMapClickListener(new BaiduMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                if (latLng == null) return;
-                baiduMap.clear();
-                baiduMap.addOverlay(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher)));
                 geoCoder.reverseGeoCode(new ReverseGeoCodeOption().location(latLng));
             }
-
             @Override
             public void onMapPoiClick(MapPoi mapPoi) {
-                if (mapPoi == null || mapPoi.getPosition() == null) return;
-                baiduMap.clear();
-                baiduMap.addOverlay(new MarkerOptions().position(mapPoi.getPosition()).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher)));
-                baiduMap.setMapStatus(MapStatusUpdateFactory.newLatLng(mapPoi.getPosition()));
-
-                tempLat = mapPoi.getPosition().latitude;
-                tempLng = mapPoi.getPosition().longitude;
-                tempAddress = mapPoi.getName() == null ? "未知兴趣点" : mapPoi.getName();
-                tvAddress.setText("当前选中位置：" + tempAddress);
+                updateSelection(mapPoi.getPosition(), mapPoi.getName(), tvAddress, baiduMap);
             }
         });
 
+        // 动态传递选中城市执行检索
         btnSearch.setOnClickListener(v -> {
             String keyword = etSearch.getText().toString().trim();
+            String selectedCity = (String) spinnerCity.getSelectedItem();
             if (!TextUtils.isEmpty(keyword)) {
-                geoCoder.geocode(new GeoCodeOption().city("全国").address(keyword));
+                boolean isSuccess = poiSearch.searchInCity(new PoiCitySearchOption().city(selectedCity).keyword(keyword).pageNum(0));
+                if (!isSuccess) {
+                    Log.e("BaiduTest", "🚨 searchInCity 返回了 false，说明鉴权没过，根本没发网请求！");
+                } else {
+                    Log.d("BaiduTest", "✅ 请求成功发出，等待回调...");
+                }
+                poiSearch.searchInCity(new PoiCitySearchOption().city(selectedCity).keyword(keyword).pageNum(0));
+            } else {
+                XToast.warning(getContext(), "请输入搜索关键字").show();
             }
         });
 
-        MaterialDialog dialog = new MaterialDialog.Builder(getContext())
+        new MaterialDialog.Builder(getContext())
                 .title("在地图上选择地点")
                 .customView(view, false)
                 .positiveText("确认位置")
-                .negativeText("取消")
                 .onPositive((d, which) -> {
-                    if (TextUtils.isEmpty(tempAddress)) {
-                        XToast.warning(getContext(), "请先在地图上选择位置").show();
-                    } else {
-                        binding.etLocation.setText(tempAddress);
-                        currentLat = tempLat;
-                        currentLng = tempLng;
-                    }
+                    binding.etLocation.setText(tempAddress);
+                    currentLat = tempLat;
+                    currentLng = tempLng;
                 })
                 .dismissListener(d -> {
-                    if(mapView != null) mapView.onDestroy();
-                    if(geoCoder != null) geoCoder.destroy();
+                    mapView.onDestroy();
+                    geoCoder.destroy();
+                    poiSearch.destroy();
                 })
-                .build();
-
-        dialog.show();
+                .show();
     }
+
+    private void updateSelection(LatLng latLng, String address, TextView tvAddress, BaiduMap baiduMap) {
+        baiduMap.clear();
+        baiduMap.addOverlay(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.fromResource(android.R.drawable.ic_menu_mylocation)));
+        baiduMap.setMapStatus(MapStatusUpdateFactory.newLatLngZoom(latLng, 17.0f));
+
+        tempLat = latLng.latitude;
+        tempLng = latLng.longitude;
+        tempAddress = address;
+        tvAddress.setText("当前选中位置：" + tempAddress);
+    }
+
     private void startLocation() {
         showLoadingDialog();
         try {
@@ -312,9 +319,9 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
             LocationClientOption option = new LocationClientOption();
             option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
             option.setCoorType("bd09ll");
-            option.setScanSpan(0);         // 只定位一次
-            option.setIsNeedAddress(true); // 需要地址
-            option.setIsNeedLocationPoiList(true); // 允许获取周边兴趣点
+            option.setScanSpan(0);
+            option.setIsNeedAddress(true);
+            option.setIsNeedLocationPoiList(true);
             option.setOpenGps(true);
             option.setIgnoreKillProcess(false);
 
@@ -328,7 +335,6 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
         }
     }
 
-    // 百度定位回调
     private class MyLocationListener extends BDAbstractLocationListener {
         @Override
         public void onReceiveLocation(BDLocation bdLocation) {
@@ -341,15 +347,12 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
 
             int code = bdLocation.getLocType();
             if (code == BDLocation.TypeGpsLocation || code == BDLocation.TypeNetWorkLocation) {
-                // 获取并保存经纬度
                 currentLat = bdLocation.getLatitude();
                 currentLng = bdLocation.getLongitude();
-                // 定位成功
                 String addr = bdLocation.getAddrStr();
-                // 获取周边 POI 列表
                 List<com.baidu.location.Poi> poiList = bdLocation.getPoiList();
+
                 if (poiList != null && !poiList.isEmpty()) {
-                    // 如果有周边建筑，弹出列表让用户选一个更准的
                     List<String> poiNames = new ArrayList<>();
                     for (com.baidu.location.Poi p : poiList) {
                         poiNames.add(p.getName());
@@ -358,14 +361,12 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
                             .title("请选择具体位置")
                             .items(poiNames)
                             .itemsCallback((dialog, itemView, position, text) -> {
-                                // 将“大地址 + 具体建筑”合并填入
                                 binding.etLocation.setText(addr + "（" + text + "）");
                             })
                             .positiveText("就用当前位置")
                             .onPositive((dialog, which) -> binding.etLocation.setText(addr))
                             .show();
                 } else {
-                    // 没有周边信息时直接填入基础地址
                     binding.etLocation.setText(addr);
                 }
             } else {
@@ -373,33 +374,24 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
                 Log.e("百度定位", "错误码：" + code + " 信息：" + bdLocation.getLocTypeDescription());
             }
 
-            // 定位一次就停止
             if (mLocationClient != null) {
                 mLocationClient.stop();
             }
         }
     }
 
-    /**
-     * 启动系统相册以选择图片。
-     */
     private void chooseImage() {
         Intent intent = new Intent("android.intent.action.GET_CONTENT");
         intent.setType("image/*");
         startActivityForResult(intent, CHOOSE_PHOTO);
     }
 
-    /**
-     * 上传图片和招领信息到服务器。
-     *
-     * @param foundJson 招领信息的 JSON 字符串
-     */
     private void addLostFound(String foundJson) {
         RequestBody requestFile = RequestBody.create(MediaType.parse("image/jpeg"), file);
         MultipartBody.Part filePart = MultipartBody.Part.createFormData("upload_file", file.getName(), requestFile);
         RetrofitClient.getInstance()
                 .getApi()
-                .addLostFound(filePart,foundJson)
+                .addLostFound(filePart, foundJson)
                 .enqueue(new retrofit2.Callback<Result<List<LostFound>>>() {
                     @Override
                     public void onResponse(retrofit2.Call<Result<List<LostFound>>> call, retrofit2.Response<Result<List<LostFound>>> response) {
@@ -407,7 +399,6 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
                         if (response.isSuccessful() && response.body() != null) {
                             if (response.body().getStatus() == 0) {
                                 showResponse(response.body().getMsg());
-
                                 List<LostFound> matchData = response.body().getData();
                                 if (matchData != null && !matchData.toString().equals("[]")) {
                                     List<LostFound> matchList = JSON.parseArray(JSON.toJSONString(matchData), LostFound.class);
@@ -420,7 +411,6 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
                                     runOnUiThread(() -> clearUI());
                                 }
                             } else {
-                                // 状态码不为0时的错误提示
                                 showResponse(response.body().getMsg());
                                 runOnUiThread(() -> clearUI());
                             }
@@ -438,7 +428,6 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
 
     private void showMatchDialog(List<LostFound> matchList, String msg) {
         if (getContext() == null) return;
-
         MatchAggregateAdapter adapter = new MatchAggregateAdapter(matchList);
 
         MaterialDialog dialog = new MaterialDialog.Builder(getContext())
@@ -451,8 +440,6 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
                 .show();
 
         adapter.setDialog(dialog);
-
-        // 限制弹窗高度，防止内容过多撑满全屏
         Window window = dialog.getWindow();
         if (window != null) {
             WindowManager.LayoutParams lp = window.getAttributes();
@@ -461,18 +448,10 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
         }
     }
 
-    /**
-     * 在主线程中显示响应结果。
-     *
-     * @param response 响应结果字符串
-     */
     private void showResponse(final String response) {
         runOnUiThread(() -> XToast.info(getContext(), response).show());
     }
 
-    /**
-     * 初始化数据，包括设置用户信息、分类适配器和获取分类列表。
-     */
     private void initData() {
         User user = Utils.getBeanFromSp(getContext(), "User", "user");
         binding.authorName.setText(user.getNickname());
@@ -488,18 +467,13 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
                     id = selectedType.getId();
                 }
             }
-
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
+            public void onNothingSelected(AdapterView<?> parent) {}
         });
 
         fetchCategoriesFromNet();
     }
 
-    /**
-     * 从网络获取分类数据并更新 UI。
-     */
     private void fetchCategoriesFromNet() {
         RetrofitClient.getInstance().getApi().getAllType().enqueue(new Callback<Result<List<LostFoundType>>>() {
             @Override
@@ -516,7 +490,6 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
                     XToast.error(getContext(), "获取分类数据失败").show();
                 }
             }
-
             @Override
             public void onFailure(retrofit2.Call<Result<List<LostFoundType>>> call, Throwable t) {
                 XToast.error(getContext(), "网络异常，无法获取分类").show();
@@ -524,9 +497,6 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
         });
     }
 
-    /**
-     * 处理权限请求的结果。
-     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -542,12 +512,15 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
             } else {
                 XToast.error(getContext(), "定位权限被拒绝").show();
             }
+        } else if (requestCode == MAP_LOCATION_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                showMapChooseDialog();
+            } else {
+                XToast.error(getContext(), "定位权限被拒绝，无法选择位置").show();
+            }
         }
     }
 
-    /**
-     * 处理活动结果，主要用于获取选择的图片路径。
-     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -579,11 +552,9 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
         binding.etLostTitle.setText("");
         binding.addContent.setText("");
         binding.etLocation.setText("");
-
         if (!categoryList.isEmpty()) {
             binding.spinnerCategory.setSelection(0);
         }
-
         binding.ivImage.setImageDrawable(null);
         this.file = null;
         this.fileName = "";
@@ -598,9 +569,6 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
         }
     }
 
-    // 弹窗相关辅助方法和适配器
-
-
     private int dpToPx(Context context, float dp) {
         if (context == null) return 0;
         float density = context.getResources().getDisplayMetrics().density;
@@ -611,7 +579,6 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
         if (getContext() == null || imageUrl == null || imageUrl.isEmpty()) return;
 
         android.app.Dialog previewDialog = new android.app.Dialog(getContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen);
-
         android.widget.ImageView fullImageView = new android.widget.ImageView(getContext());
         fullImageView.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -623,12 +590,10 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
         fullImageView.setOnClickListener(v -> previewDialog.dismiss());
 
         previewDialog.setContentView(fullImageView);
-
         Window window = previewDialog.getWindow();
         if (window != null) {
             window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
         }
-
         previewDialog.show();
     }
 

@@ -94,11 +94,7 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
     @Override
     protected void initViews() {
         initData();
-        // 设置地点输入框为只读，只能通过定位按钮获取
-        binding.etLocation.setFocusable(false);
-        binding.etLocation.setClickable(false);
-        binding.etLocation.setCursorVisible(false);
-        binding.etLocation.setKeyListener(null);  // 禁止键盘输入
+
     }
 
     @Override

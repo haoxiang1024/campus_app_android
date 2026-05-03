@@ -12,6 +12,13 @@
         android:layout_marginBottom="8dp"
         android:gravity="center_vertical">
 
+        <Spinner
+            android:id="@+id/spinner_city"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_card_white_radius" />
+
         <EditText
             android:id="@+id/et_map_search"
             android:layout_width="0dp"

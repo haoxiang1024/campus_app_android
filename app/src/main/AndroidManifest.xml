@@ -50,7 +50,7 @@
         <!-- 百度地图API Key -->
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="@string/baidu_api_key" />
+            android:value="${baidu_api_key}" />
         <activity
             android:name=".activity.CustomScannerActivity"
             android:screenOrientation="portrait"

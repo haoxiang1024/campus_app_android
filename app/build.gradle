@@ -23,15 +23,25 @@ android {
                 arguments = [moduleName: project.getName()]
             }
         }
+        // 初始化Properties对象
         Properties properties = new Properties()
-        def localPropertiesFile = project.rootProject.file('local.properties')
+// 获取配置文件路径
+        def localPropertiesFile = project.rootProject.file('config.properties')
         if (localPropertiesFile.exists()) {
+            // 加载配置文件
             properties.load(localPropertiesFile.newDataInputStream())
         }
-        //  读取 Key，并提供一个空的默认值防止崩溃
+// 读取Key并设置默认值
         def baiduKey = properties.getProperty("baidu_api_key") ?: ""
-        //  注入资源
-        resValue "string", "baidu_api_key", baiduKey
+
+        android {
+            defaultConfig {
+                // 生成字符串资源
+                resValue "string", "baidu_api_key", baiduKey
+                // 注入清单文件占位符
+                manifestPlaceholders = [baidu_api_key: baiduKey]
+            }
+        }
     }
     signingConfigs {
         if (isNeedPackage.toBoolean()) {
