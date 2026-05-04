@@ -20,7 +20,6 @@ import com.hx.campus.utils.api.RetrofitClient;
 import com.hx.campus.utils.common.TokenUtils;
 import com.xuexiang.xpage.annotation.Page;
 import com.xuexiang.xui.utils.CountDownButtonHelper;
-import com.xuexiang.xutil.app.ActivityUtils;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -30,7 +29,6 @@ import retrofit2.Response;
 public class ResetPwdFragment extends BaseFragment<FragmentResetPwdBinding> implements View.OnClickListener {
 
     private CountDownButtonHelper mCountDownHelper;
-
     private boolean isPasswordVisible = false;
     private boolean isRePasswordVisible = false;
 
@@ -44,7 +42,7 @@ public class ResetPwdFragment extends BaseFragment<FragmentResetPwdBinding> impl
     protected void initViews() {
         mCountDownHelper = new CountDownButtonHelper(binding.btnGetVerifyCode, 60);
 
-        // 绑定新密码眼睛图标点击事件
+        // 切换新密码可见状态
         binding.ivPwdToggle.setOnClickListener(v -> {
             isPasswordVisible = !isPasswordVisible;
             if (isPasswordVisible) {
@@ -57,7 +55,7 @@ public class ResetPwdFragment extends BaseFragment<FragmentResetPwdBinding> impl
             binding.etPassword.setSelection(binding.etPassword.getText().length());
         });
 
-        // 绑定确认新密码眼睛图标点击事件
+        // 切换确认密码可见状态
         binding.ivRepwdToggle.setOnClickListener(v -> {
             isRePasswordVisible = !isRePasswordVisible;
             if (isRePasswordVisible) {
@@ -99,7 +97,7 @@ public class ResetPwdFragment extends BaseFragment<FragmentResetPwdBinding> impl
         String code = binding.inputCode.getEditValue();
         String email = binding.inputEmail.getEditValue();
 
-        // 校验输入非空
+        // 校验输入项非空
         if (TextUtils.isEmpty(number) || TextUtils.isEmpty(password) || TextUtils.isEmpty(repassword) || TextUtils.isEmpty(code) || TextUtils.isEmpty(email)) {
             Utils.showResponse("请填写完整信息");
             return;
@@ -111,18 +109,7 @@ public class ResetPwdFragment extends BaseFragment<FragmentResetPwdBinding> impl
             return;
         }
 
-        // 校验提交的邮箱是否为当前用户绑定的邮箱
-        User user = Utils.getBeanFromSp(getContext(), "User", "user");
-        if (user == null || TextUtils.isEmpty(user.getEmail())) {
-            Utils.showResponse("未获取到用户信息，请重新登录");
-            return;
-        }
-        if (!TextUtils.equals(user.getEmail(), email)) {
-            Utils.showResponse("提交的邮箱与绑定邮箱不一致");
-            return;
-        }
-
-        // 校验验证码
+        // 提交验证码校验
         RetrofitClient.getInstance().getApi().verifyCode(email, code).enqueue(new Callback<Result<Object>>() {
             @Override
             public void onResponse(@NonNull Call<Result<Object>> call, @NonNull Response<Result<Object>> response) {
@@ -145,12 +132,7 @@ public class ResetPwdFragment extends BaseFragment<FragmentResetPwdBinding> impl
     }
 
     private void resetPassword(String number, String password) {
-        User user = Utils.getBeanFromSp(getContext(), "User", "user");
-        if(!number.equals(user.getPhone())){
-            Utils.showResponse("请输入你自己的手机号");
-            return;
-        }
-        // 执行重置
+        // 提交密码重置请求
         RetrofitClient.getInstance().getApi().resetPwd(number, password).enqueue(new Callback<Result<Object>>() {
             @Override
             public void onResponse(@NonNull Call<Result<Object>> call, @NonNull Response<Result<Object>> response) {
@@ -159,10 +141,10 @@ public class ResetPwdFragment extends BaseFragment<FragmentResetPwdBinding> impl
                     if (response.body().isSuccess()) {
                         Utils.showResponse("密码重置成功，请重新登录");
                         binding.getRoot().postDelayed(() -> {
-                            if (isAdded()) { // 检查 Fragment 是否还依附在 Activity 上
+                            if (isAdded()) {
                                 handlePostResetLogic();
                             }
-                        }, 1500); // 延迟 1.5 秒
+                        }, 1500);
                     }
                 }
             }
@@ -173,51 +155,41 @@ public class ResetPwdFragment extends BaseFragment<FragmentResetPwdBinding> impl
             }
         });
     }
-    /**
-     * 重置成功后的后续逻辑处理
-     */
+
     private void handlePostResetLogic() {
-        User user = Utils.getBeanFromSp(getContext(), "User", "user");
-        if (user != null) {
-            // 如果原本是登录状态，说明是从主页里进来的，需要彻底清空栈重启
-            TokenUtils.handleLogoutSuccess();
-            gotoLogin();
-        } else {
-            // 如果原本就是未登录（忘记密码进来的），直接回退到 LoginFragment 即可
-            popToBack();
-        }
+        // 清除登录态并跳转至登录页
+        TokenUtils.handleLogoutSuccess();
+        gotoLogin();
     }
+
     private void gotoLogin() {
         if (getActivity() == null) return;
         Intent intent = new Intent(getActivity(), MainActivity.class);
+        // 增加冷启动标识
+        intent.setAction(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
-        // 销毁当前页面所在的 Activity
-        getActivity().finish();
     }
+
     private void send() {
         String email = binding.inputEmail.getEditValue();
 
-        // 校验输入非空
+        // 校验邮箱输入非空
         if (TextUtils.isEmpty(email)) {
             Utils.showResponse("请输入邮箱");
             return;
         }
-
-        // 校验发送验证码的邮箱是否为当前登录用户绑定的邮箱
+        // 校验缓存用户邮箱一致性
         User user = Utils.getBeanFromSp(getContext(), "User", "user");
-        if (user == null || TextUtils.isEmpty(user.getEmail())) {
-            Utils.showResponse("未获取到用户信息，请重新登录");
-            return;
-        }
-        if (!TextUtils.equals(user.getEmail(), email)) {
-            Utils.showResponse("只能向您绑定的邮箱发送验证码");
+        if (user != null && !TextUtils.equals(user.getEmail(), email)) {
+            Utils.showResponse("只能向你绑定的邮箱发送验证码");
             return;
         }
 
         mCountDownHelper.start();
 
-        // 发送验证码
+        // 提交发送验证码请求
         RetrofitClient.getInstance().getApi().sendCode(email).enqueue(new Callback<Result<Object>>() {
             @Override
             public void onResponse(@NonNull Call<Result<Object>> call, @NonNull Response<Result<Object>> response) {
