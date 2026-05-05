@@ -132,7 +132,7 @@ public interface ApiService {
     Call<Result<List<Comment>>> getCommentsByUserId(@Query("user_id") int user_id);
 
     //删除用户评论
-    @GET("admin/deleteCommentById")
+    @GET("delComment")
     Call<Result<String>>deleteComment(@Query("commentId") int commentId);
 
     //根据Id获取失物招领信息
