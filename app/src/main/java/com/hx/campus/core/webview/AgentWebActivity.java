@@ -26,11 +26,7 @@ public class AgentWebActivity extends AppCompatActivity {
 
     private AgentWebFragment mAgentWebFragment;
 
-    /**
-     * 请求浏览器
-     *
-     * @param url
-     */
+    
     public static void goWeb(Context context, final String url) {
         Intent intent = new Intent(context, AgentWebActivity.class);
         intent.putExtra(KEY_URL, url);

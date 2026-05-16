@@ -14,92 +14,42 @@ public final class RandomUtils {
     public static final String CAPITAL_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     public static final String LOWER_CASE_LETTERS = "abcdefghijklmnopqrstuvwxyz";
 
-    /**
-     * Don't let anyone instantiate this class.
-     */
+    
     private RandomUtils() {
         throw new Error("Do not need instantiate!");
     }
 
-    /**
-     * 在数字和英文字母中获取一个定长的随机字符串
-     *
-     * @param length 长度
-     * @return 随机字符串
-     * @see RandomUtils#getRandom(String source, int length)
-     */
+    
     public static String getRandomNumbersAndLetters(int length) {
         return getRandom(NUMBERS_AND_LETTERS, length);
     }
 
-    /**
-     * 在数字中获取一个定长的随机字符串
-     *
-     * @param length 长度
-     * @return 随机数字符串
-     * @see RandomUtils#getRandom(String source, int length)
-     */
+    
     public static String getRandomNumbers(int length) {
         return getRandom(NUMBERS, length);
     }
 
-    /**
-     * 在英文字母中获取一个定长的随机字符串
-     *
-     * @param length 长度
-     * @return 随机字母字符串
-     * @see RandomUtils#getRandom(String source, int length)
-     */
+    
     public static String getRandomLetters(int length) {
         return getRandom(LETTERS, length);
     }
 
-    /**
-     * 在大写英文字母中获取一个定长的随机字符串
-     *
-     * @param length 长度
-     * @return 随机字符串 只包含大写字母
-     * @see RandomUtils#getRandom(String source, int length)
-     */
+    
     public static String getRandomCapitalLetters(int length) {
         return getRandom(CAPITAL_LETTERS, length);
     }
 
-    /**
-     * 在小写英文字母中获取一个定长的随机字符串
-     *
-     * @param length 长度
-     * @return 随机字符串 只包含小写字母
-     * @see RandomUtils#getRandom(String source, int length)
-     */
+    
     public static String getRandomLowerCaseLetters(int length) {
         return getRandom(LOWER_CASE_LETTERS, length);
     }
 
-    /**
-     * 在一个字符数组源中获取一个定长的随机字符串
-     *
-     * @param source 源字符串
-     * @param length 长度
-     * @return <ul>
-     * <li>if source is null or empty, return null</li>
-     * <li>else see {@link RandomUtils#getRandom(char[] sourceChar, int length)}</li>
-     * </ul>
-     */
+    
     public static String getRandom(String source, int length) {
         return TextUtils.isEmpty(source) ? null : getRandom(source.toCharArray(), length);
     }
 
-    /**
-     * 在一个字符数组源中获取一个定长的随机字符串
-     *
-     * @param sourceChar 字符数组源
-     * @param length     长度
-     * @return <ul>
-     * <li>if sourceChar is null or empty, return null</li>
-     * <li>if length less than 0, return null</li>
-     * </ul>
-     */
+    
     public static String getRandom(char[] sourceChar, int length) {
         if (sourceChar == null || sourceChar.length == 0 || length < 0) {
             return null;
@@ -113,30 +63,12 @@ public final class RandomUtils {
         return str.toString();
     }
 
-    /**
-     * get random int between 0 and max
-     *
-     * @param max 最大随机数
-     * @return <ul>
-     * <li>if max <= 0, return 0</li>
-     * <li>else return random int between 0 and max</li>
-     * </ul>
-     */
+    
     public static int getRandom(int max) {
         return getRandom(0, max);
     }
 
-    /**
-     * get random int between min and max
-     *
-     * @param min 最小随机数
-     * @param max 最大随机数
-     * @return <ul>
-     * <li>if min > max, return 0</li>
-     * <li>if min == max, return min</li>
-     * <li>else return random int between min and max</li>
-     * </ul>
-     */
+    
     public static int getRandom(int min, int max) {
         if (min > max) {
             return 0;
@@ -147,11 +79,7 @@ public final class RandomUtils {
         return min + new Random().nextInt(max - min);
     }
 
-    /**
-     * 获取随机颜色
-     *
-     * @return
-     */
+    
     public static int getRandomColor() {
         Random random = new Random();
         int r = random.nextInt(256);
@@ -160,12 +88,7 @@ public final class RandomUtils {
         return Color.rgb(r, g, b);
     }
 
-    /**
-     * 随机打乱数组中的内容
-     *
-     * @param objArray
-     * @return
-     */
+    
     public static boolean shuffle(Object[] objArray) {
         if (objArray == null) {
             return false;
@@ -174,13 +97,7 @@ public final class RandomUtils {
         return shuffle(objArray, getRandom(objArray.length));
     }
 
-    /**
-     * 随机打乱数组中的内容
-     *
-     * @param objArray
-     * @param shuffleCount
-     * @return
-     */
+    
     public static boolean shuffle(Object[] objArray, int shuffleCount) {
         int length;
         if (objArray == null || shuffleCount < 0 || (length = objArray.length) < shuffleCount) {
@@ -196,12 +113,7 @@ public final class RandomUtils {
         return true;
     }
 
-    /**
-     * 随机打乱数组中的内容
-     *
-     * @param intArray
-     * @return
-     */
+    
     public static int[] shuffle(int[] intArray) {
         if (intArray == null) {
             return null;
@@ -210,13 +122,7 @@ public final class RandomUtils {
         return shuffle(intArray, getRandom(intArray.length));
     }
 
-    /**
-     * 随机打乱数组中的内容
-     *
-     * @param intArray
-     * @param shuffleCount
-     * @return
-     */
+    
     public static int[] shuffle(int[] intArray, int shuffleCount) {
         int length;
         if (intArray == null || shuffleCount < 0 || (length = intArray.length) < shuffleCount) {

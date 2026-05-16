@@ -78,9 +78,7 @@ public class GeneralFragment extends BaseFragment<FragmentGeneralBinding> implem
         }
     }
 
-    /**
-     * 显示注销账号的二次确认弹窗
-     */
+    
     private void showDeleteAccountDialog() {
         new MaterialDialog.Builder(getContext())
                 .title("严重警告")
@@ -95,9 +93,7 @@ public class GeneralFragment extends BaseFragment<FragmentGeneralBinding> implem
                 .show();
     }
 
-    /**
-     * 发起注销网络请求
-     */
+    
     private void requestDeleteAccount() {
         User user = Utils.getBeanFromSp(getContext(), "User", "user");
         int userId = user.getId();

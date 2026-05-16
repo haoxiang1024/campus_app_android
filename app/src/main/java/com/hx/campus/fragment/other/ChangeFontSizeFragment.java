@@ -13,22 +13,14 @@ import com.xuexiang.xpage.annotation.Page;
 public class ChangeFontSizeFragment extends BaseFragment<FragmentChangeFontSizeBinding> {
 
 
-    /**
-     * 构建ViewBinding
-     *
-     * @param inflater  inflater
-     * @param container 容器
-     * @return ViewBinding
-     */
+    
     @NonNull
     @Override
     protected FragmentChangeFontSizeBinding viewBindingInflate(@NonNull LayoutInflater inflater, ViewGroup container, boolean attachToRoot)  {
         return FragmentChangeFontSizeBinding.inflate(inflater,container,false);
     }
 
-    /**
-     * 初始化控件
-     */
+    
     @Override
     protected void initViews() {
 

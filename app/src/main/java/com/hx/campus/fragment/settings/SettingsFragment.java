@@ -33,9 +33,7 @@ public class SettingsFragment extends BaseFragment<FragmentSettingsBinding> impl
     protected FragmentSettingsBinding viewBindingInflate(@NonNull LayoutInflater inflater, ViewGroup container, boolean attachToRoot)  {
         return FragmentSettingsBinding.inflate(inflater, container, attachToRoot);
     }
-    /**
-     * 获取页面标题
-     */
+    
     @Override
     protected String getPageTitle() {
         return getResources().getString(R.string.setting);

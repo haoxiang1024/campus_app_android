@@ -102,9 +102,7 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
         }
     }
 
-    /**
-     * 显示加载弹窗
-     */
+    
     private void showLoadingDialog() {
         if (loadingDialog == null) {
             loadingDialog = new LoadingDialog(getActivity());
@@ -114,18 +112,14 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
         }
     }
 
-    /**
-     * 隐藏加载弹窗
-     */
+    
     private void hideLoadingDialog() {
         if (loadingDialog != null && loadingDialog.isShowing()) {
             loadingDialog.dismiss();
         }
     }
 
-    /**
-     * 注册前的预校验逻辑
-     */
+    
     private void handleRegister() {
         String phone = binding.etPhoneNumber.getEditValue();
         String password = binding.etPassword.getEditValue();
@@ -147,9 +141,7 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
         verifyCodeAndRegister(phone, password, email, code);
     }
 
-    /**
-     * 校验验证码并执行注册
-     */
+    
     private void verifyCodeAndRegister(String phone, String password, String email, String code) {
         showLoadingDialog(); // 发起请求前显示加载动画
 
@@ -178,9 +170,7 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
         });
     }
 
-    /**
-     * 最终提交注册请求
-     */
+    
     private void doRegisterRequest(String phone, String email, String password) {
         RetrofitClient.getInstance().getApi().register(phone, email, password,0).enqueue(new Callback<Result<LoginResponseDTO>>() {
             @Override
@@ -211,9 +201,7 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
         });
     }
 
-    /**
-     * 获取 IM Token 并根据本地状态选择连接方式
-     */
+    
     private void fetchIMTokenAndConnect(User user) {
         RetrofitClient.getInstance().getApi().getIMUserToken(user.getId(),user.getNickname()).enqueue(new retrofit2.Callback<Result<String>>() {
             @Override
@@ -232,9 +220,7 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
                 }
             }
 
-            /**
-             * 融云连接核心逻辑
-             */
+            
             private void performIMConnect(String token) {
                 // 从本地存储获取旧 Token
                 String localToken = TokenUtils.getImToken();
@@ -277,9 +263,7 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
         });
     }
 
-    /**
-     * 发送验证码逻辑
-     */
+    
     private void sendVerifyCode() {
         String email = binding.inputEmail.getEditValue();
         if (TextUtils.isEmpty(email)) {

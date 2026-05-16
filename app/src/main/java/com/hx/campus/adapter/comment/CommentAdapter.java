@@ -1,12 +1,4 @@
-/**
- * 评论列表适配器
- * 负责渲染失物招领系统的评论列表，支持层级评论显示和交互
- * 实现评论展开/收起、用户头像加载、时间格式化等功能
- * 
- * @author 开发团队
- * @version 1.0.0
- * @since 2024
- */
+
 package com.hx.campus.adapter.comment;
 
 import android.content.Context;
@@ -33,55 +25,36 @@ import com.hx.campus.utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * RecyclerView适配器，用于展示评论列表
- * 支持一级评论和多级回复的层级显示
- */
+
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHolder> {
     
-    /** 评论数据列表 */
+    
     private List<Comment> mList = new ArrayList<>();
     
-    /** 上下文环境 */
+    
     private Context mContext;
     
-    /** 评论点击事件监听器 */
+    
     private OnCommentClickListener listener;
 
-    /** 记录每条评论的展开状态，key为评论ID，value为是否展开 */
+    
     private SparseBooleanArray expandStateArray = new SparseBooleanArray();
     
-    /** 默认最多显示的回复数量 */
+    
     private static final int MAX_SHOW_REPLIES = 2;
 
-    /**
-     * 评论点击事件监听接口
-     * 用于处理回复按钮点击事件
-     */
+    
     public interface OnCommentClickListener {
-        /**
-         * 回复按钮点击回调
-         * @param parentId 父评论ID
-         * @param targetUserId 被回复用户ID
-         * @param targetNickname 被回复用户昵称
-         */
+        
         void onReplyClick(int parentId, int targetUserId, String targetNickname);
     }
 
-    /**
-     * 设置评论点击监听器
-     * @param listener 评论点击事件监听器
-     */
+    
     public void setOnCommentClickListener(OnCommentClickListener listener) {
         this.listener = listener;
     }
 
-    /**
-     * 设置新的评论数据
-     * 会清空之前的展开状态记录
-     * 
-     * @param list 新的评论数据列表
-     */
+    
     public void setNewData(List<Comment> list) {
         this.mList = list == null ? new ArrayList<>() : list;
         // 刷新数据时重置所有评论的展开状态
@@ -89,13 +62,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         notifyDataSetChanged();
     }
 
-    /**
-     * 创建ViewHolder实例
-     * 
-     * @param parent 父容器
-     * @param viewType 视图类型
-     * @return ViewHolder实例
-     */
+    
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -104,13 +71,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         return new ViewHolder(view);
     }
 
-    /**
-     * 绑定数据到ViewHolder
-     * 处理评论内容显示、头像加载、回复列表渲染等
-     * 
-     * @param holder ViewHolder实例
-     * @param position 数据位置
-     */
+    
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Comment comment = mList.get(position);

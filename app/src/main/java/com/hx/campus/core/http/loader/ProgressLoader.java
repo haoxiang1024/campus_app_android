@@ -18,23 +18,12 @@ public final class ProgressLoader {
         ProgressLoader.sIProgressLoaderFactory = sIProgressLoaderFactory;
     }
 
-    /**
-     * 创建进度加载者
-     *
-     * @param context
-     * @return
-     */
+    
     public static IProgressLoader create(Context context) {
         return sIProgressLoaderFactory.create(context);
     }
 
-    /**
-     * 创建进度加载者
-     *
-     * @param context
-     * @param message 默认提示信息
-     * @return
-     */
+    
     public static IProgressLoader create(Context context, String message) {
         return sIProgressLoaderFactory.create(context, message);
     }

@@ -20,16 +20,12 @@ public final class TokenUtils {
     private static Context context;
     // 专门存储融云 IM Token 的键
     private static final String KEY_IM_TOKEN = "com.hx.campus.utils.KEY_IM_TOKEN";
-    /**
-     * 获取存储的 IM Token
-     */
+    
     public static String getImToken() {
         return MMKVUtils.getString(KEY_IM_TOKEN, "");
     }
 
-    /**
-     * 设置并持久化 IM Token
-     */
+    
     public static void setImToken(String imToken) {
         MMKVUtils.put(KEY_IM_TOKEN, imToken);
     }
@@ -45,9 +41,7 @@ public final class TokenUtils {
         throw new UnsupportedOperationException("u can't instantiate me...");
     }
 
-    /**
-     * 初始化Token信息
-     */
+    
     public static void init(Context context) {
         MMKVUtils.init(context);
         sToken = MMKVUtils.getString(KEY_TOKEN, "");
@@ -73,11 +67,7 @@ public final class TokenUtils {
         return MMKVUtils.containsKey(KEY_TOKEN);
     }
 
-    /**
-     * 处理登录成功的事件
-     *
-     * @param token 账户信息
-     */
+    
     public static boolean handleLoginSuccess(String token) {
         if (!StringUtils.isEmpty(token)) {
             XToastUtils.success(Utils.getString(context, R.string.login_su));
@@ -90,9 +80,7 @@ public final class TokenUtils {
         }
     }
 
-    /**
-     * 处理登出的事件
-     */
+    
     public static void handleLogoutSuccess() {
         MobclickAgent.onProfileSignOff();
         //登出时，清除账号信息

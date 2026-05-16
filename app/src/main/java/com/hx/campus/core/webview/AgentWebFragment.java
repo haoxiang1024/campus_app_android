@@ -61,17 +61,9 @@ import java.util.HashMap;
 public class AgentWebFragment extends Fragment implements FragmentKeyDown {
     public static final String KEY_URL = "com.xuexiang.xuidemo.base.webview.key_url";
     public static final String TAG = AgentWebFragment.class.getSimpleName();
-    /**
-     * 权限申请拦截器
-     */
+    
     protected PermissionInterceptor mPermissionInterceptor = new PermissionInterceptor() {
-        /**
-         * PermissionInterceptor 能达到 url1 允许授权， url2 拒绝授权的效果。
-         * @param url
-         * @param permissions
-         * @param action
-         * @return true 该Url对应页面请求权限进行拦截 ，false 表示不拦截。
-         */
+        
         @Override
         public boolean intercept(String url, String[] permissions, String action) {
             Log.i(TAG, "mUrl:" + url + "  permission:" + JsonUtil.toJson(permissions) + " action:" + action);
@@ -164,9 +156,7 @@ public class AgentWebFragment extends Fragment implements FragmentKeyDown {
         }
     };
     private AgentWeb mAgentWeb;
-    /**
-     * 菜单事件
-     */
+    
     private final PopupMenu.OnMenuItemClickListener mOnMenuItemClickListener = new PopupMenu.OnMenuItemClickListener() {
         @Override
         public boolean onMenuItemClick(MenuItem item) {
@@ -224,20 +214,9 @@ public class AgentWebFragment extends Fragment implements FragmentKeyDown {
 
     };
     private DownloadingService mDownloadingService;
-    /**
-     * 更新于 AgentWeb 4.0.0，下载监听
-     */
+    
     protected DownloadListenerAdapter mDownloadListenerAdapter = new DownloadListenerAdapter() {
-        /**
-         *
-         * @param url                下载链接
-         * @param userAgent          UserAgent
-         * @param contentDisposition ContentDisposition
-         * @param mimetype           资源的媒体类型
-         * @param contentLength      文件长度
-         * @param extra              下载配置 ， 用户可以通过 Extra 修改下载icon ， 关闭进度条 ， 是否强制下载。
-         * @return true 表示用户处理了该下载事件 ， false 交给 AgentWeb 下载
-         */
+        
         @Override
         public boolean onStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength, AgentWebDownloader.Extra extra) {
             LogUtils.i(TAG, "onStart:" + url);
@@ -264,12 +243,7 @@ public class AgentWebFragment extends Fragment implements FragmentKeyDown {
             return false;
         }
 
-        /**
-         *
-         * 不需要暂停或者停止下载该方法可以不必实现
-         * @param url
-         * @param downloadingService  用户可以通过 DownloadingService#shutdownNow 终止下载
-         */
+        
         @Override
         public void onBindService(String url, DownloadingService downloadingService) {
             super.onBindService(url, downloadingService);
@@ -277,11 +251,7 @@ public class AgentWebFragment extends Fragment implements FragmentKeyDown {
             LogUtils.i(TAG, "onBindService:" + url + "  DownloadingService:" + downloadingService);
         }
 
-        /**
-         * 回调onUnbindService方法，让用户释放掉 DownloadingService。
-         * @param url
-         * @param downloadingService
-         */
+        
         @Override
         public void onUnbindService(String url, DownloadingService downloadingService) {
             super.onUnbindService(url, downloadingService);
@@ -289,14 +259,7 @@ public class AgentWebFragment extends Fragment implements FragmentKeyDown {
             LogUtils.i(TAG, "onUnbindService:" + url);
         }
 
-        /**
-         *
-         * @param url  下载链接
-         * @param loaded  已经下载的长度
-         * @param length    文件的总大小
-         * @param usedTime   耗时 ，单位ms
-         * 注意该方法回调在子线程 ，线程名 AsyncTask #XX 或者 AgentWeb # XX
-         */
+        
         @Override
         public void onProgress(String url, long loaded, long length, long usedTime) {
             int mProgress = (int) ((loaded) / Float.valueOf(length) * 100);
@@ -304,13 +267,7 @@ public class AgentWebFragment extends Fragment implements FragmentKeyDown {
             super.onProgress(url, loaded, length, usedTime);
         }
 
-        /**
-         *
-         * @param path 文件的绝对路径
-         * @param url  下载地址
-         * @param throwable    如果异常，返回给用户异常
-         * @return true 表示用户处理了下载完成后续的事件 ，false 默认交给AgentWeb 处理
-         */
+        
         @Override
         public boolean onResult(String path, String url, Throwable throwable) {
             //下载成功
@@ -441,9 +398,7 @@ public class AgentWebFragment extends Fragment implements FragmentKeyDown {
         mLineView.setVisibility(tag);
     }
 
-    /**
-     * @return IAgentWebSettings
-     */
+    
     public IAgentWebSettings getSettings() {
         return new AbsAgentWebSettings() {
             private AgentWeb mAgentWeb;
@@ -453,15 +408,7 @@ public class AgentWebFragment extends Fragment implements FragmentKeyDown {
                 this.mAgentWeb = agentWeb;
             }
 
-            /**
-             * AgentWeb 4.0.0 内部删除了 DownloadListener 监听 ，以及相关API ，将 Download 部分完全抽离出来独立一个库，
-             * 如果你需要使用 AgentWeb Download 部分 ， 请依赖上 compile 'com.just.agentweb:download:4.0.0 ，
-             * 如果你需要监听下载结果，请自定义 AgentWebSetting ， New 出 DefaultDownloadImpl，传入DownloadListenerAdapter
-             * 实现进度或者结果监听，例如下面这个例子，如果你不需要监听进度，或者下载结果，下面 setDownloader 的例子可以忽略。
-             * @param webView
-             * @param downloadListener
-             * @return WebListenerManager
-             */
+            
             @Override
             public WebListenerManager setDownloader(WebView webView, android.webkit.DownloadListener downloadListener) {
                 return super.setDownloader(webView,
@@ -475,11 +422,7 @@ public class AgentWebFragment extends Fragment implements FragmentKeyDown {
         };
     }
 
-    /**
-     * 页面空白，请检查scheme是否加上， scheme://host:port/path?query&query 。
-     *
-     * @return mUrl
-     */
+    
     public String getUrl() {
         String target = "";
         Bundle bundle = getArguments();
@@ -500,11 +443,7 @@ public class AgentWebFragment extends Fragment implements FragmentKeyDown {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    /**
-     * 打开浏览器
-     *
-     * @param targetUrl 外部浏览器打开的地址
-     */
+    
     private void openBrowser(String targetUrl) {
         if (TextUtils.isEmpty(targetUrl) || targetUrl.startsWith("file://")) {
             XToastUtils.toast(targetUrl + " 该链接无法使用浏览器打开。");
@@ -517,11 +456,7 @@ public class AgentWebFragment extends Fragment implements FragmentKeyDown {
         startActivity(intent);
     }
 
-    /**
-     * 显示更多菜单
-     *
-     * @param view 菜单依附在该View下面
-     */
+    
     private void showPoPup(View view) {
         if (mPopupMenu == null) {
             mPopupMenu = new PopupMenu(getContext(), view);
@@ -531,11 +466,7 @@ public class AgentWebFragment extends Fragment implements FragmentKeyDown {
         mPopupMenu.show();
     }
 
-    /**
-     * 分享网页链接
-     *
-     * @param url 网页链接
-     */
+    
     private void shareWebUrl(String url) {
         Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
@@ -546,12 +477,7 @@ public class AgentWebFragment extends Fragment implements FragmentKeyDown {
     }
 
 
-    /**
-     * 复制字符串
-     *
-     * @param context
-     * @param text
-     */
+    
     private void toCopy(Context context, String text) {
         ClipboardManager manager = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
         if (manager == null) {
@@ -586,22 +512,10 @@ public class AgentWebFragment extends Fragment implements FragmentKeyDown {
 
 
 
-    /**
-     * MiddlewareWebClientBase 是 AgentWeb 3.0.0 提供一个强大的功能，
-     * 如果用户需要使用 AgentWeb 提供的功能， 不想重写 WebClientView方
-     * 法覆盖AgentWeb提供的功能，那么 MiddlewareWebClientBase 是一个
-     * 不错的选择 。
-     *
-     * @return
-     */
+    
     protected MiddlewareWebClientBase getMiddlewareWebClient() {
         return new MiddlewareWebViewClient() {
-            /**
-             *
-             * @param view
-             * @param url
-             * @return
-             */
+            
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 // 拦截 url，不执行 DefaultWebClient#shouldOverrideUrlLoading

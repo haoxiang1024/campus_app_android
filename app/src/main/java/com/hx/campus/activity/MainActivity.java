@@ -122,9 +122,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
         handleDeepLinkIntent(intent);
     }
 
-    /**
-     * 处理 Deep Link 跳转
-     */
+    
     private void handleDeepLinkIntent(Intent intent) {
         if (intent != null && Intent.ACTION_VIEW.equals(intent.getAction())) {
             Uri data = intent.getData();
@@ -143,9 +141,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
         }
     }
 
-    /**
-     * 提供给【App内扫一扫】回调使用的方法
-     */
+    
     public void onScanResult(String resultUrl) {
         if (resultUrl.contains("share.html?id=")) {
             Uri uri = Uri.parse(resultUrl);
@@ -160,9 +156,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
         }
     }
 
-    /**
-     * 根据 ID 获取详细数据并跳转
-     */
+    
     private void jumpToDetail(int foundId) {
         // 提示用户正在加载
         Utils.showResponse("正在加载详情...");
@@ -408,12 +402,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
         binding.includeMain.bottomNavigation.setOnNavigationItemSelectedListener(this);//底部导航栏点击事件(onNavigationItemSelected)
     }
 
-    /**
-     * 处理侧边栏点击事件
-     *
-     * @param menuItem
-     * @return
-     */
+    
     private boolean handleNavigationItemSelected(@NonNull MenuItem menuItem) {
         int index = CollectionUtils.arrayIndexOf(mTitles, menuItem.getTitle());
         if (index != -1) {
@@ -438,12 +427,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
     }
 
 
-    /**
-     * 底部导航栏点击事件
-     *
-     * @param menuItem
-     * @return
-     */
+    
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         int index = CollectionUtils.arrayIndexOf(mTitles, menuItem.getTitle());
@@ -456,21 +440,14 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
         return false;
     }
 
-    /**
-     * 更新侧边栏菜单选中状态
-     * @param menuItem
-     */
+    
     private void updateSideNavStatus(MenuItem menuItem) {
         MenuItem side = binding.navView.getMenu().findItem(menuItem.getItemId());
         if (side != null) {
             side.setChecked(true);
         }
     }
-    /**
-     * 从服务器获取用户信息
-     * 用于即时通讯中动态更新用户资料
-     * @param userId 用户唯一标识符
-     */
+    
     private void fetchUserInfoFromServer(String userId) {
         RetrofitClient.getInstance().getApi().getUserInfo(Integer.parseInt(userId)).enqueue(new Callback<User>() {
             @Override
@@ -499,13 +476,10 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
 
             @Override
             public void onFailure(Call<User> call, Throwable t) {
-                Utils.showResponse("用户请求失败: " + t.getMessage());
             }
         });
     }
-    /**
-     * 菜单、返回键响应
-     */
+    
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {

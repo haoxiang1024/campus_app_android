@@ -9,13 +9,9 @@ import com.xuexiang.xui.widget.dialog.MiniLoadingDialog;
 
 
 public class MiniLoadingDialogLoader implements IProgressLoader {
-    /**
-     * 进度loading弹窗
-     */
+    
     private final MiniLoadingDialog mDialog;
-    /**
-     * 进度框取消监听
-     */
+    
     private OnProgressCancelListener mOnProgressCancelListener;
 
     public MiniLoadingDialogLoader(Context context) {

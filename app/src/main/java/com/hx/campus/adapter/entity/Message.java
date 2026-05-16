@@ -2,9 +2,7 @@ package com.hx.campus.adapter.entity;
 
 import java.util.Date;
 
-/**
- * 留言实体类
- */
+
 public class Message {
     private Integer id;
     private Integer userId;

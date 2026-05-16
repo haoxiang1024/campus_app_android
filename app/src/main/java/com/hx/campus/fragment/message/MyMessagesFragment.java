@@ -145,11 +145,7 @@ public class MyMessagesFragment extends BaseFragment<LayoutCommonListBinding> {
         });
     }
 
-    /**
-     * 删除留言接口调用
-     * @param messageId 留言ID
-     * @param position 列表位置
-     */
+    
     private void deleteMessageApi(Integer messageId, int position) {
         if (messageId == null) {
             Utils.showResponse("出错了，未获取到留言ID");
@@ -176,9 +172,7 @@ public class MyMessagesFragment extends BaseFragment<LayoutCommonListBinding> {
         });
     }
 
-    /**
-     * 根据数据量切换空状态和列表的显示
-     */
+    
     private void checkEmptyState() {
         if (mAdapter.getItemCount() == 0) {
             binding.layoutEmpty.setVisibility(View.VISIBLE);

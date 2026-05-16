@@ -275,9 +275,7 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
                 .show();
     }
 
-    /**
-     * 将 Bitmap 保存到手机相册
-     */
+    
     private void saveBitmapToGallery(Bitmap bitmap) {
         // 准备图片的元数据
         String fileName = "VerifyCode_" + System.currentTimeMillis() + ".png";
@@ -319,9 +317,7 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
             Toast.makeText(getContext(), "无法访问相册", Toast.LENGTH_SHORT).show();
         }
     }
-    /**
-     * 将 View 转换为 Bitmap
-     */
+    
     private Bitmap createBitmapFromView(View view) {
         // 获取 View 的宽和高
         int width = view.getWidth();

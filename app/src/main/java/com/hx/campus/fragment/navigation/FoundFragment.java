@@ -36,23 +36,14 @@ public class FoundFragment extends BaseFragment<FragmentFoundBinding> {
     public static final String KEY_TITLE_NAME = "title_name";
     LoadingDialog loadingDialog;
 
-    /**
-     * 初始化参数
-     * 通过XRouter进行依赖注入
-     */
+    
     @Override
     protected void initArgs() {
         // 使用XRouter进行字段自动注入
         XRouter.getInstance().inject(this);
     }
 
-    /**
-     * 创建视图绑定对象
-     * @param inflater 布局填充器
-     * @param container 父容器
-     * @param attachToRoot 是否附加到根布局
-     * @return FragmentFoundBinding 视图绑定实例
-     */
+    
     @NonNull
     @Override
     protected FragmentFoundBinding viewBindingInflate(@NonNull LayoutInflater inflater, ViewGroup container, boolean attachToRoot) {
@@ -60,10 +51,7 @@ public class FoundFragment extends BaseFragment<FragmentFoundBinding> {
         return FragmentFoundBinding.inflate(inflater, container, attachToRoot);
     }
 
-    /**
-     * 初始化视图组件
-     * 设置ViewPager和TabLayout的关联
-     */
+    
     @Override
     protected void initViews() {
         binding.getRoot().postDelayed(() -> {
@@ -114,21 +102,14 @@ public class FoundFragment extends BaseFragment<FragmentFoundBinding> {
             loadingDialog.dismiss();
         }
     }
-    /**
-     * 初始化标题栏
-     * 添加发布按钮和设置标题
-     * @return TitleBar 标题栏对象
-     */
+    
     @Override
     protected TitleBar initTitle() {
         // 获取父类初始化的标题栏
         TitleBar titleBar = super.initTitle();
         // 添加右侧发布按钮
         titleBar.addAction(new TitleBar.ImageAction(R.drawable.add) {
-            /**
-             * 发布按钮点击事件处理
-             * @param view 按钮视图
-             */
+            
             @Override
             public void performAction(android.view.View view) {
                 // 跳转到招领信息发布页面

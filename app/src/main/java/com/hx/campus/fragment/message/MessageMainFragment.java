@@ -21,13 +21,7 @@ public class MessageMainFragment extends BaseFragment<FragmentMessageMainBinding
     private TabLayout tabLayout;
     // ViewPager2控件，用于实现页面滑动切换
     private ViewPager2 viewPager;
-    /**
-     * 创建视图绑定对象
-     * @param inflater 布局填充器
-     * @param container 父容器
-     * @param attachToRoot 是否附加到根布局
-     * @return FragmentMessageMainBinding 视图绑定实例
-     */
+    
     @NonNull
     @Override
     protected FragmentMessageMainBinding viewBindingInflate(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, boolean attachToRoot) {
@@ -35,10 +29,7 @@ public class MessageMainFragment extends BaseFragment<FragmentMessageMainBinding
         return FragmentMessageMainBinding.inflate(inflater, container, attachToRoot);
     }
 
-    /**
-     * 初始化视图组件
-     * 设置TabLayout和ViewPager2的关联
-     */
+    
     @Override
     protected void initViews() {
         // 获取TabLayout引用
@@ -53,11 +44,7 @@ public class MessageMainFragment extends BaseFragment<FragmentMessageMainBinding
 
         // 使用TabLayoutMediator将TabLayout和ViewPager2进行绑定
         new TabLayoutMediator(tabLayout, viewPager, new TabLayoutMediator.TabConfigurationStrategy() {
-            /**
-             * 配置每个标签页的显示内容
-             * @param tab TabLayout.Tab标签对象
-             * @param position 标签位置索引
-             */
+            
             @Override
             public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
                 // 根据位置设置对应标签的文字
@@ -72,10 +59,7 @@ public class MessageMainFragment extends BaseFragment<FragmentMessageMainBinding
         }).attach();
     }
 
-    /**
-     * 初始化标题栏
-     * @return TitleBar 标题栏对象，返回null表示不使用默认标题栏
-     */
+    
     @Override
     protected TitleBar initTitle() {
         // 消息主页不需要显示标题栏

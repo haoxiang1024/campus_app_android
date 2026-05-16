@@ -16,9 +16,7 @@ import java.util.List;
 
 public class DemoDataProvider {
 
-    /**
-     * 定义Handler常量
-     */
+    
     private static final int MSG_GET_NEWS_LIST_SUCCESS = 1;
 
     public static String[] titles = new String[]{
@@ -64,11 +62,7 @@ public class DemoDataProvider {
         return list;
     }
 
-    /**
-     * 用于占位的空信息
-     *
-     * @return
-     */
+    
     
     public static List<NewInfo> getEmptyNewInfo() {
         List<NewInfo> list = new ArrayList<>();

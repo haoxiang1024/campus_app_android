@@ -1,12 +1,4 @@
-/**
- * 搜索功能Fragment
- * 提供失物招领信息的搜索功能，支持关键词搜索和结果展示
- * 集成搜索适配器、网络请求、加载动画等完整功能
- * 
- * @author 开发团队
- * @version 1.0.0
- * @since 2024
- */
+
 package com.hx.campus.fragment.other;
 
 import android.text.TextUtils;
@@ -33,59 +25,40 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/**
- * 搜索页面Fragment
- * 继承自BaseFragment，使用ViewBinding进行视图绑定
- */
+
 @Page()
 public class SearchFragment extends BaseFragment<FragmentSearchBinding> {
     
-    /** 搜索结果适配器 */
+    
     private SearchInfoAdapter searchInfoAdapter;
     
-    /** 加载对话框 */
+    
     private LoadingDialog loadingDialog;
     
-    /** 搜索结果数据列表 */
+    
     private List<SearchInfo> detailList = new ArrayList<>();
 
-    /**
-     * 创建ViewBinding实例
-     * 
-     * @param inflater 布局填充器
-     * @param container 父容器
-     * @param attachToRoot 是否附加到根布局
-     * @return FragmentSearchBinding实例
-     */
+    
     @NonNull
     @Override
     protected FragmentSearchBinding viewBindingInflate(@NonNull LayoutInflater inflater, ViewGroup container, boolean attachToRoot) {
         return FragmentSearchBinding.inflate(inflater, container, attachToRoot);
     }
 
-    /**
-     * 初始化视图组件
-     * 创建并配置搜索适配器
-     */
+    
     @Override
     protected void initViews() {
         searchInfoAdapter = new SearchInfoAdapter(getContext());
         binding.listview.setAdapter(searchInfoAdapter);
     }
 
-    /**
-     * 获取页面标题
-     * @return 页面标题字符串
-     */
+    
     @Override
     protected String getPageTitle() {
         return Utils.getString(getContext(), R.string.search);
     }
 
-    /**
-     * 初始化事件监听器
-     * 设置搜索按钮和列表项点击事件
-     */
+    
     @Override
     protected void initListeners() {
         super.initListeners();
@@ -104,10 +77,7 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> {
         });
     }
 
-    /**
-     * 执行搜索请求
-     * 通过Retrofit发起网络请求获取搜索结果
-     */
+    
     private void getData() {
         // 获取用户输入的搜索关键词
         String value = binding.searchEdittext.getEditValue();
@@ -156,10 +126,7 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> {
         });
     }
 
-    /**
-     * 显示加载对话框
-     * 单例模式，避免重复创建
-     */
+    
     private void showLoadingDialog() {
         if (loadingDialog == null) {
             loadingDialog = new LoadingDialog(getContext());
@@ -167,10 +134,7 @@ public class SearchFragment extends BaseFragment<FragmentSearchBinding> {
         loadingDialog.show();
     }
 
-    /**
-     * 隐藏加载对话框
-     * 确保对话框存在且正在显示时才隐藏
-     */
+    
     private void hideLoadingDialog() {
         if (loadingDialog != null && loadingDialog.isShowing()) {
             loadingDialog.dismiss();

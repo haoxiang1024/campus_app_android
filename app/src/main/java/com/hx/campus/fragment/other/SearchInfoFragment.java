@@ -68,31 +68,21 @@ public class SearchInfoFragment extends BaseFragment<FragmentSearchInfoBinding> 
     private int currentReplyUserId = 0;
     private PopupWindow emojiPopup; // Emoji面板弹窗
 
-    /**
-     * 初始化参数
-     */
+    
     @Override
     protected void initArgs() {
         super.initArgs();
         XRouter.getInstance().inject(this);
     }
 
-    /**
-     * 构建ViewBinding
-     *
-     * @param inflater  inflater
-     * @param container 容器
-     * @return ViewBinding
-     */
+    
     @NonNull
     @Override
     protected FragmentSearchInfoBinding viewBindingInflate(@NonNull LayoutInflater inflater, ViewGroup container, boolean attachToRoot) {
         return FragmentSearchInfoBinding.inflate(inflater, container, attachToRoot);
     }
 
-    /**
-     * 初始化控件
-     */
+    
     @Override
     protected void initViews() {
         setData();
@@ -108,9 +98,7 @@ public class SearchInfoFragment extends BaseFragment<FragmentSearchInfoBinding> 
         }
     }
 
-    /**
-     * 初始化Emoji面板
-     */
+    
     private void initEmojiPanel() {
         // 常用Emoji列表
         String[] emojis = {
@@ -164,9 +152,7 @@ public class SearchInfoFragment extends BaseFragment<FragmentSearchInfoBinding> 
         });
     }
 
-    /**
-     * 初始化评论列表
-     */
+    
     private void initCommentList() {
         commentAdapter = new CommentAdapter();
         binding.rvComments.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -189,9 +175,7 @@ public class SearchInfoFragment extends BaseFragment<FragmentSearchInfoBinding> 
         loadComments();
     }
 
-    /**
-     * 加载评论数据
-     */
+    
     private void loadComments() {
         if (searchInfo == null || searchInfo.getId() == 0) return;
 
@@ -213,9 +197,7 @@ public class SearchInfoFragment extends BaseFragment<FragmentSearchInfoBinding> 
         });
     }
 
-    /**
-     * 初始化评论发送事件
-     */
+    
     private void initCommentEvent() {
         binding.btnSendComment.setOnClickListener(v -> {
             String content = binding.etCommentInput.getText().toString().trim();
@@ -236,9 +218,7 @@ public class SearchInfoFragment extends BaseFragment<FragmentSearchInfoBinding> 
         });
     }
 
-    /**
-     * 提交评论到后端
-     */
+    
     private void submitComment(int searchInfoId, int userId, String content, int parentId, int replyUserId) {
         // 禁用按钮防重复点击
         binding.btnSendComment.setEnabled(false);
@@ -281,9 +261,7 @@ public class SearchInfoFragment extends BaseFragment<FragmentSearchInfoBinding> 
                 });
     }
 
-    /**
-     * 填充基础数据
-     */
+    
     private void setData() {
         if (searchInfo == null) return;
 

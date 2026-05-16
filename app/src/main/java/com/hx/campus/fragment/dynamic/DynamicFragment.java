@@ -112,9 +112,7 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
         binding.refreshLayout.autoRefresh();
     }
 
-    /**
-     * 初始化独立固定的 Banner
-     */
+    
     private void initFixedBanner() {
         SimpleImageBanner banner = findViewById(R.id.sib_simple_usage);
         if (banner != null) {
@@ -141,9 +139,7 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
         }
     }
 
-    /**
-     * 初始化独立固定的 九宫格菜单
-     */
+    
     private void initFixedGrid() {
         RecyclerView rvGrid = findViewById(R.id.rv_grid_menu);
         if (rvGrid != null) {
@@ -183,9 +179,7 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
         }
     }
 
-    /**
-     * 下方新闻列表适配器
-     */
+    
     private void adapter(VirtualLayoutManager virtualLayoutManager) {
         // 仅保留标题适配器
         SingleDelegateAdapter titleAdapter = new SingleDelegateAdapter(R.layout.adapter_title_item) {

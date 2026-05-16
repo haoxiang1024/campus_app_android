@@ -184,9 +184,7 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements
 
     }
 
-    /**
-     * 登录成功的处理
-     */
+    
     private void Login() {
         //登录注册的处理
         String phoneNumber = binding.etPhoneNumber.getEditValue();
@@ -232,9 +230,7 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements
         });
 
     }
-    /**
-     * 获取 IM Token 并根据本地状态选择连接方式
-     */
+    
     private void fetchIMTokenAndConnect(User user) {
         RetrofitClient.getInstance().getApi().getIMUserToken(user.getId(),user.getNickname()).enqueue(new retrofit2.Callback<Result<String>>() {
             @Override
@@ -252,9 +248,7 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements
                     ActivityUtils.startActivity(MainActivity.class);
                 }
             }
-            /**
-             * 融云连接核心逻辑
-             */
+            
             private void performIMConnect(String token) {
                 // 从本地存储获取旧 Token
                 String localToken = TokenUtils.getImToken();

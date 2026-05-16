@@ -162,24 +162,18 @@ public interface ApiService {
     @POST("message/deleteMessage")
     Call<Result<String>> deleteMessage(@Field("id") int id);
 
-    /**
-     * 获取可兑换商品列表
-     */
+    
     @GET("shop/items")
     Call<Result<List<ShopItem>>> getShopItems();
 
-    /**
-     * 发起积分兑换
-     */
+    
     @POST("shop/exchange")
     Call<Result<String>> exchangeItem(
             @Query("userId") Integer userId,
             @Query("itemId") Integer itemId
     );
 
-    /**
-     * 获取我的积分明细
-     */
+    
     @GET("shop/history")
     Call<Result<List<PointHistory>>> getPointHistory(@Query("userId") Integer userId);
 
@@ -195,9 +189,7 @@ public interface ApiService {
     @POST("shop/deleteOrder")
     Call<Result<String>> deleteOrder(@Field("id") Integer id, @Field("userId")Integer userId);
 
-    /**
-     * 百度地图地点检索 Web API
-     */
+    
     @GET
     Call<BaiduPoiResponse> searchPlaceBaidu(
             @retrofit2.http.Url String url,

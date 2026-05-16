@@ -18,11 +18,7 @@ public final class MMKVUtils {
         throw new UnsupportedOperationException("u can't instantiate me...");
     }
 
-    /**
-     * 初始化
-     *
-     * @param context
-     */
+    
     public static void init(Context context) {
         MMKV.initialize(context.getApplicationContext());
         sMMKV = MMKV.defaultMMKV();
@@ -37,13 +33,7 @@ public final class MMKVUtils {
 
     //=======================================键值保存==================================================//
 
-    /**
-     * 保存键值
-     *
-     * @param key
-     * @param value
-     * @return
-     */
+    
     public static boolean put(String key, Object value) {
         if (value instanceof Integer) {
             return getsMMKV().encode(key, (Integer) value);
@@ -70,13 +60,7 @@ public final class MMKVUtils {
 
     //=======================================键值获取==================================================//
 
-    /**
-     * 获取键值
-     *
-     * @param key
-     * @param defaultValue
-     * @return
-     */
+    
     public static Object get(String key, Object defaultValue) {
         if (defaultValue instanceof Integer) {
             return getsMMKV().decodeInt(key, (Integer) defaultValue);
@@ -99,13 +83,7 @@ public final class MMKVUtils {
     }
 
 
-    /**
-     * 根据key获取boolean值
-     *
-     * @param key
-     * @param defValue
-     * @return
-     */
+    
     public static boolean getBoolean(String key, boolean defValue) {
         try {
             return getsMMKV().getBoolean(key, defValue);
@@ -115,13 +93,7 @@ public final class MMKVUtils {
         return defValue;
     }
 
-    /**
-     * 根据key获取long值
-     *
-     * @param key
-     * @param defValue
-     * @return
-     */
+    
     public static long getLong(String key, long defValue) {
         try {
             return getsMMKV().getLong(key, defValue);
@@ -131,13 +103,7 @@ public final class MMKVUtils {
         return defValue;
     }
 
-    /**
-     * 根据key获取float值
-     *
-     * @param key
-     * @param defValue
-     * @return
-     */
+    
     public static float getFloat(String key, float defValue) {
         try {
             return getsMMKV().getFloat(key, defValue);
@@ -147,13 +113,7 @@ public final class MMKVUtils {
         return defValue;
     }
 
-    /**
-     * 根据key获取String值
-     *
-     * @param key
-     * @param defValue
-     * @return
-     */
+    
     public static String getString(String key, String defValue) {
         try {
             return getsMMKV().getString(key, defValue);
@@ -163,13 +123,7 @@ public final class MMKVUtils {
         return defValue;
     }
 
-    /**
-     * 根据key获取int值
-     *
-     * @param key
-     * @param defValue
-     * @return
-     */
+    
     public static int getInt(String key, int defValue) {
         try {
             return getsMMKV().getInt(key, defValue);
@@ -180,13 +134,7 @@ public final class MMKVUtils {
     }
 
 
-    /**
-     * 根据key获取double值
-     *
-     * @param key
-     * @param defValue
-     * @return
-     */
+    
     public static double getDouble(String key, double defValue) {
         try {
             return getsMMKV().decodeDouble(key, defValue);
@@ -197,26 +145,12 @@ public final class MMKVUtils {
     }
 
 
-    /**
-     * 获取对象
-     *
-     * @param key
-     * @param tClass 类型
-     * @param <T>
-     * @return
-     */
+    
     public static <T extends Parcelable> T getObject(String key, Class<T> tClass) {
         return getsMMKV().decodeParcelable(key, tClass);
     }
 
-    /**
-     * 获取对象
-     *
-     * @param key
-     * @param tClass 类型
-     * @param <T>
-     * @return
-     */
+    
     public static <T extends Parcelable> T getObject(String key, Class<T> tClass, T defValue) {
         try {
             return getsMMKV().decodeParcelable(key, tClass, defValue);
@@ -227,21 +161,12 @@ public final class MMKVUtils {
     }
 
 
-    /**
-     * 判断键值对是否存在
-     *
-     * @param key 键
-     * @return 键值对是否存在
-     */
+    
     public static boolean containsKey(String key) {
         return getsMMKV().containsKey(key);
     }
 
-    /**
-     * 清除指定键值对
-     *
-     * @param key 键
-     */
+    
     public static void remove(String key) {
         getsMMKV().remove(key).apply();
     }

@@ -26,11 +26,7 @@ public class WebViewInterceptDialog extends AppCompatActivity implements DialogI
     public static final String APP_LINK_ACTION = "com.xuexiang.xui.applink";
     private static final String KEY_INTERCEPT_URL = "key_intercept_url";
 
-    /**
-     * 显示WebView拦截提示
-     *
-     * @param url 需要拦截处理的url
-     */
+    
     public static void show(String url) {
         ActivityUtils.startActivity(WebViewInterceptDialog.class, KEY_INTERCEPT_URL, url);
     }

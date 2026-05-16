@@ -22,11 +22,7 @@ public class UpdateTipDialog extends AppCompatActivity implements DialogInterfac
 
     private static final String DOWNLOAD_URL = "https://gitee.com/hx_a/campus_app_android/releases/tag/1.0";
 
-    /**
-     * 显示版本更新重试提示弹窗
-     *
-     * @param content
-     */
+    
     public static void show(String content) {
         Intent intent = new Intent(XUpdate.getContext(), UpdateTipDialog.class);
         intent.putExtra(KEY_CONTENT, content);

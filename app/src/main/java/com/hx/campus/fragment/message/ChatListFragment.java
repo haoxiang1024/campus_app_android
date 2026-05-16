@@ -17,11 +17,7 @@ import io.rong.imkit.widget.adapter.ViewHolder;
 @Page
 public class ChatListFragment extends ConversationListFragment {
 
-    /**
-     * 视图创建完成回调
-     * @param view Fragment的根视图
-     * @param savedInstanceState 保存的状态数据
-     */
+    
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         // 调用父类的视图创建方法

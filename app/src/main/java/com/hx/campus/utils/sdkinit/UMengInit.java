@@ -23,16 +23,12 @@ public final class UMengInit {
         throw new UnsupportedOperationException("u can't instantiate me...");
     }
 
-    /**
-     * 初始化SDK,合规指南【先进行预初始化，如果用户隐私同意后可以初始化UmengSDK进行信息上报】
-     */
+    
     public static void init() {
         init(XUI.getContext());
     }
 
-    /**
-     * 初始化SDK,合规指南【先进行预初始化，如果用户隐私同意后可以初始化UmengSDK进行信息上报】
-     */
+    
     public static void init(@NonNull Context context) {
         Context appContext = context.getApplicationContext();
         if (appContext instanceof Application) {
@@ -40,9 +36,7 @@ public final class UMengInit {
         }
     }
 
-    /**
-     * 初始化SDK,合规指南【先进行预初始化，如果用户隐私同意后可以初始化UmengSDK进行信息上报】
-     */
+    
     public static void init(Application application) {
         // 运营统计数据调试运行时不初始化
         if (MyApp.isDebug()) {
@@ -56,9 +50,7 @@ public final class UMengInit {
         }
     }
 
-    /**
-     * 真实的初始化UmengSDK【进行设备信息的统计上报，必须在获得用户隐私同意后方可调用】
-     */
+    
     private static void realInit(Application application) {
         // 运营统计数据调试运行时不初始化
         if (MyApp.isDebug()) {
@@ -72,12 +64,7 @@ public final class UMengInit {
         MobclickAgent.setPageCollectionMode(MobclickAgent.PageMode.AUTO);
     }
 
-    /**
-     * 获取渠道信息
-     *
-     * @param context
-     * @return
-     */
+    
     public static String getChannel(final Context context) {
         return WalleChannelReader.getChannel(context, DEFAULT_CHANNEL_ID);
     }

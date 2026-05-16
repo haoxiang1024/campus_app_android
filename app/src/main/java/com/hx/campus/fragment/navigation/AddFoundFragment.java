@@ -82,9 +82,7 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Callback;
 
-/**
- * 处理用户发布招领信息功能
- */
+
 @Page
 public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
     public static final int CHOOSE_PHOTO = 1;

@@ -32,10 +32,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-/**
- * Retrofit 客户端工具类
- * 负责创建和管理 Retrofit 实例，处理 HTTP 请求的拦截器、Token 认证、响应解析等功能
- */
+
 public class RetrofitClient {
     private static volatile RetrofitClient mInstance;
     private Retrofit retrofit;
@@ -43,10 +40,7 @@ public class RetrofitClient {
     private static final Gson gson = new Gson();
     private final AtomicBoolean isExiting = new AtomicBoolean(false);
 
-    /**
-     * API 响应数据结构
-     * 用于解析后端返回的统一响应格式
-     */
+    
     private static class ApiResponse {
         private int status;
         private Object data;
@@ -61,12 +55,7 @@ public class RetrofitClient {
         }
     }
 
-    /**
-     * 私有构造函数，初始化 Retrofit 实例
-     * 配置 Token 拦截器和认证拦截器，处理日期格式化
-     *
-     * @param baseUrl API 基础 URL
-     */
+    
     private RetrofitClient(String baseUrl) {
         // Token 拦截器：为请求添加 Authorization 头
         Interceptor tokenInterceptor = chain -> {
@@ -150,12 +139,7 @@ public class RetrofitClient {
                 .build();
     }
 
-    /**
-     * 处理强制退出逻辑
-     * 断开融云连接、清除 Token、退出所有页面并跳转到登录页
-     *
-     * @param reason 退出原因提示
-     */
+    
     public void handleForceLogout(String reason) {
         // 使用原子布尔保证只执行一次退出逻辑
         if (!isExiting.compareAndSet(false, true)) {
@@ -181,12 +165,7 @@ public class RetrofitClient {
         });
     }
 
-    /**
-     * 获取 RetrofitClient 单例实例
-     *
-     * @return RetrofitClient 实例
-     * @throws RuntimeException 如果未先调用 init() 方法初始化
-     */
+    
     public static RetrofitClient getInstance() {
         if (mInstance == null) {
             throw new RuntimeException("请先调用 init() 初始化 RetrofitClient");
@@ -194,12 +173,7 @@ public class RetrofitClient {
         return mInstance;
     }
 
-    /**
-     * 初始化 RetrofitClient 单例
-     * 使用双重检查锁定确保线程安全
-     *
-     * @param context 上下文对象
-     */
+    
     public static void init(Context context) {
         if (mInstance == null) {
             // 使用同步锁确保线程安全
@@ -213,22 +187,12 @@ public class RetrofitClient {
         }
     }
 
-    /**
-     * 获取 API 服务接口实例
-     *
-     * @return ApiService 接口实例
-     */
+    
     public ApiService getApi() {
         return retrofit.create(ApiService.class);
     }
 
-    /**
-     * 解析日期字符串
-     * 支持多种日期格式，包括 CST 格式和常见 ISO 8601 格式
-     *
-     * @param dateStr 日期字符串
-     * @return 解析后的 Date 对象，解析失败返回 null
-     */
+    
     private Date parseDateString(String dateStr) {
         // 解析 CST 时区格式
         if (dateStr.contains("CST")) {

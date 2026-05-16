@@ -19,9 +19,7 @@ public final class XBasicLibInit {
         throw new UnsupportedOperationException("u can't instantiate me...");
     }
 
-    /**
-     * 初始化基础库SDK
-     */
+    
     public static void init(Application application) {
         //工具类
         initXUtil(application);
@@ -42,18 +40,14 @@ public final class XBasicLibInit {
         initRouter(application);
     }
 
-    /**
-     * 初始化XUtil工具类
-     */
+    
     private static void initXUtil(Application application) {
         XUtil.init(application);
         XUtil.debug(MyApp.isDebug());
         TokenUtils.init(application);
     }
 
-    /**
-     * 初始化XHttp2
-     */
+    
     private static void initXHttp2(Application application) {
         //初始化网络请求框架，必须首先执行
         XHttpSDK.init(application);
@@ -70,9 +64,7 @@ public final class XBasicLibInit {
 //        XHttpSDK.addInterceptor(new CustomExpiredInterceptor());
     }
 
-    /**
-     * 初始化XPage页面框架
-     */
+    
     private static void initXPage(Application application) {
         PageConfig.getInstance()
                 .debug(MyApp.isDebug())
@@ -80,9 +72,7 @@ public final class XBasicLibInit {
                 .init(application);
     }
 
-    /**
-     * 初始化XAOP
-     */
+    
 //    private static void initXAOP(Application application) {
 //        XAOP.init(application);
 //        XAOP.debug(MyApp.isDebug());
@@ -90,17 +80,13 @@ public final class XBasicLibInit {
 //        XAOP.setOnPermissionDeniedListener(permissionsDenied -> XToastUtils.error("权限申请被拒绝:" + StringUtils.listToString(permissionsDenied, ",")));
 //    }
 
-    /**
-     * 初始化XUI框架
-     */
+    
     private static void initXUI(Application application) {
         XUI.init(application);
         XUI.debug(MyApp.isDebug());
     }
 
-    /**
-     * 初始化路由框架
-     */
+    
     private static void initRouter(Application application) {
         // 这两行必须写在init之前，否则这些配置在init过程中将无效
         if (MyApp.isDebug()) {

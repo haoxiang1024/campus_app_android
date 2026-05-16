@@ -8,21 +8,10 @@ import com.xuexiang.xhttp2.subsciber.impl.IProgressLoader;
 public interface IProgressLoaderFactory {
 
 
-    /**
-     * 创建进度加载者
-     *
-     * @param context
-     * @return
-     */
+    
     IProgressLoader create(Context context);
 
 
-    /**
-     * 创建进度加载者
-     *
-     * @param context
-     * @param message 默认提示
-     * @return
-     */
+    
     IProgressLoader create(Context context, String message);
 }

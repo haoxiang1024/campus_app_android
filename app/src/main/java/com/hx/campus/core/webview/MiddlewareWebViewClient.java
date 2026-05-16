@@ -25,12 +25,7 @@ public class MiddlewareWebViewClient extends MiddlewareWebClientBase {
     public MiddlewareWebViewClient() {
     }
 
-    /**
-     * 判断是否存在广告的链接
-     *
-     * @param url
-     * @return
-     */
+    
     private static boolean hasAdUrl(String url) {
         String[] adUrls = ResUtils.getStringArray(R.array.adBlockUrl);
         for (String adUrl : adUrls) {
@@ -86,9 +81,7 @@ public class MiddlewareWebViewClient extends MiddlewareWebClientBase {
         }
     }
 
-    /**
-     * 根据url的scheme处理跳转第三方app的业务,true代表拦截，false代表不拦截
-     */
+    
     private boolean shouldOverrideUrlLoadingByApp(WebView webView, final String url) {
         if (url.startsWith("http") || url.startsWith("https") || url.startsWith("ftp")) {
             //不拦截http, https, ftp的请求

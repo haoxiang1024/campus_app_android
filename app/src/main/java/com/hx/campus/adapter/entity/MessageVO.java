@@ -3,9 +3,7 @@ package com.hx.campus.adapter.entity;
 import java.util.Date;
 import java.util.List;
 
-/**
- * 留言展示视图对象 (包含用户头像和昵称)
- */
+
 public class MessageVO {
     private Integer id;
     private Integer userId;

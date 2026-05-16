@@ -1,12 +1,4 @@
-/**
- * 聊天对话Activity
- * 负责处理用户间的一对一聊天功能
- * 集成融云IMKit，提供完整的聊天界面和功能
- * 
- * @author 开发团队
- * @version 1.0.0
- * @since 2024
- */
+
 package com.hx.campus.activity;
 
 import android.os.Bundle;
@@ -29,13 +21,10 @@ import io.rong.imkit.userinfo.model.GroupUserInfo;
 import io.rong.imlib.model.Group;
 import io.rong.imlib.model.UserInfo;
 
-/**
- * 聊天对话页面Activity
- * 继承自AppCompatActivity，提供完整的聊天体验
- */
+
 public class ConversationActivity extends AppCompatActivity {
 
-    /** 用户信息观察者，用于监听用户信息变化 */
+    
     private RongUserInfoManager.UserDataObserver userDataObserver;
     ConversationFragment fragment;
     private void background(@NonNull View view) {
@@ -44,12 +33,7 @@ public class ConversationActivity extends AppCompatActivity {
         int backgroundColor = typedValue.data;
         view.setBackgroundColor(backgroundColor);
     }
-    /**
-     * Activity创建时的初始化方法
-     * 设置布局、挂载聊天Fragment、配置标题栏和用户信息监听
-     * 
-     * @param savedInstanceState 保存的状态数据
-     */
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -117,10 +101,7 @@ public class ConversationActivity extends AppCompatActivity {
         setBtn();
     }
 
-    /**
-     * 自定义发送按钮样式
-     * 通过监听布局变化来动态调整发送按钮的外观
-     */
+    
     private void setBtn() {
         View root = findViewById(android.R.id.content);
         root.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
@@ -145,10 +126,7 @@ public class ConversationActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Activity销毁时的清理工作
-     * 移除用户信息观察者，避免内存泄漏
-     */
+    
     @Override
     protected void onDestroy() {
         super.onDestroy();

@@ -1,13 +1,6 @@
 
 
-/**
- * 校园应用主程序入口类
- * 负责整个应用的初始化工作，包括第三方SDK配置、即时通讯服务初始化等
- * 
- * @author 开发团队
- * @version 1.0.0
- * @since 2024
- */
+
 package com.hx.campus;
 
 import android.app.Application;
@@ -56,25 +49,15 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/**
- * 应用程序主类，继承自Application
- * 处理应用启动时的各项初始化工作
- */
+
 public class MyApp extends Application {
     private static Context mContext; // 保存 context 用于跳转
 
-    /**
-     * 检查当前是否为调试模式
-     * @return true表示调试模式，false表示发布模式
-     */
+    
     public static boolean isDebug() {
         return BuildConfig.DEBUG;
     }
-    /**
-     * 应用程序启动时最先调用的方法
-     * 主要用于解决Android 4.x版本的多dex支持问题
-     * @param base 应用上下文
-     */
+    
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
@@ -82,10 +65,7 @@ public class MyApp extends Application {
         MultiDex.install(this);
     }
 
-    /**
-     * 应用程序创建时的核心初始化方法
-     * 按顺序初始化各种基础库和服务
-     */
+    
     @Override
     public void onCreate() {
         super.onCreate();
@@ -108,9 +88,7 @@ public class MyApp extends Application {
         SDKInitializer.setCoordType(CoordType.BD09LL);
     }
 
-    /**
-     * 初始化全局的消息监听
-     */
+    
     public static void initMsgListener() {
         RongCoreClient.setConnectionStatusListener(status -> {
             // 如果状态是：用户被封禁 (CONN_USER_BLOCKED)
@@ -151,10 +129,7 @@ public class MyApp extends Application {
         mContext.startActivity(intent);
     }
 
-    /**
-     * 初始化融云即时通讯SDK
-     * 包括SDK初始化、路由配置、用户信息提供者设置等
-     */
+    
     private void initIM() {
         // 获取融云AppKey配置
         String appKey = Utils.getAppKey(this);
@@ -171,10 +146,7 @@ public class MyApp extends Application {
         // 配置消息通知相关设置
         notification();
     }
-    /**
-     * 配置消息通知通道
-     * 主要针对Android 8.0及以上版本的通知渠道设置
-     */
+    
     private void notification() {
         String NEW_CHANNEL_ID = "rc_notification_id_v2";
         NotificationChannel channel = null;
@@ -206,11 +178,7 @@ public class MyApp extends Application {
     }
 
 
-    /**
-     * 从服务器获取用户信息
-     * 用于即时通讯中动态更新用户资料
-     * @param userId 用户唯一标识符
-     */
+    
     private void fetchUserInfoFromServer(String userId) {
         RetrofitClient.getInstance().getApi().getUserInfo(Integer.parseInt(userId)).enqueue(new Callback<User>() {
             @Override
@@ -239,15 +207,11 @@ public class MyApp extends Application {
 
             @Override
             public void onFailure(Call<User> call, Throwable t) {
-                Utils.showResponse("用户请求失败: " + t.getMessage());
             }
         });
     }
 
-    /**
-     * 初始化应用所需的各种基础库
-     * 按照依赖关系有序初始化各个功能模块
-     */
+    
     private void initLibs() {
         // 初始化X系列UI基础库（XUI框架）
         XBasicLibInit.init(this);

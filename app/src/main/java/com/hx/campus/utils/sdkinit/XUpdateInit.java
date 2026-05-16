@@ -15,9 +15,7 @@ import com.xuexiang.xutil.common.StringUtils;
 
 public final class XUpdateInit {
 
-    /**
-     * 应用版本更新的检查地址
-     */
+    
     private static final String KEY_UPDATE_URL = "";
 
     private XUpdateInit() {
@@ -43,20 +41,12 @@ public final class XUpdateInit {
                 .init(application);
     }
 
-    /**
-     * 进行版本更新检查
-     */
+    
     public static void checkUpdate(Context context, boolean needErrorTip) {
         checkUpdate(context, KEY_UPDATE_URL, needErrorTip);
     }
 
-    /**
-     * 进行版本更新检查
-     *
-     * @param context      上下文
-     * @param url          版本更新检查的地址
-     * @param needErrorTip 是否需要错误的提示
-     */
+    
     private static void checkUpdate(Context context, String url, boolean needErrorTip) {
         if (StringUtils.isEmpty(url)) {
             return;

@@ -22,14 +22,10 @@ public class ServiceProtocolFragment extends BaseFragment<FragmentServiceProtoco
 
     public static final String KEY_PROTOCOL_TITLE = "key_protocol_title";
     public static final String KEY_IS_IMMERSIVE = "key_is_immersive";
-    /**
-     * 用户协议asset本地保存路径
-     */
+    
     private static final String ACCOUNT_PROTOCOL_ASSET_PATH = "protocol/account_protocol.txt";
 
-    /**
-     * 隐私政策asset本地保存路径
-     */
+    
     private static final String PRIVACY_PROTOCOL_ASSET_PATH = "protocol/privacy_protocol.txt";
 
     @AutoWired(name = KEY_PROTOCOL_TITLE)
@@ -53,9 +49,7 @@ public class ServiceProtocolFragment extends BaseFragment<FragmentServiceProtoco
         return super.initTitle().setTitle(title).setImmersive(isImmersive);
     }
 
-    /**
-     * 初始化控件
-     */
+    
     @Override
     protected void initViews() {
         if (title.equals(ResUtils.getString(R.string.title_user_protocol))) {

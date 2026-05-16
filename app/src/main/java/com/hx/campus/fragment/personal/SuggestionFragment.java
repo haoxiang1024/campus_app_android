@@ -19,28 +19,18 @@ import com.xuexiang.xui.widget.textview.supertextview.SuperTextView;
 public class SuggestionFragment extends BaseFragment<FragmentSuggestionBinding> implements SuperTextView.OnSuperTextViewClickListener, View.OnClickListener {
 
 
-    /**
-     * 构建ViewBinding
-     *
-     * @param inflater  inflater
-     * @param container 容器
-     * @return ViewBinding
-     */
+    
     @NonNull
     @Override
     protected FragmentSuggestionBinding viewBindingInflate(@NonNull LayoutInflater inflater, ViewGroup container, boolean attachToRoot)  {
         return FragmentSuggestionBinding.inflate(inflater, container, attachToRoot);
     }
-    /**
-     * 获取页面标题
-     */
+    
     @Override
     protected String getPageTitle() {
         return getResources().getString(R.string.help);
     }
-    /**
-     * 初始化控件
-     */
+    
     @Override
     protected void initViews() {
 
@@ -76,11 +66,7 @@ public class SuggestionFragment extends BaseFragment<FragmentSuggestionBinding> 
 
     }
 
-    /**
-     * Called when a view has been clicked.
-     *
-     * @param v The view that was clicked.
-     */
+    
     @Override
     public void onClick(View v) {
 

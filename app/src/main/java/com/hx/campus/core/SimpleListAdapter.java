@@ -47,13 +47,9 @@ public class SimpleListAdapter extends BaseListAdapter<Map<String, String>, Simp
     }
 
     public static class ViewHolder {
-        /**
-         * 标题
-         */
+        
         public TextView mTvTitle;
-        /**
-         * 副标题
-         */
+        
         public TextView mTvSubTitle;
     }
 }

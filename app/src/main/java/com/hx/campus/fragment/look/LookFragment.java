@@ -21,13 +21,7 @@ import com.xuexiang.xui.widget.textview.supertextview.SuperTextView;
 @Page(anim = CoreAnim.none)
 public class LookFragment extends BaseFragment<FragmentTrendingBinding> implements SuperTextView.OnSuperTextViewClickListener {
 
-    /**
-     * 创建视图绑定对象
-     * @param inflater 布局填充器
-     * @param container 父容器
-     * @param attachToRoot 是否附加到根布局
-     * @return FragmentTrendingBinding 视图绑定实例
-     */
+    
     @NonNull
     @Override
     protected FragmentTrendingBinding viewBindingInflate(@NonNull LayoutInflater inflater, ViewGroup container, boolean attachToRoot)  {
@@ -35,28 +29,19 @@ public class LookFragment extends BaseFragment<FragmentTrendingBinding> implemen
         return FragmentTrendingBinding.inflate(inflater, container, attachToRoot);
     }
 
-    /**
-     * 初始化标题栏
-     * @return TitleBar 标题栏对象，返回null表示不使用默认标题栏
-     */
+    
     @Override
     protected TitleBar initTitle() {
         // 查看信息页面不需要显示标题栏
         return null;
     }
 
-    /**
-     * 初始化视图控件
-     * 当前页面主要通过XML布局定义控件，无需额外初始化
-     */
+    
     @Override
     protected void initViews() {
     }
 
-    /**
-     * 初始化事件监听器
-     * 为失物和招领按钮设置点击监听
-     */
+    
     @Override
     protected void initListeners() {
         // 调用父类监听器初始化
@@ -71,11 +56,7 @@ public class LookFragment extends BaseFragment<FragmentTrendingBinding> implemen
 
     }
 
-    /**
-     * 处理SuperTextView点击事件
-     * 根据点击的按钮跳转到相应的信息页面
-     * @param view 被点击的SuperTextView控件
-     */
+    
     @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(SuperTextView view) {

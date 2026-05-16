@@ -8,26 +8,18 @@ import com.xuexiang.xutil.common.logger.Logger;
 public final class ANRWatchDogInit {
 
     private static final String TAG = "ANRWatchDog";
-    /**
-     * ANR监听触发的时间
-     */
+    
     private static final int ANR_DURATION = 4000;
-    /**
-     * ANR静默处理【就是不处理，直接记录一下日志】
-     */
+    
     private final static ANRWatchDog.ANRListener SILENT_LISTENER = error -> Logger.eTag(TAG, error);
-    /**
-     * ANR自定义处理【可以是记录日志用于上传】
-     */
+    
     private final static ANRWatchDog.ANRListener CUSTOM_LISTENER = error -> {
         Logger.eTag(TAG, "Detected Application Not Responding!", error);
         //这里进行ANR的捕获后的操作
 
         throw error;
     };
-    /**
-     * ANR看门狗
-     */
+    
     private static ANRWatchDog sANRWatchDog;
 
     private ANRWatchDogInit() {

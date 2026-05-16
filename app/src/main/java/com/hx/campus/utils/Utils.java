@@ -1,13 +1,5 @@
 
-/**
- * 应用核心工具类
- * 提供各种常用的工具方法，包括隐私政策处理、页面跳转、颜色处理等
- * 采用单例模式设计，防止被实例化
- * 
- * @author 开发团队
- * @version 1.0.0
- * @since 2024
- */
+
 package com.hx.campus.utils;
 
 import static com.hx.campus.core.webview.AgentWebFragment.KEY_URL;
@@ -75,31 +67,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-/**
- * 工具类集合，提供应用所需的各类辅助方法
- * 使用final修饰防止继承，构造函数私有化防止实例化
- */
+
 public final class Utils {
 
-    /** 应用隐私政策网页地址 */
+    
     private static final String PRIVACY_URL = "https://gitee.com/hx_a/campus_app_android/blob/master/LICENSE";
 
-    /**
-     * 私有构造函数
-     * 防止工具类被实例化
-     */
+    
     private Utils() {
         throw new UnsupportedOperationException("工具类不允许被实例化");
     }
 
-    /**
-     * 显示隐私政策确认对话框
-     * 实现用户隐私政策同意流程，包含多次确认机制
-     * 
-     * @param context 上下文环境
-     * @param submitListener 用户同意隐私政策的回调监听器
-     * @return 创建的对话框实例
-     */
+    
     public static Dialog showPrivacyDialog(Context context, MaterialDialog.SingleButtonCallback submitListener) {
         // 构建隐私政策确认对话框
         MaterialDialog dialog = new MaterialDialog.Builder(context)
@@ -162,13 +141,7 @@ public final class Utils {
         return dialog;
     }
 
-    /**
-     * 构造隐私政策说明文本
-     * 包含可点击的超链接，引导用户查看完整隐私政策
-     * 
-     * @param context 上下文环境
-     * @return 格式化的隐私政策说明文本
-     */
+    
     private static SpannableStringBuilder getPrivacyContent(Context context) {
         SpannableStringBuilder stringBuilder = new SpannableStringBuilder()
                 .append("    欢迎来到").append(ResUtils.getString(R.string.app_name)).append("!\n")
@@ -185,13 +158,7 @@ public final class Utils {
         return stringBuilder;
     }
 
-    /**
-     * 创建可点击的隐私政策链接文本
-     * 
-     * @param context 上下文环境
-     * @param privacyUrl 隐私政策网页地址
-     * @return 可点击的SpannableString对象
-     */
+    
     private static SpannableString getPrivacyLink(Context context, String privacyUrl) {
         String privacyName = String.format(ResUtils.getString(R.string.lab_privacy_name), ResUtils.getString(R.string.app_name));
         SpannableString spannableString = new SpannableString(privacyName);
@@ -209,13 +176,7 @@ public final class Utils {
     }
 
 
-    /**
-     * 在内置WebView中打开网页
-     * 使用应用内浏览器而非系统浏览器，提供更好的用户体验
-     * 
-     * @param context 上下文环境
-     * @param url 要打开的网页地址
-     */
+    
     public static void goWeb(Context context, final String url) {
         Intent intent = new Intent(context, AgentWebActivity.class);
         intent.putExtra(KEY_URL, url);
@@ -223,13 +184,7 @@ public final class Utils {
     }
 
 
-    /**
-     * 跳转到协议页面（用户协议或隐私协议）
-     * 
-     * @param fragment 当前Fragment实例
-     * @param isPrivacy true表示隐私协议，false表示用户协议
-     * @param isImmersive 是否使用沉浸式状态栏
-     */
+    
     public static void gotoProtocol(XPageFragment fragment, boolean isPrivacy, boolean isImmersive) {
         PageOption.to(ServiceProtocolFragment.class)
                 .putString(KEY_PROTOCOL_TITLE, isPrivacy ? ResUtils.getString(R.string.title_privacy_protocol) : ResUtils.getString(R.string.title_user_protocol))
@@ -237,22 +192,12 @@ public final class Utils {
                 .open(fragment);
     }
 
-    /**
-     * 判断颜色是否为深色
-     * 用于自动调整文字颜色以确保良好的对比度
-     * 
-     * @param color 要判断的颜色值
-     * @return true表示深色，false表示浅色
-     */
+    
     public static boolean isColorDark(@ColorInt int color) {
         return ColorUtils.isColorDark(color, 0.382);
     }
 
-    /**
-     * @param reurl   需要构造的url
-     * @param context 上下文
-     * @return 返回url
-     */
+    
 
 
     public static String rebuildUrl(String reurl, Context context) {
@@ -340,9 +285,7 @@ public final class Utils {
         return obj;
     }
 
-    /**
-     * 图片真实路径获取
-     */
+    
     public static String getRealPath(Context context, Intent data) {
         // 判断手机系统版本号
         if (Build.VERSION.SDK_INT >= 19) {
@@ -421,9 +364,7 @@ public final class Utils {
         Utils.saveBean2Sp(getContext(), user, "User", "user");
     }
 
-    /**
-     * 从 assets/config.properties 文件中读取指定的 key 值
-     */
+    
     public static String getPropertyFromAssets(Context context, String key) {
         String value = "";
         try {
@@ -459,10 +400,7 @@ public final class Utils {
             return "http://192.168.254.122:8081/school/"; // 备选默认值
         }
     }
-    /**
-     * 智能时间格式化
-     *
-     */
+    
     public static String formatCommentTime(String timeStr) {
         if (TextUtils.isEmpty(timeStr)) return "";
         try {
@@ -508,10 +446,7 @@ public final class Utils {
             return timeStr;
         }
     }
-    /**
-     * @param oldPic 原图地址
-     * @return 新图地址
-     */
+    
     public static String getImageUrl(String oldPic, Context context) {
         Pattern pattern = Pattern.compile(".*http.*");
         Matcher matcher = pattern.matcher(oldPic); // 将正则表达式应用到输入字符串上

@@ -161,11 +161,7 @@ public class MyCommentsFragment extends BaseFragment<LayoutCommonListBinding> {
         });
     }
 
-    /**
-     * 删除评论接口调用
-     * @param commentId 评论ID
-     * @param position 列表位置
-     */
+    
     private void deleteCommentApi(Integer commentId, int position) {
         if (commentId == null) {
             Utils.showResponse("出错了");
@@ -196,9 +192,7 @@ public class MyCommentsFragment extends BaseFragment<LayoutCommonListBinding> {
         });
     }
 
-    /**
-     * 根据数据量切换空状态和列表的显示
-     */
+    
     private void checkEmptyState() {
         if (mAdapter.getItemCount() == 0) {
             binding.layoutEmpty.setVisibility(View.VISIBLE);
