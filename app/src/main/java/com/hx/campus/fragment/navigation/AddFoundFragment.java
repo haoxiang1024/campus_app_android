@@ -226,14 +226,16 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
         baiduMap.setOnMapClickListener(new BaiduMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
+                //点击地图 反地理编码（坐标→地址）
                 geoCoder.reverseGeoCode(new ReverseGeoCodeOption().location(latLng));
             }
             @Override
             public void onMapPoiClick(MapPoi mapPoi) {
+                //点击地图上的兴趣点直接获取POI名称和坐标
                 updateSelection(mapPoi.getPosition(), mapPoi.getName(), tvAddress, baiduMap);
             }
         });
-
+        //关键词搜索地点 调用百度Web API
         btnSearch.setOnClickListener(v -> {
             String keyword = etSearch.getText().toString().trim();
 
