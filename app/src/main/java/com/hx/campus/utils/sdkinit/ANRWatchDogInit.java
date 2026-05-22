@@ -15,7 +15,7 @@ public final class ANRWatchDogInit {
     
     private final static ANRWatchDog.ANRListener CUSTOM_LISTENER = error -> {
         Logger.eTag(TAG, "Detected Application Not Responding!", error);
-        //这里进行ANR的捕获后的操作
+
 
         throw error;
     };
@@ -27,14 +27,14 @@ public final class ANRWatchDogInit {
     }
 
     public static void init() {
-        //这里设置监听的间隔为2秒
+
         sANRWatchDog = new ANRWatchDog(2000);
         sANRWatchDog.setANRInterceptor(duration -> {
             long ret = ANR_DURATION - duration;
             if (ret > 0) {
                 Logger.wTag(TAG, "Intercepted ANR that is too short (" + duration + " ms), postponing for " + ret + " ms.");
             }
-            //当返回是0或者负数时，就会触发ANR监听回调
+
             return ret;
         }).setANRListener(SILENT_LISTENER).start();
     }

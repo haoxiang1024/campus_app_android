@@ -38,13 +38,13 @@ public final class UMengInit {
 
     
     public static void init(Application application) {
-        // 运营统计数据调试运行时不初始化
+
         if (MyApp.isDebug()) {
             return;
         }
         UMConfigure.setLogEnabled(false);
         UMConfigure.preInit(application, BuildConfig.APP_ID_UMENG, getChannel(application));
-        // 用户同意了隐私协议
+
         if (SettingUtils.isAgreePrivacy()) {
             realInit(application);
         }
@@ -52,14 +52,14 @@ public final class UMengInit {
 
     
     private static void realInit(Application application) {
-        // 运营统计数据调试运行时不初始化
+
         if (MyApp.isDebug()) {
             return;
         }
-        //第二个参数是appkey，最后一个参数是pushSecret
+
         UMConfigure.init(application, BuildConfig.APP_ID_UMENG, getChannel(application), UMConfigure.DEVICE_TYPE_PHONE, "");
-        //统计SDK是否支持采集在子进程中打点的自定义事件，默认不支持
-        //支持多进程打点
+
+
         UMConfigure.setProcessEvent(true);
         MobclickAgent.setPageCollectionMode(MobclickAgent.PageMode.AUTO);
     }

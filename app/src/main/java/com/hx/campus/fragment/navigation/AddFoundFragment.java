@@ -200,7 +200,7 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
             }
         });
     }
-    // 初始化弹窗与地图检索
+
     private void showMapChooseDialog() {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_map_choose, null);
         EditText etSearch = view.findViewById(R.id.et_map_search);
@@ -210,7 +210,7 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
         BaiduMap baiduMap = mapView.getMap();
         tvAddress.setText("当前选中位置：请搜索或点击地图");
 
-        // 反地理编码
+
         GeoCoder geoCoder = GeoCoder.newInstance();
         geoCoder.setOnGetGeoCodeResultListener(new OnGetGeoCoderResultListener() {
             @Override
@@ -226,16 +226,16 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
         baiduMap.setOnMapClickListener(new BaiduMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                //点击地图 反地理编码（坐标→地址）
+
                 geoCoder.reverseGeoCode(new ReverseGeoCodeOption().location(latLng));
             }
             @Override
             public void onMapPoiClick(MapPoi mapPoi) {
-                //点击地图上的兴趣点直接获取POI名称和坐标
+
                 updateSelection(mapPoi.getPosition(), mapPoi.getName(), tvAddress, baiduMap);
             }
         });
-        //关键词搜索地点 调用百度Web API
+
         btnSearch.setOnClickListener(v -> {
             String keyword = etSearch.getText().toString().trim();
 
@@ -249,13 +249,13 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
                                 if (response.isSuccessful() && response.body() != null) {
                                     com.hx.campus.adapter.entity.BaiduPoiResponse poiResponse = response.body();
 
-                                    // 百度Web API 状态码 0 表示成功
+
                                     if (poiResponse.getStatus() == 0 && poiResponse.getResults() != null && !poiResponse.getResults().isEmpty()) {
-                                        // 取第一条检索结果
+
                                         com.hx.campus.adapter.entity.BaiduPoiResponse.BaiduPoiResult firstResult = poiResponse.getResults().get(0);
 
                                         LatLng latLng = new LatLng(firstResult.getLocation().getLat(), firstResult.getLocation().getLng());
-                                        // 更新地图和选中地址显示
+
                                         updateSelection(latLng, firstResult.getAddress() + "（" + firstResult.getName() + "）", tvAddress, baiduMap);
                                     } else {
                                         String errMsg = poiResponse.getStatus() == 0 ? "未找到该地点" : "检索失败，错误码: " + poiResponse.getStatus();
@@ -291,7 +291,7 @@ public class AddFoundFragment extends BaseFragment<FragmentAddFoundBinding> {
                 })
                 .show();
     }
-    // 更新地图标记点
+
     private void updateSelection(LatLng latLng, String address, TextView tvAddress, BaiduMap baiduMap) {
         baiduMap.clear();
         baiduMap.addOverlay(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.fromResource(android.R.drawable.ic_menu_mylocation)));

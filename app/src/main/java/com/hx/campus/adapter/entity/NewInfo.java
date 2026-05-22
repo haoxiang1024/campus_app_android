@@ -51,13 +51,13 @@ public class NewInfo {
     
     private Integer user_id;
     
-    private String uniquekey;//新闻唯一码用于获取新闻内容
+    private String uniquekey;
     
-    private String State;//状态
+    private String State;
     
-    private String Phone;//联系方式
+    private String Phone;
     
-    private String Place;//地点
+    private String Place;
     
     @SerializedName("pubDate")
     private Date pub_date;

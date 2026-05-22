@@ -42,7 +42,7 @@ public class ResetPwdFragment extends BaseFragment<FragmentResetPwdBinding> impl
     protected void initViews() {
         mCountDownHelper = new CountDownButtonHelper(binding.btnGetVerifyCode, 60);
 
-        // 切换新密码可见状态
+
         binding.ivPwdToggle.setOnClickListener(v -> {
             isPasswordVisible = !isPasswordVisible;
             if (isPasswordVisible) {
@@ -55,7 +55,7 @@ public class ResetPwdFragment extends BaseFragment<FragmentResetPwdBinding> impl
             binding.etPassword.setSelection(binding.etPassword.getText().length());
         });
 
-        // 切换确认密码可见状态
+
         binding.ivRepwdToggle.setOnClickListener(v -> {
             isRePasswordVisible = !isRePasswordVisible;
             if (isRePasswordVisible) {
@@ -97,19 +97,19 @@ public class ResetPwdFragment extends BaseFragment<FragmentResetPwdBinding> impl
         String code = binding.inputCode.getEditValue();
         String email = binding.inputEmail.getEditValue();
 
-        // 校验输入项非空
+
         if (TextUtils.isEmpty(number) || TextUtils.isEmpty(password) || TextUtils.isEmpty(repassword) || TextUtils.isEmpty(code) || TextUtils.isEmpty(email)) {
             Utils.showResponse("请填写完整信息");
             return;
         }
 
-        // 校验密码一致性
+
         if (!password.equals(repassword)) {
             Utils.showResponse("两次密码不一致");
             return;
         }
 
-        // 提交验证码校验
+
         RetrofitClient.getInstance().getApi().verifyCode(email, code).enqueue(new Callback<Result<Object>>() {
             @Override
             public void onResponse(@NonNull Call<Result<Object>> call, @NonNull Response<Result<Object>> response) {
@@ -132,7 +132,7 @@ public class ResetPwdFragment extends BaseFragment<FragmentResetPwdBinding> impl
     }
 
     private void resetPassword(String number, String password) {
-        // 提交密码重置请求
+
         RetrofitClient.getInstance().getApi().resetPwd(number, password).enqueue(new Callback<Result<Object>>() {
             @Override
             public void onResponse(@NonNull Call<Result<Object>> call, @NonNull Response<Result<Object>> response) {
@@ -157,7 +157,7 @@ public class ResetPwdFragment extends BaseFragment<FragmentResetPwdBinding> impl
     }
 
     private void handlePostResetLogic() {
-        // 清除登录态并跳转至登录页
+
         TokenUtils.handleLogoutSuccess();
         gotoLogin();
     }
@@ -165,7 +165,7 @@ public class ResetPwdFragment extends BaseFragment<FragmentResetPwdBinding> impl
     private void gotoLogin() {
         if (getActivity() == null) return;
         Intent intent = new Intent(getActivity(), MainActivity.class);
-        // 增加冷启动标识
+
         intent.setAction(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -175,12 +175,12 @@ public class ResetPwdFragment extends BaseFragment<FragmentResetPwdBinding> impl
     private void send() {
         String email = binding.inputEmail.getEditValue();
 
-        // 校验邮箱输入非空
+
         if (TextUtils.isEmpty(email)) {
             Utils.showResponse("请输入邮箱");
             return;
         }
-        // 校验缓存用户邮箱一致性
+
         User user = Utils.getBeanFromSp(getContext(), "User", "user");
         if (user != null && !TextUtils.equals(user.getEmail(), email)) {
             Utils.showResponse("只能向你绑定的邮箱发送验证码");
@@ -189,7 +189,7 @@ public class ResetPwdFragment extends BaseFragment<FragmentResetPwdBinding> impl
 
         mCountDownHelper.start();
 
-        // 提交发送验证码请求
+
         RetrofitClient.getInstance().getApi().sendCode(email).enqueue(new Callback<Result<Object>>() {
             @Override
             public void onResponse(@NonNull Call<Result<Object>> call, @NonNull Response<Result<Object>> response) {

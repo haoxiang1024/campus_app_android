@@ -9,8 +9,8 @@ public class CommentDataUtils {
 
     
     public static List<Comment> flattenComments(List<Comment> originalList) {
-        //实现了评论树的扁平化处理 遍历所有一级评论，对每个一级评论的子回复进行深度优先的递归收集。
-        //扁平化后，一级评论的replies字段不再是嵌套的树形结构，而是一个按展示顺序排列的平铺列表
+
+
         List<Comment> result = new ArrayList<>();
         if (originalList == null) {
             return result;

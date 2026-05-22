@@ -31,7 +31,7 @@ public final class MMKVUtils {
         return sMMKV;
     }
 
-    //=======================================键值保存==================================================//
+
 
     
     public static boolean put(String key, Object value) {
@@ -58,7 +58,7 @@ public final class MMKVUtils {
     }
 
 
-    //=======================================键值获取==================================================//
+
 
     
     public static Object get(String key, Object defaultValue) {

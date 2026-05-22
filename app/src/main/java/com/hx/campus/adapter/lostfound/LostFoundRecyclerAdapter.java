@@ -47,7 +47,7 @@ public class LostFoundRecyclerAdapter extends RecyclerView.Adapter<LostFoundRecy
 
     @Override
     public int getItemViewType(int position) {
-        return "0".equals(dataList.get(position).getType()) ? 0 : 1; // 0失物, 1招领
+        return "0".equals(dataList.get(position).getType()) ? 0 : 1;
     }
 
     @NonNull

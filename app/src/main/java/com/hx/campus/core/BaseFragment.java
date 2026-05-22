@@ -73,7 +73,7 @@ public abstract class BaseFragment<Binding extends ViewBinding> extends XPageFra
     
     @Override
     protected void initListeners() {
-        // 默认空实现，子类根据需要重写
+
     }
 
     
@@ -97,7 +97,7 @@ public abstract class BaseFragment<Binding extends ViewBinding> extends XPageFra
     
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
-        // 屏幕旋转时刷新标题栏
+
         super.onConfigurationChanged(newConfig);
         ViewGroup root = (ViewGroup) getRootView();
         if (root.getChildAt(0) instanceof TitleBar) {
@@ -130,7 +130,7 @@ public abstract class BaseFragment<Binding extends ViewBinding> extends XPageFra
         MobclickAgent.onPageEnd(getPageName());
     }
 
-    //==============================页面跳转API===================================//
+
 
     
     public <T extends XPageFragment> Fragment openNewPage(Class<T> clazz) {
@@ -181,7 +181,7 @@ public abstract class BaseFragment<Binding extends ViewBinding> extends XPageFra
         } else if (value instanceof Serializable) {
             option.putSerializable(key, (Serializable) value);
         } else {
-            // 对于复杂对象，序列化为JSON字符串传递
+
             option.putString(key, serializeObject(value));
         }
         return option.open(this);
@@ -251,7 +251,7 @@ public abstract class BaseFragment<Binding extends ViewBinding> extends XPageFra
         if (getActivity() == null) {
             return;
         }
-        // 通过清除当前焦点来隐藏软键盘
+
         Utils.hideSoftInputClearFocus(getActivity().getCurrentFocus());
     }
 

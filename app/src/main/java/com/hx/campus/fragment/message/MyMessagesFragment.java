@@ -33,7 +33,7 @@ import retrofit2.Response;
 @Page(name = "我的留言")
 public class MyMessagesFragment extends BaseFragment<LayoutCommonListBinding> {
 
-    // 统一使用 MessageVO 的适配器和数据源
+
     private BaseRecyclerAdapter<MessageVO> mAdapter;
     private List<MessageVO> mDataList = new ArrayList<>();
     private User user;
@@ -46,14 +46,14 @@ public class MyMessagesFragment extends BaseFragment<LayoutCommonListBinding> {
 
     @Override
     protected void initViews() {
-        // 动态修改复用布局中的空状态文案
+
         binding.tvApp.setText("暂无留言消息");
 
         WidgetUtils.initRecyclerView(binding.recyclerView);
         user = Utils.getBeanFromSp(getContext(), "User", "user");
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // 初始化适配器，将泛型改为 MessageVO
+
         mAdapter = new BaseRecyclerAdapter<MessageVO>(mDataList) {
             @Override
             protected int getItemLayoutId(int viewType) {
@@ -70,7 +70,7 @@ public class MyMessagesFragment extends BaseFragment<LayoutCommonListBinding> {
                             .circleCrop()
                             .into((android.widget.ImageView) holder.findViewById(R.id.iv_avatar));
                 }
-                // 绑定 MessageVO 的数据
+
                 holder.text(R.id.tv_comment_content, item.getContent() != null ? item.getContent() : "");
                 holder.text(R.id.tv_time, item.getCreateTime() != null ? Utils.formatCommentTime(String.valueOf(item.getCreateTime())) : "");
             }
@@ -78,7 +78,7 @@ public class MyMessagesFragment extends BaseFragment<LayoutCommonListBinding> {
 
         binding.recyclerView.setAdapter(mAdapter);
 
-        // 加载留言数据
+
         loadData();
     }
     private void openMSGWeb() {
@@ -103,7 +103,7 @@ public class MyMessagesFragment extends BaseFragment<LayoutCommonListBinding> {
                     .positiveText("确定")
                     .negativeText("取消")
                     .onPositive((dialog, which) -> {
-                        // 调用删除接口
+
                         deleteMessageApi(item.getId(), position);
                     })
                     .show();
@@ -120,7 +120,7 @@ public class MyMessagesFragment extends BaseFragment<LayoutCommonListBinding> {
             return;
         }
 
-        // 调用获取留言的后端接口
+
         RetrofitClient.getInstance().getApi().getMessagesByUserId(user.getId()).enqueue(new Callback<Result<List<MessageVO>>>() {
             @Override
             public void onResponse(Call<Result<List<MessageVO>>> call, Response<Result<List<MessageVO>>> response) {

@@ -1,7 +1,7 @@
 package com.hx.campus.adapter.entity;
 
 import java.util.List;
-//百度POI接口返回结果
+
 public class BaiduPoiResponse {
     private int status;
     private String message;

@@ -37,7 +37,7 @@ public class AccountFragment extends BaseFragment<FragmentAccountBinding> implem
     private User currentUser;
     private CountDownTimer countDownTimer;
 
-    // 记录修改安全信息类型：0=无，1=手机号，2=邮箱
+
     private int currentModifySecurityType = 0;
 
     @NonNull
@@ -67,7 +67,7 @@ public class AccountFragment extends BaseFragment<FragmentAccountBinding> implem
 
     @SuppressLint({"ClickableViewAccessibility", "SetTextI18n"})
     private void initData() {
-        // 初始化回显数据
+
         currentUser = Utils.getBeanFromSp(getContext(), "User", "user");
         if (currentUser == null) return;
 
@@ -118,7 +118,7 @@ public class AccountFragment extends BaseFragment<FragmentAccountBinding> implem
         }
     }
 
-    // 展开验证面板及UI重置
+
     private void showSecurityVerifyContainer(int type) {
         currentModifySecurityType = type;
         binding.llSecurityVerifyContainer.setVisibility(View.VISIBLE);
@@ -135,9 +135,9 @@ public class AccountFragment extends BaseFragment<FragmentAccountBinding> implem
         }
     }
 
-    // 发送验证码校验与执行
+
     private void sendVerifyCodeToOldEmail() {
-        // 实时获取缓存校验邮箱绑定状态
+
         User user = Utils.getBeanFromSp(getContext(), "User", "user");
         if (user == null || TextUtils.isEmpty(user.getEmail())) {
             Utils.showResponse("当前账号未绑定邮箱，无法验证！");
@@ -145,7 +145,7 @@ public class AccountFragment extends BaseFragment<FragmentAccountBinding> implem
         }
         String oldEmail = user.getEmail();
 
-        // 发送验证码
+
         RetrofitClient.getInstance().getApi().sendCode(oldEmail).enqueue(new Callback<Result<Object>>() {
             @Override
             public void onResponse(@NonNull Call<Result<Object>> call, @NonNull Response<Result<Object>> response) {
@@ -168,7 +168,7 @@ public class AccountFragment extends BaseFragment<FragmentAccountBinding> implem
         });
     }
 
-    // 验证码倒计时处理
+
     private void startCountDownTimer() {
         binding.tvSendVerifyCode.setEnabled(false);
         countDownTimer = new CountDownTimer(60000, 1000) {
@@ -186,7 +186,7 @@ public class AccountFragment extends BaseFragment<FragmentAccountBinding> implem
         }.start();
     }
 
-    // 提交安全信息更新校验与执行
+
     @SuppressLint("SetTextI18n")
     private void submitSecurityInfoUpdate() {
         String verifyCode = binding.etEmailVerifyCode.getText().toString().trim();
@@ -201,7 +201,7 @@ public class AccountFragment extends BaseFragment<FragmentAccountBinding> implem
             return;
         }
 
-        // 实时获取缓存校验用户状态
+
         User user = Utils.getBeanFromSp(getContext(), "User", "user");
         if (user == null) {
             Utils.showResponse("未获取到用户信息，请重新登录");
@@ -215,7 +215,7 @@ public class AccountFragment extends BaseFragment<FragmentAccountBinding> implem
             call = RetrofitClient.getInstance().getApi().updateEmail(user.getId(), newValue, verifyCode);
         }
 
-        // 提交修改请求
+
         call.enqueue(new Callback<Result<User>>() {
             @Override
             public void onResponse(@NonNull Call<Result<User>> call, @NonNull Response<Result<User>> response) {
@@ -249,7 +249,7 @@ public class AccountFragment extends BaseFragment<FragmentAccountBinding> implem
         });
     }
 
-    // 提交基础信息校验与执行
+
     private void updateBasicInfo() {
         String nickName = binding.etNickName.getText().toString().trim();
         if (TextUtils.isEmpty(nickName)) {
@@ -257,7 +257,7 @@ public class AccountFragment extends BaseFragment<FragmentAccountBinding> implem
             return;
         }
 
-        // 实时获取缓存校验用户状态
+
         User user = Utils.getBeanFromSp(getContext(), "User", "user");
         if (user == null) {
             Utils.showResponse("未获取到用户信息，请重新登录");
@@ -267,7 +267,7 @@ public class AccountFragment extends BaseFragment<FragmentAccountBinding> implem
         int id = user.getId();
         String sex = binding.rbMan.isChecked() ? "男" : "女";
 
-        // 更新基础资料请求
+
         RetrofitClient.getInstance().getApi().updateAccount(nickName, sex, id).enqueue(new Callback<Result<User>>() {
             @Override
             public void onResponse(@NonNull Call<Result<User>> call, @NonNull Response<Result<User>> response) {
@@ -306,7 +306,7 @@ public class AccountFragment extends BaseFragment<FragmentAccountBinding> implem
     @Override
     public void onDestroy() {
         super.onDestroy();
-        // 销毁倒计时避免泄露
+
         if (countDownTimer != null) {
             countDownTimer.cancel();
         }

@@ -80,7 +80,7 @@ public final class Utils {
 
     
     public static Dialog showPrivacyDialog(Context context, MaterialDialog.SingleButtonCallback submitListener) {
-        // 构建隐私政策确认对话框
+
         MaterialDialog dialog = new MaterialDialog.Builder(context)
                 .title(R.string.title_reminder)
                 .autoDismiss(false)
@@ -98,7 +98,7 @@ public final class Utils {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         dialog.dismiss();
-                        // 用户拒绝后再次确认
+
                         DialogLoader.getInstance().showConfirmDialog(
                                 context, 
                                 ResUtils.getString(R.string.title_reminder), 
@@ -106,13 +106,13 @@ public final class Utils {
                                 ResUtils.getString(R.string.lab_look_again),
                                 (dialog3, which2) -> {
                                     dialog3.dismiss();
-                                    // 重新显示隐私政策对话框
+
                                     showPrivacyDialog(context, submitListener);
                                 },
                                 ResUtils.getString(R.string.lab_still_disagree),
                                 (dialog2, which1) -> {
                                     dialog2.dismiss();
-                                    // 最后一次确认机会
+
                                     DialogLoader.getInstance().showConfirmDialog(
                                             context,
                                             ResUtils.getString(R.string.content_think_about_it_again),
@@ -127,15 +127,15 @@ public final class Utils {
                                             ResUtils.getString(R.string.lab_exit_app),
                                             (dialog4, which3) -> {
                                                 dialog4.dismiss();
-                                                // 用户最终拒绝，退出应用
+
                                                 XUtil.exitApp();
                                             });
                                 });
                     }
                 }).build();
-        // 设置隐私政策内容
+
         dialog.setContent(getPrivacyContent(context));
-        // 启用链接点击功能
+
         dialog.getContentView().setMovementMethod(LinkMovementMethod.getInstance());
         dialog.show();
         return dialog;
@@ -148,7 +148,7 @@ public final class Utils {
                 .append("    我们深知个人信息对你的重要性，也感谢你对我们的信任。\n")
                 .append("    为了更好地保护你的权益，同时遵守相关监管的要求，我们将通过");
         
-        // 添加可点击的隐私政策链接
+
         stringBuilder.append(getPrivacyLink(context, PRIVACY_URL))
                 .append("向你说明我们会如何收集、存储、保护、使用及对外提供你的信息，并说明你享有的权利。\n")
                 .append("    更多详情，敬请查阅")
@@ -163,11 +163,11 @@ public final class Utils {
         String privacyName = String.format(ResUtils.getString(R.string.lab_privacy_name), ResUtils.getString(R.string.app_name));
         SpannableString spannableString = new SpannableString(privacyName);
         
-        // 设置可点击的链接样式
+
         spannableString.setSpan(new ClickableSpan() {
             @Override
             public void onClick(@NonNull View widget) {
-                // 点击后跳转到隐私政策网页
+
                 goWeb(context, privacyUrl);
             }
         }, 0, privacyName.length(), Spanned.SPAN_MARK_MARK);
@@ -201,18 +201,18 @@ public final class Utils {
 
 
     public static String rebuildUrl(String reurl, Context context) {
-        //读取url资源文件
+
         String endUrl = "";
         PropertiesUtil propertiesUtil = new PropertiesUtil();
         Properties properties = propertiesUtil.LoadProperties(context);
         String url = properties.getProperty("url");
-        //改造url
+
         if (url != null) {
             endUrl = url + reurl;
         }
         return endUrl;
     }
-    //获取key
+
     public static String getAppKey(Context context) {
         Properties properties = new Properties();
         try {
@@ -226,13 +226,13 @@ public final class Utils {
         return null;
     }
 
-    //时间格式转换
+
     public static String dateFormat(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return sdf.format(date);
     }
 
-    //存储Javabean
+
     public static <T> void saveBean2Sp(Context context, T t, String fileName, String keyName) {
         SharedPreferences preferences = context.getSharedPreferences(fileName, Context.MODE_PRIVATE);
         ByteArrayOutputStream bos;
@@ -260,7 +260,7 @@ public final class Utils {
         }
     }
 
-    //读取javabean
+
     public static <T extends Object> T getBeanFromSp(Context context, String fileName, String keyNme) {
         SharedPreferences preferences = context.getSharedPreferences(fileName, Context.MODE_PRIVATE);
         byte[] bytes = Base64.decode(preferences.getString(keyNme, ""), Base64.DEFAULT);
@@ -287,12 +287,12 @@ public final class Utils {
 
     
     public static String getRealPath(Context context, Intent data) {
-        // 判断手机系统版本号
+
         if (Build.VERSION.SDK_INT >= 19) {
-            // 4.4及以上系统使用这个方法处理图片
+
             return handleImageOnKitKat(context, data);
         } else {
-            // 4.4以下系统使用这个方法处理图片
+
             return handleImageBeforeKitKat(context, data);
         }
     }
@@ -302,10 +302,10 @@ public final class Utils {
         String imagePath = null;
         Uri uri = data.getData();
         if (DocumentsContract.isDocumentUri(context, uri)) {
-            // 如果是document类型的Uri，则通过document id处理
+
             String docId = DocumentsContract.getDocumentId(uri);
             if ("com.android.providers.media.documents".equals(uri.getAuthority())) {
-                String id = docId.split(":")[1]; // 解析出数字格式的id
+                String id = docId.split(":")[1];
                 String selection = MediaStore.Images.Media._ID + "=" + id;
                 imagePath = getImagePath(context, MediaStore.Images.Media.EXTERNAL_CONTENT_URI, selection);
             } else if ("com.android.providers.downloads.documents".equals(uri.getAuthority())) {
@@ -313,13 +313,13 @@ public final class Utils {
                 imagePath = getImagePath(context, contentUri, null);
             }
         } else if ("content".equalsIgnoreCase(uri.getScheme())) {
-            // 如果是content类型的Uri，则使用普通方式处理
+
             imagePath = getImagePath(context, uri, null);
         } else if ("file".equalsIgnoreCase(uri.getScheme())) {
-            // 如果是file类型的Uri，直接获取图片路径即可
+
             imagePath = uri.getPath();
         }
-        //displayImage(imagePath); // 根据图片路径显示图片
+
         return imagePath;
     }
 
@@ -333,7 +333,7 @@ public final class Utils {
     @SuppressLint("Range")
     private static String getImagePath(Context context, Uri uri, String selection) {
         String path = null;
-        // 通过Uri和selection来获取真实的图片路径
+
         Cursor cursor = context.getContentResolver().query(uri, null, selection, null, null);
         if (cursor != null) {
             if (cursor.moveToFirst()) {
@@ -344,23 +344,23 @@ public final class Utils {
         return path;
     }
 
-    //ui操作，提示框
+
     public static void showResponse(final String response) {
         runOnUiThread(() -> {
-            // 在这里进行UI操作，将结果显示到界面上
+
             XToast.info(getContext(), response).show();
         });
     }
-    //获取服务端返回的用户数据并存储
+
     public static void doUserData(User user) {
         if (user == null) return;
         String photoUrl = user.getPhoto();
         if (!photoUrl.startsWith("http")) {
-            // 如果不是以 http 开头，说明是文件名，需要手动拼接
+
             photoUrl = Utils.rebuildUrl("upload/" + photoUrl, getContext());
             user.setPhoto(photoUrl);
         }
-        //存储SharedPreferences以便之后调用
+
         Utils.saveBean2Sp(getContext(), user, "User", "user");
     }
 
@@ -380,7 +380,7 @@ public final class Utils {
         return value;
     }
 
-    //根据资源id读取字符串
+
     public static String getString(Context context, int id) {
         return context.getResources().getString(id);
     }
@@ -390,7 +390,7 @@ public final class Utils {
             InputStream is = context.getAssets().open("url.properties");
             properties.load(is);
             String url = properties.getProperty("url");
-            // 确保以 / 结尾，Retrofit 的 baseUrl 要求必须以斜杠结尾
+
             if (url != null && !url.endsWith("/")) {
                 url += "/";
             }
@@ -423,7 +423,7 @@ public final class Utils {
                 commentCal.setTime(date);
                 Calendar nowCal = Calendar.getInstance();
 
-                // 判断是否是昨天
+
                 nowCal.add(Calendar.DAY_OF_YEAR, -1);
                 if (commentCal.get(Calendar.YEAR) == nowCal.get(Calendar.YEAR) &&
                         commentCal.get(Calendar.DAY_OF_YEAR) == nowCal.get(Calendar.DAY_OF_YEAR)) {
@@ -431,12 +431,12 @@ public final class Utils {
                     return "昨天 " + hourSdf.format(date);
                 }
 
-                // 判断是否在3天内 (包含昨天的话算2天前，这里再看是否是前天)
+
                 long days = diff / (24 * 60 * 60 * 1000);
                 if (days < 3) {
                     return days + "天前";
                 } else {
-                    // 超过3天，显示 "MM-dd"
+
                     SimpleDateFormat monthDaySdf = new SimpleDateFormat("M-d", Locale.getDefault());
                     return monthDaySdf.format(date);
                 }
@@ -449,9 +449,9 @@ public final class Utils {
     
     public static String getImageUrl(String oldPic, Context context) {
         Pattern pattern = Pattern.compile(".*http.*");
-        Matcher matcher = pattern.matcher(oldPic); // 将正则表达式应用到输入字符串上
+        Matcher matcher = pattern.matcher(oldPic);
         String savePath = getUrlFromAssets(context)+"upload/";
-        //String savePath = "http://123.207.51.104:8081/school/upload/";
+
         if (!matcher.matches()) {
             return savePath+oldPic;
         }

@@ -51,7 +51,7 @@ public class MaterialFooter extends ProgressBar implements RefreshFooter {
     @NonNull
     @Override
     public SpinnerStyle getSpinnerStyle() {
-        //指定为平移，不能null
+
         return SpinnerStyle.Translate;
     }
 

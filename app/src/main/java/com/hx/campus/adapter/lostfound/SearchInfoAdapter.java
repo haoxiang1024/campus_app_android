@@ -27,7 +27,7 @@ public class SearchInfoAdapter extends BaseAdapter {
             data.clear();
         }
         searchInfoList.addAll(data);
-        notifyDataSetChanged();//刷新界面
+        notifyDataSetChanged();
     }
 
     
@@ -68,7 +68,7 @@ public class SearchInfoAdapter extends BaseAdapter {
         searchInfoBinding.lostTitle.setText(searchInfo.getTitle());
         searchInfoBinding.authorName.setText(searchInfo.getNickname());
         searchInfoBinding.tvLostContent.setText(searchInfo.getContent());
-        //加载图片
+
         if (TextUtils.isEmpty(searchInfo.getImg())) {
             searchInfoBinding.lostImg.setVisibility(View.GONE);
         } else {

@@ -18,7 +18,7 @@ public class MessagePagerAdapter extends FragmentStateAdapter {
     @NonNull
     @Override
     public Fragment createFragment(int position) {
-        // 根据位置返回对应的 Fragment
+
         if (position == 0) {
             return new ChatListFragment();
         } else {
@@ -28,6 +28,6 @@ public class MessagePagerAdapter extends FragmentStateAdapter {
 
     @Override
     public int getItemCount() {
-        return 2; // 总共两个页面：私信、互动
+        return 2;
     }
 }

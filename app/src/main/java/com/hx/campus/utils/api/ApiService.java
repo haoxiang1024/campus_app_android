@@ -26,26 +26,26 @@ import retrofit2.http.Part;
 import retrofit2.http.Query;
 
 public interface ApiService {
-    //登录
+
     @POST("login")
     Call<Result<LoginResponseDTO>> login(@Query("phone") String phone, @Query("pwd") String pwd);
-    //获取置顶信息
+
     @POST("showTopList")
     Call<Result<List<LostFound>>> showTopList(@Query("stick") int stick);
 
-    // 获取指定用户的列表
+
     @POST("getLostFoundByUserId")
     Call<Result<List<LostFound>>> getLostFoundListByUserId( @Query("user_id") int userId);
 
-    // 更新物品状态
+
     @POST("updateState")
     Call<Result<String>> updateState(@Query("id") int id, @Query("state") String state, @Query("user_id") int userId);
 
-    //获取分类下面的内容
+
     @POST("DetailByTitle")
     Call<Result<List<LostFound>>> DetailByTitle( @Query("title") String title,@Query("type") String type);
 
-    //添加物品信息
+
     @Multipart
     @POST("addLostFound")
     Call<Result<List<LostFound>>> addLostFound(
@@ -54,38 +54,38 @@ public interface ApiService {
 
     );
 
-    // 发送验证码
+
     @POST("send_code")
     Call<Result<Object>> sendCode(@Query("email") String email);
 
-    // 校验验证码
+
     @POST("verify_code")
     Call<Result<Object>> verifyCode(@Query("email") String email, @Query("code") String code);
 
-    // 重置密码
+
     @POST("resetPwd")
     Call<Result<Object>> resetPwd(
             @Query("phone") String phone,
             @Query("newPwd") String password
     );
-    //搜索
+
     @POST("searchInfo")
     Call<Result<List<SearchInfo>>> searchInfo(@Query("value") String value);
-    //用户修改信息
+
     @POST("updateAc")
     Call<Result<User>> updateAccount(
             @Query("nickname") String nickname,
             @Query("sex") String sex,
             @Query("id") int id
     );
-    //用户修改头像
+
     @Multipart
     @POST("updatePic")
     Call<Result<User>> updatePhoto(
             @Part MultipartBody.Part file,
             @Query("id") int userId
     );
-    //注册接口
+
     @POST("register")
     Call<Result<LoginResponseDTO>> register(
             @Query("phone") String phone,
@@ -93,26 +93,26 @@ public interface ApiService {
             @Query("password") String password,
             @Query("role") int role
     );
-    //获取IM用户token
+
     @POST("getIMUserToken")
     Call<Result<String>> getIMUserToken(
             @Query("uid") int uid,
             @Query("nickname") String nickname
     );
 
-    // 根据用户ID获取用户信息
+
     @POST("getUserById")
     Call<User> getUserInfo(@Query("id") int id);
 
-    // 获取评论列表
+
     @GET("getCommentsByLostFoundId")
     Call<Result<List<Comment>>> getComments(@Query("lostfound_id") int lostfoundId);
 
-    // 获取某用户收到的所有评论/回复
+
     @GET("getReceivedComments")
     Call<Result<List<Comment>>> getReceivedComments(@Query("user_id") int user_id);
 
-    // 发布评论
+
     @FormUrlEncoded
     @POST("addComment")
     Call<Result<String>> addComment(
@@ -123,41 +123,41 @@ public interface ApiService {
             @Field("reply_user_id") int replyUserId
     );
 
-    //获取所有分类
+
     @GET("getAllType")
     Call<Result<List<LostFoundType>>> getAllType();
 
-    //获取用户发的评论
+
     @GET("getComments")
     Call<Result<List<Comment>>> getCommentsByUserId(@Query("user_id") int user_id);
 
-    //删除用户评论
+
     @GET("delComment")
     Call<Result<String>>deleteComment(@Query("commentId") int commentId);
 
-    //根据Id获取失物招领信息
+
     @GET("admin/getLostFoundById")
     Call<Result<LostFound>>getLostFoundById(@Query("lostFoundId") int lostFoundId);
-    // 修改手机号
+
     @POST("updatePhone")
     @FormUrlEncoded
     Call<Result<User>> updatePhone(@Field("id") int id, @Field("newPhone") String newPhone, @Field("code") String code);
 
-    //  修改邮箱
+
     @POST("updateEmail")
     @FormUrlEncoded
     Call<Result<User>> updateEmail(@Field("id") int id, @Field("newEmail") String newEmail, @Field("code") String code);
 
-    // 删除用户
+
     @FormUrlEncoded
     @POST("deleteAccount")
     Call<Result<String>> deleteAccount(@Field("id") int id);
 
-    //查看用户留言
+
     @GET("message/userList")
     Call<Result<List<MessageVO>>> getMessagesByUserId(@Query("userId") Integer userId);
 
-    //删除用户留言
+
     @FormUrlEncoded
     @POST("message/deleteMessage")
     Call<Result<String>> deleteMessage(@Field("id") int id);
@@ -177,7 +177,7 @@ public interface ApiService {
     @GET("shop/history")
     Call<Result<List<PointHistory>>> getPointHistory(@Query("userId") Integer userId);
 
-    // 管理员核验提货码接口
+
     @POST("admin/verifyOrder")
     @FormUrlEncoded
     Call<Result<String>> verifyOrder(@Field("verifyCode") String verifyCode, @Field("adminId") int adminId);

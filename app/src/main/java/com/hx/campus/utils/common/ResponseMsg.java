@@ -3,7 +3,7 @@
 package com.hx.campus.utils.common;
 
 public class ResponseMsg{
-    // ===================== 基础操作提示 =====================
+
     
     public static final String SUCCESS = "操作成功";
     
@@ -13,7 +13,7 @@ public class ResponseMsg{
     
     public static final String REQUEST_FAIL = "请求失败";
 
-    // ===================== 参数相关提示 =====================
+
     
     public static final String PARAM_ERROR = "参数格式错误或缺失";
     
@@ -23,7 +23,7 @@ public class ResponseMsg{
     
     public static final String PARAM_OUT_OF_RANGE = "参数超出允许范围";
 
-    // ===================== 权限/认证相关提示 =====================
+
     
     public static final String UNAUTHORIZED = "未登录或登录已过期，请重新登录";
     
@@ -35,7 +35,7 @@ public class ResponseMsg{
     
     public static final String CAPTCHA_ERROR = "验证码错误或已过期";
 
-    // ===================== 资源相关提示 =====================
+
     
     public static final String RESOURCE_NOT_FOUND = "请求的资源不存在";
     
@@ -45,7 +45,7 @@ public class ResponseMsg{
     
     public static final String RESOURCE_OCCUPIED = "资源正在被使用，无法操作";
 
-    // ===================== 数据相关提示 =====================
+
     
     public static final String DATA_EMPTY = "暂无数据";
     
@@ -55,7 +55,7 @@ public class ResponseMsg{
     
     public static final String DATA_ADD_FAIL = "数据新增失败";
 
-    // ===================== 系统相关提示 =====================
+
     
     public static final String SYSTEM_BUSY = "系统繁忙，请稍后重试";
     
@@ -65,7 +65,7 @@ public class ResponseMsg{
     
     public static final String INTERFACE_CALL_FAIL = "第三方接口调用失败";
 
-    // ===================== 业务通用提示 =====================
+
     
     public static final String OPERATE_TOO_FREQUENT = "操作过于频繁，请稍后再试";
     

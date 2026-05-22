@@ -75,7 +75,7 @@ public abstract class BaseContainerFragment extends XPageContainerListFragment {
 
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
-        //屏幕旋转时刷新一下title
+
         super.onConfigurationChanged(newConfig);
         ViewGroup root = (ViewGroup) getRootView();
         if (root.getChildAt(0) instanceof TitleBar) {

@@ -20,7 +20,7 @@ public class SplashActivity extends AppCompatActivity {
 
 
     private void loginOrGoMainPage() {
-        //通过用户令牌的操作
+
         if (TokenUtils.hasToken()) {
             startActivity(new Intent(SplashActivity.this, MainActivity.class));
             finish();

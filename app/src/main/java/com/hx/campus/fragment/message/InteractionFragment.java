@@ -34,7 +34,7 @@ import io.rong.imlib.model.Message;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-//评论页
+
 @Page
 public class InteractionFragment extends BaseFragment<LayoutCommonListBinding> {
 
@@ -54,7 +54,7 @@ public class InteractionFragment extends BaseFragment<LayoutCommonListBinding> {
         mAdapter.setOnItemClickListener(msg -> showReplyDialog(msg));
         loadCommentData();
     }
-   // 弹出回复对话框
+
    private void showReplyDialog(InteractionMsg msg) {
        new MaterialDialog.Builder(getContext())
                .title("回复 @" + msg.username)
@@ -64,7 +64,7 @@ public class InteractionFragment extends BaseFragment<LayoutCommonListBinding> {
                    if (TextUtils.isEmpty(content)) {
                        Utils.showResponse("回复内容不能为空");
                    } else {
-                       // 触发发送请求
+
                        sendReplyToServer(msg, content);
                    }
                })
@@ -107,11 +107,11 @@ public class InteractionFragment extends BaseFragment<LayoutCommonListBinding> {
             }
         });
     }
-    // 发送消息通知评论区更新
+
     private void sendRefreshCommand(int targetUserId, int lostfoundId) {
         String commandData = "REFRESH_COMMENT:" + lostfoundId;
         io.rong.imlib.model.Message content = io.rong.imlib.model.Message.obtain(
-                String.valueOf(targetUserId), // 接收者的用户ID
+                String.valueOf(targetUserId),
                 io.rong.imlib.model.Conversation.ConversationType.PRIVATE,
                 io.rong.message.CommandMessage.obtain("RefreshComment", commandData)
         );
@@ -136,11 +136,11 @@ public class InteractionFragment extends BaseFragment<LayoutCommonListBinding> {
     @Override
     public void onResume() {
         super.onResume();
-        // 每次页面可见时，重新请求一次最新数据
+
         loadCommentData();
     }
     private void loadCommentData() {
-        //获取登录用户信息
+
         User user = Utils.getBeanFromSp(getContext(), "User", "user");
         if(user==null)return;
         RetrofitClient.getInstance().getApi().getReceivedComments(user.getId()).enqueue(new Callback<Result<List<Comment>>>() {
@@ -152,11 +152,11 @@ public class InteractionFragment extends BaseFragment<LayoutCommonListBinding> {
                         List<Comment> backendComments = serverResponse.getData();
                         if (backendComments != null && !backendComments.isEmpty()) {
                             hideEmptyView();
-                            // 准备一个新集合，用来装转换后的 UI 数据
+
                             List<InteractionMsg> uiList = new ArrayList<>();
-                            // 遍历后端数据，转换为前端 Adapter 需要的数据
+
                             for (Comment comment : backendComments) {
-                                // 格式化时间
+
                                 String timeStr = "";
                                 if (comment.getCreate_time() != null) {
                                     timeStr = Utils.formatCommentTime(String.valueOf(comment.getCreate_time()));
@@ -180,11 +180,11 @@ public class InteractionFragment extends BaseFragment<LayoutCommonListBinding> {
 
                                 uiList.add(msg);
                             }
-                            // 将转换好的数据传给 Adapter，刷新列表
+
                             mAdapter.setData(uiList);
 
                         } else {
-                            // 数据为空时的处理
+
                             showEmptyView();
                         }
                     } else {
@@ -205,7 +205,7 @@ public class InteractionFragment extends BaseFragment<LayoutCommonListBinding> {
     private void showEmptyView() {
         binding.recyclerView.setVisibility(View.GONE);
         binding.layoutEmpty.setVisibility(View.VISIBLE);
-        mAdapter.setData(new ArrayList<>()); // 确保列表清空
+        mAdapter.setData(new ArrayList<>());
     }
     private void hideEmptyView() {
         binding.recyclerView.setVisibility(View.VISIBLE);

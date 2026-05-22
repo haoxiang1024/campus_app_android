@@ -35,8 +35,8 @@ import retrofit2.Response;
 public class RegFragment extends BaseFragment<FragmentRegBinding> implements View.OnClickListener {
 
     private CountDownButtonHelper mCountDownHelper;
-    LoadingDialog loadingDialog; // 加载动画
-    // 设置连接超时时间
+    LoadingDialog loadingDialog;
+
     private final int timeLimit = 10;
 
     private boolean isPasswordVisible = false;
@@ -55,10 +55,10 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
 
     @Override
     protected void initViews() {
-        // 初始化验证码倒计时助手，绑定获取验证码按钮，时长60秒
+
         mCountDownHelper = new CountDownButtonHelper(binding.btnGetVerifyCode, 60);
 
-        // 绑定密码眼睛图标点击事件
+
         binding.ivPwdToggle.setOnClickListener(v -> {
             isPasswordVisible = !isPasswordVisible;
             if (isPasswordVisible) {
@@ -71,7 +71,7 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
             binding.etPassword.setSelection(binding.etPassword.getText().length());
         });
 
-        // 绑定确认密码眼睛图标点击事件
+
         binding.ivRepwdToggle.setOnClickListener(v -> {
             isRePasswordVisible = !isRePasswordVisible;
             if (isRePasswordVisible) {
@@ -87,7 +87,7 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
 
     @Override
     protected void initListeners() {
-        // 绑定监听器
+
         binding.btnRegister.setOnClickListener(this);
         binding.btnGetVerifyCode.setOnClickListener(this);
     }
@@ -96,9 +96,9 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
     public void onClick(View v) {
         int id = v.getId();
         if (id == R.id.btn_register) {
-            handleRegister(); // 执行注册校验
+            handleRegister();
         } else if (id == R.id.btn_get_verify_code) {
-            sendVerifyCode(); // 发送验证码
+            sendVerifyCode();
         }
     }
 
@@ -143,28 +143,28 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
 
     
     private void verifyCodeAndRegister(String phone, String password, String email, String code) {
-        showLoadingDialog(); // 发起请求前显示加载动画
+        showLoadingDialog();
 
         RetrofitClient.getInstance().getApi().verifyCode(email, code).enqueue(new Callback<Result<Object>>() {
             @Override
             public void onResponse(@NonNull Call<Result<Object>> call, @NonNull Response<Result<Object>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     if (response.body().isSuccess()) {
-                        // 验证码通过，调用注册接口
+
                         doRegisterRequest(phone, email, password);
                     } else {
-                        hideLoadingDialog(); // 失败隐藏加载动画
+                        hideLoadingDialog();
                         Utils.showResponse("验证码错误：" + response.body().getMsg());
                     }
                 } else {
-                    hideLoadingDialog(); // 失败隐藏加载动画
+                    hideLoadingDialog();
                     Utils.showResponse("服务器验证异常");
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<Result<Object>> call, @NonNull Throwable t) {
-                hideLoadingDialog(); // 失败隐藏加载动画
+                hideLoadingDialog();
                 Utils.showResponse("网络异常: " + t.getMessage());
             }
         });
@@ -178,7 +178,7 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
                 if (response.isSuccessful() && response.body() != null) {
                     Utils.showResponse(response.body().getMsg());
                     if (response.body().isSuccess()) {
-                        // 注册成功，直接跳转主页
+
                         LoginResponseDTO loginData = response.body().getData();
                         User user = loginData.getUserInfo();
                         Utils.doUserData(user);
@@ -186,16 +186,16 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
                         TokenUtils.handleLoginSuccess(token);
                         fetchIMTokenAndConnect(user);
                     } else {
-                        hideLoadingDialog(); // 业务逻辑失败隐藏加载动画
+                        hideLoadingDialog();
                     }
                 } else {
-                    hideLoadingDialog(); // 请求失败隐藏加载动画
+                    hideLoadingDialog();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<Result<LoginResponseDTO>> call, @NonNull Throwable t) {
-                hideLoadingDialog(); // 失败隐藏加载动画
+                hideLoadingDialog();
                 Utils.showResponse("注册请求失败: " + t.getMessage());
             }
         });
@@ -208,13 +208,13 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
             public void onResponse(retrofit2.Call<Result<String>> call, retrofit2.Response<Result<String>> response) {
                 if (response.body() != null && response.body().isSuccess()) {
                     String imToken = response.body().getData();
-                    // 执行连接逻辑
+
                     performIMConnect(imToken);
-                    // 登录全流程完成，跳转主页
-                    hideLoadingDialog(); // 成功完成所有流程隐藏加载动画
+
+                    hideLoadingDialog();
                     ActivityUtils.startActivity(MainActivity.class);
                 } else {
-                    hideLoadingDialog(); // 失败隐藏加载动画
+                    hideLoadingDialog();
                     Utils.showResponse("IM授权获取失败");
                     ActivityUtils.startActivity(MainActivity.class);
                 }
@@ -222,13 +222,13 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
 
             
             private void performIMConnect(String token) {
-                // 从本地存储获取旧 Token
+
                 String localToken = TokenUtils.getImToken();
                 RongIMClient.ConnectCallback connectCallback=new RongIMClient.ConnectCallback() {
                     @Override
                     public void onSuccess(String userId) {
                         Log.e("IM_LOG", "融云连接成功: " + userId);
-                        // 连接成功后，持久化新的 Token 到 MMKV
+
                         TokenUtils.setImToken(token);
                     }
 
@@ -244,11 +244,11 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
                 };
 
                 if (token.equals(localToken)) {
-                    // 非首次连接：不传超时参数
+
                     Log.e("IM_LOG", "Token一致，执行快速连接...");
                     IMCenter.getInstance().connect(token, connectCallback);
                 } else {
-                    // 首次连接：传入超时时间
+
                     Log.e("IM_LOG", "Token变更，执行带超时的首次连接...");
                     IMCenter.getInstance().connect(token, timeLimit, connectCallback);
                 }
@@ -256,7 +256,7 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
 
             @Override
             public void onFailure(retrofit2.Call<Result<String>> call, Throwable t) {
-                hideLoadingDialog(); // 失败隐藏加载动画
+                hideLoadingDialog();
                 Log.e("IM_ERROR", "获取IM Token网络失败", t);
                 ActivityUtils.startActivity(MainActivity.class);
             }
@@ -271,7 +271,7 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
             return;
         }
 
-        mCountDownHelper.start(); // 开始倒计时
+        mCountDownHelper.start();
 
         RetrofitClient.getInstance().getApi().sendCode(email).enqueue(new Callback<Result<Object>>() {
             @Override
@@ -284,7 +284,7 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
             @Override
             public void onFailure(@NonNull Call<Result<Object>> call, @NonNull Throwable t) {
                 Utils.showResponse("验证码发送失败");
-                mCountDownHelper.recycle(); // 失败时重置按钮
+                mCountDownHelper.recycle();
             }
         });
     }
@@ -292,7 +292,7 @@ public class RegFragment extends BaseFragment<FragmentRegBinding> implements Vie
     @Override
     public void onDestroyView() {
         if (mCountDownHelper != null) {
-            mCountDownHelper.recycle(); // 销毁视图时回收倒计时，防止内存泄漏
+            mCountDownHelper.recycle();
         }
         super.onDestroyView();
     }

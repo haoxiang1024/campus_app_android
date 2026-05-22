@@ -38,7 +38,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-// 个人中心页面 - 用户个人信息管理和设置入口
+
 @Page(anim = CoreAnim.none)
 public class PersonalFragment extends BaseFragment<FragmentProfileBinding> implements SuperTextView.OnSuperTextViewClickListener {
 
@@ -46,26 +46,26 @@ public class PersonalFragment extends BaseFragment<FragmentProfileBinding> imple
     @NonNull
     @Override
     protected FragmentProfileBinding viewBindingInflate(@NonNull LayoutInflater inflater, ViewGroup container, boolean attachToRoot)  {
-        // 使用FragmentProfileBinding inflate方法创建绑定对象
+
         return FragmentProfileBinding.inflate(inflater, container, attachToRoot);
     }
     
     @Override
     protected String getPageTitle() {
-        // 从资源文件获取个人中心标题
+
         return getResources().getString(R.string.menu_profile);
     }
     
     @Override
     protected TitleBar initTitle() {
-        // 个人中心页面不需要显示标题栏
+
         return null;
     }
 
     
     @Override
     protected void initViews() {
-        // 初始化账户数据和用户信息显示
+
         initAc();
         SuperTextView menuScan = findViewById(R.id.menu_scan);
         if (menuScan != null) {
@@ -75,16 +75,16 @@ public class PersonalFragment extends BaseFragment<FragmentProfileBinding> imple
 
     
     private void initAc() {
-        // 从SharedPreferences获取存储的用户对象
+
         User user = Utils.getBeanFromSp(getContext(), "User", "user");
-        // 设置用户头像显示
+
         if (TextUtils.isEmpty(user.getPhoto())) {
-            // 头像URL为空时隐藏头像控件
+
             binding.rivHeadPic.setVisibility(View.GONE);
         } else {
-            // 头像URL存在时显示头像控件
+
             binding.rivHeadPic.setVisibility(View.VISIBLE);
-            // 使用Glide加载用户头像
+
             Glide.with(this).load(user.getPhoto()).into(binding.rivHeadPic);
         }
     }
@@ -92,19 +92,19 @@ public class PersonalFragment extends BaseFragment<FragmentProfileBinding> imple
     
     @Override
     protected void initListeners() {
-        // 为头像设置按钮添加点击监听
+
         binding.photo.setOnSuperTextViewClickListener(this);
-        // 为账户管理按钮添加点击监听
+
         binding.account.setOnSuperTextViewClickListener(this);
-        // 为公告按钮添加点击监听
+
         binding.tips.setOnSuperTextViewClickListener(this);
-        // 为意见反馈按钮添加点击监听
+
         binding.suggestion.setOnSuperTextViewClickListener(this);
-        // 为设置按钮添加点击监听
+
         binding.menuSettings.setOnSuperTextViewClickListener(this);
-        // 为关于按钮添加点击监听
+
         binding.menuAbout.setOnSuperTextViewClickListener(this);
-        //积分商城
+
         binding.points.setOnSuperTextViewClickListener(this);
     }
 
@@ -113,35 +113,35 @@ public class PersonalFragment extends BaseFragment<FragmentProfileBinding> imple
  
     @Override
     public void onClick(SuperTextView view) {
-        // 获取被点击控件的ID
+
         int id = view.getId();
         switch (id) {
             case R.id.photo:
-                // 跳转到头像设置页面
+
                 openNewPage(PhotoFragment.class);
                 break;
             case R.id.account:
-                // 跳转到账户管理页面
+
                 openNewPage(AccountFragment.class);
                 break;
             case R.id.tips:
-                // 跳转到公告页面
+
                 AgentWebActivity.goWeb(getContext(), Utils.rebuildUrl("/pages/notification.html", getContext()));
                 break;
             case R.id.suggestion:
-                // 跳转到意见反馈页面
+
                 openNewPage(SuggestionFragment.class);
                 break;
             case R.id.menu_settings:
-                // 跳转到设置页面
+
                 openNewPage(SettingsFragment.class);
                 break;
             case R.id.menu_about:
-                // 跳转到关于页面
+
                 openNewPage(AboutFragment.class);
                 break;
             case R.id.points:
-                    // 跳转到积分商城页面
+
                     openNewPage(ShopFragment.class);
                     break;
 
@@ -152,11 +152,11 @@ public class PersonalFragment extends BaseFragment<FragmentProfileBinding> imple
         IntentIntegrator integrator = IntentIntegrator.forSupportFragment(this);
         integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE);
         integrator.setPrompt("请对准二维码进行扫描");
-        integrator.setCameraId(0); // 0是后置摄像头
-        integrator.setBeepEnabled(true); // 扫码成功时“滴”一声
+        integrator.setCameraId(0);
+        integrator.setBeepEnabled(true);
         integrator.setBarcodeImageEnabled(false);
-        integrator.setOrientationLocked(true); // 锁定方向
-        integrator.setCaptureActivity(CustomScannerActivity.class); // 指定自定义的扫描页面
+        integrator.setOrientationLocked(true);
+        integrator.setCaptureActivity(CustomScannerActivity.class);
         integrator.initiateScan();
     }
 
@@ -168,7 +168,7 @@ public class PersonalFragment extends BaseFragment<FragmentProfileBinding> imple
             if (result.getContents() == null) {
                 XToastUtils.info("已取消扫码");
             } else {
-                // 获取扫到的内容，并交给智能路由处理
+
                 String scannedContent = result.getContents().trim();
                 handleScannedResult(scannedContent);
             }
@@ -179,23 +179,23 @@ public class PersonalFragment extends BaseFragment<FragmentProfileBinding> imple
 
     
     private void handleScannedResult(String content) {
-        // 判断是否是网页链接
+
         if (content.toLowerCase().startsWith("http://") || content.toLowerCase().startsWith("https://")) {
-            // 使用AgentWebActivity 直接打开网页
+
             AgentWebActivity.goWeb(getContext(), content);
             return;
         }
 
-        //  如果不是链接，判断当前用户是否是管理员进行核验
+
         User user = Utils.getBeanFromSp(getContext(), "User", "user");
-        if (user != null && user.getRole() == 1) { // role == 1 为管理员
+        if (user != null && user.getRole() == 1) {
             if (content.length() == 8) {
                 requestVerifyOrder(content.toUpperCase(), user.getId());
             } else {
                 XToastUtils.warning("无法识别的核验码：" + content);
             }
         } else {
-            // 普通用户扫了无法识别的普通文本
+
             new MaterialDialog.Builder(getContext())
                     .title("扫描结果")
                     .content("您不是管理员，无法核验商品")

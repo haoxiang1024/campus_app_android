@@ -29,9 +29,9 @@ import retrofit2.Response;
 @Page()
 public class FoundInfoFragment extends BaseFragment<FragmentFoundInfoBinding> implements AdapterView.OnItemClickListener {
 
-    // 列表适配器
+
     private LostFoundDetailAdapter adapter;
-    // 缓存原始数据
+
     private List<LostFound> originalFoundList = new ArrayList<>();
 
     @NonNull
@@ -62,16 +62,16 @@ public class FoundInfoFragment extends BaseFragment<FragmentFoundInfoBinding> im
         super.initListeners();
         binding.listview.setOnItemClickListener(this);
 
-        // 搜索按钮点击事件
+
         binding.searchButton.setOnClickListener(v -> {
             String keyword = binding.searchEdittext.getText().toString().trim();
-            // 关键字为空恢复全量数据
+
             if (TextUtils.isEmpty(keyword)) {
                 setAdapter(originalFoundList);
                 return;
             }
 
-            // 过滤包含关键字的项
+
             List<LostFound> searchResult = new ArrayList<>();
             for (LostFound item : originalFoundList) {
                 if ((item.getTitle() != null && item.getTitle().contains(keyword)) ||
@@ -121,7 +121,7 @@ public class FoundInfoFragment extends BaseFragment<FragmentFoundInfoBinding> im
     }
 
     private void setAdapter(List<LostFound> list) {
-        // 重新实例化适配器避免数据追加
+
         adapter = new LostFoundDetailAdapter(getContext());
         binding.listview.setAdapter(adapter);
 

@@ -60,13 +60,13 @@ public class SearchInfoFragment extends BaseFragment<FragmentSearchInfoBinding> 
     public static final String KEY_INFO = "info";
 
     @AutoWired(name = KEY_INFO)
-    SearchInfo searchInfo;//实体类不能序列化，否则无法注入
+    SearchInfo searchInfo;
 
     private CommentAdapter commentAdapter;
-    // 评论回复相关参数：0 代表直接评论帖子，非0代表回复对应ID的评论/用户
+
     private int currentParentId = 0;
     private int currentReplyUserId = 0;
-    private PopupWindow emojiPopup; // Emoji面板弹窗
+    private PopupWindow emojiPopup;
 
     
     @Override
@@ -86,9 +86,9 @@ public class SearchInfoFragment extends BaseFragment<FragmentSearchInfoBinding> 
     @Override
     protected void initViews() {
         setData();
-        initCommentList();  // 初始化评论列表
-        initCommentEvent(); // 初始化评论发送事件
-        initEmojiPanel();   // 初始化Emoji面板
+        initCommentList();
+        initCommentEvent();
+        initEmojiPanel();
 
         if (binding.btnSharePoster != null) {
             binding.btnSharePoster.setOnClickListener(v -> {
@@ -100,16 +100,16 @@ public class SearchInfoFragment extends BaseFragment<FragmentSearchInfoBinding> 
 
     
     private void initEmojiPanel() {
-        // 常用Emoji列表
+
         String[] emojis = {
                 "😀","😂","🤣","😅","😊","😍","😘","😜",
                 "😝","🤩","😔","😢","😭","😡","🤯","👍",
                 "👎","🙏","🤝","👏","🔥","💯","❤️","💔"
         };
 
-        // 构建Emoji网格布局
+
         GridLayout gridLayout = new GridLayout(getContext());
-        gridLayout.setColumnCount(8); // 每行8个表情
+        gridLayout.setColumnCount(8);
         gridLayout.setBackgroundColor(Color.parseColor("#F5F6F9"));
         gridLayout.setPadding(16, 16, 16, 16);
 
@@ -119,14 +119,14 @@ public class SearchInfoFragment extends BaseFragment<FragmentSearchInfoBinding> 
             tv.setTextSize(26);
             tv.setPadding(12, 12, 12, 12);
             tv.setOnClickListener(v -> {
-                // 插入Emoji到输入框光标位置
+
                 int cursor = binding.etCommentInput.getSelectionStart();
                 binding.etCommentInput.getText().insert(cursor, emoji);
             });
             gridLayout.addView(tv);
         }
 
-        // 包装成PopupWindow
+
         emojiPopup = new PopupWindow(gridLayout,
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -134,17 +134,17 @@ public class SearchInfoFragment extends BaseFragment<FragmentSearchInfoBinding> 
         emojiPopup.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         emojiPopup.setOutsideTouchable(true);
 
-        // Emoji按钮点击事件
+
         binding.btnEmoji.setOnClickListener(v -> {
-            // 隐藏软键盘
+
             InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
             if (imm != null) imm.hideSoftInputFromWindow(binding.etCommentInput.getWindowToken(), 0);
 
-            // 弹出Emoji面板
+
             emojiPopup.showAsDropDown(binding.btnEmoji, 0, - (binding.btnEmoji.getHeight() + 500));
         });
 
-        // 输入框点击关闭Emoji面板
+
         binding.etCommentInput.setOnClickListener(v -> {
             if (emojiPopup.isShowing()) {
                 emojiPopup.dismiss();
@@ -158,20 +158,20 @@ public class SearchInfoFragment extends BaseFragment<FragmentSearchInfoBinding> 
         binding.rvComments.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.rvComments.setAdapter(commentAdapter);
 
-        // 评论回复点击事件
+
         commentAdapter.setOnCommentClickListener((parentId, targetUserId, targetNickname) -> {
             currentParentId = parentId;
             currentReplyUserId = targetUserId;
             binding.etCommentInput.setHint("回复 " + targetNickname + "...");
             binding.etCommentInput.requestFocus();
-            // 弹出软键盘
+
             InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
             if (imm != null) {
                 imm.showSoftInput(binding.etCommentInput, InputMethodManager.SHOW_IMPLICIT);
             }
         });
 
-        // 加载评论数据
+
         loadComments();
     }
 
@@ -206,21 +206,21 @@ public class SearchInfoFragment extends BaseFragment<FragmentSearchInfoBinding> 
                 return;
             }
 
-            // 获取当前登录用户
+
             User user = Utils.getBeanFromSp(getContext(), "User", "user");
             if (user == null) {
                 Utils.showResponse("请先登录");
                 return;
             }
 
-            // 提交评论
+
             submitComment(searchInfo.getId(), user.getId(), content, currentParentId, currentReplyUserId);
         });
     }
 
     
     private void submitComment(int searchInfoId, int userId, String content, int parentId, int replyUserId) {
-        // 禁用按钮防重复点击
+
         binding.btnSendComment.setEnabled(false);
 
         RetrofitClient.getInstance().getApi()
@@ -232,20 +232,20 @@ public class SearchInfoFragment extends BaseFragment<FragmentSearchInfoBinding> 
                         if (response.isSuccessful() && response.body() != null) {
                             Result<String> result = response.body();
                             if (result.getStatus() == 0) {
-                                // 清空输入框、重置回复状态
+
                                 binding.etCommentInput.setText("");
                                 binding.etCommentInput.clearFocus();
                                 binding.etCommentInput.setHint("写下你的评论...");
                                 currentParentId = 0;
                                 currentReplyUserId = 0;
 
-                                // 隐藏软键盘
+
                                 InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                                 if (imm != null) {
                                     imm.hideSoftInputFromWindow(binding.etCommentInput.getWindowToken(), 0);
                                 }
 
-                                // 刷新评论列表
+
                                 loadComments();
                             } else {
                                 Utils.showResponse(result.getMsg());
@@ -265,29 +265,29 @@ public class SearchInfoFragment extends BaseFragment<FragmentSearchInfoBinding> 
     private void setData() {
         if (searchInfo == null) return;
 
-        //设置标题
+
         binding.tvLostTitle.setText(searchInfo.getTitle());
-        //设置内容
+
         binding.tvLostContent.setText(searchInfo.getContent());
-        //加载图片
+
         if (TextUtils.isEmpty(searchInfo.getImg())) {
             binding.imgLost.setVisibility(View.GONE);
         } else {
             binding.imgLost.setVisibility(View.VISIBLE);
             Glide.with(this).load(searchInfo.getImg()).into(binding.imgLost);
         }
-        //设置失主名称
+
         binding.tvAuthor.setText(searchInfo.getNickname());
-        //设置联系方式
+
         binding.tvPhonenum.setText(searchInfo.getPhone());
-        //设置地点
+
         binding.location.setText(searchInfo.getPlace());
-        //设置状态
+
         binding.state.setText(searchInfo.getState());
-        //设置发布日期
+
         String date = Utils.dateFormat(searchInfo.getPub_date());
         binding.tvDate.setText(date);
-        //私信
+
         binding.chatBtn.setOnClickListener(v -> {
             String targetId = String.valueOf(searchInfo.getUser_id());
             if (TextUtils.isEmpty(targetId)) {

@@ -29,7 +29,7 @@ public class BaseActivity<Binding extends ViewBinding> extends XPageActivity {
 
     @Override
     protected void attachBaseContext(Context newBase) {
-        //注入字体
+
         super.attachBaseContext(ViewPumpContextWrapper.wrap(newBase));
     }
 

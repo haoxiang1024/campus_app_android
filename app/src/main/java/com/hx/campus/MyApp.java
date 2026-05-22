@@ -51,7 +51,7 @@ import retrofit2.Response;
 
 
 public class MyApp extends Application {
-    private static Context mContext; // 保存 context 用于跳转
+    private static Context mContext;
 
     
     public static boolean isDebug() {
@@ -61,7 +61,7 @@ public class MyApp extends Application {
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
-        // 为Android 4.x设备安装多dex支持，避免ClassNotFound异常
+
         MultiDex.install(this);
     }
 
@@ -69,16 +69,16 @@ public class MyApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        // 百度地图/定位 隐私合规检查
+
         initBaiduMap();
-        // 初始化基础功能库
+
         initLibs();
-        // 初始化即时通讯服务
+
         initIM();
-        // 初始化网络请求客户端
+
         RetrofitClient.init(this);
-        //消息监听
-        //initMsgListener();
+
+
     }
 
     private void initBaiduMap() {
@@ -91,24 +91,24 @@ public class MyApp extends Application {
     
     public static void initMsgListener() {
         RongCoreClient.setConnectionStatusListener(status -> {
-            // 如果状态是：用户被封禁 (CONN_USER_BLOCKED)
-            // 或者：在其他设备登录被踢下线 (KICKED_OFFLINE_BY_OTHER_CLIENT)
+
+
             if (status == IRongCoreListener.ConnectionStatusListener.ConnectionStatus.CONN_USER_BLOCKED ||
                     status == IRongCoreListener.ConnectionStatusListener.ConnectionStatus.KICKED_OFFLINE_BY_OTHER_CLIENT) {
                 IMCenter.getInstance().logout();
-                // 必须切换到主线程执行 UI 和 跳转逻辑
+
                 new Handler(Looper.getMainLooper()).post(() -> {
                     Utils.showResponse("您的账号已被管理员禁用或在其他设备登录");
                     logout();
                 });
             }
         });
-// 注册消息监听
+
         RongCoreClient.addOnReceiveMessageListener(new OnReceiveMessageWrapperListener() {
             @Override
             public void onReceivedMessage(Message message, ReceivedProfile profile) {
                 if (message.getObjectName().equals("App:ForceOffline")) {
-                    // 执行登出操作
+
                     IMCenter.getInstance().logout();
                     logout();
                 }
@@ -118,11 +118,11 @@ public class MyApp extends Application {
     }
 
     private static void logout() {
-        //  断开融云连接
+
         IMCenter.getInstance().disconnect();
-        //  清除本地 Token 缓存
+
         TokenUtils.handleLogoutSuccess();
-        //  退出所有 Activity 并跳转 Login
+
         XUtil.getActivityLifecycleHelper().exit();
         Intent intent = new Intent(mContext, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -131,19 +131,19 @@ public class MyApp extends Application {
 
     
     private void initIM() {
-        // 获取融云AppKey配置
+
         String appKey = Utils.getAppKey(this);
         Boolean enablePush = true;
-        // 初始化融云SDK核心功能
+
         RongIM.init(this, appKey, enablePush);
-        // 注册聊天页面路由
+
         RouteUtils.registerActivity(RouteUtils.RongActivityType.ConversationActivity, ConversationActivity.class);
-        // 设置用户信息提供者，用于动态获取用户资料
+
         RongUserInfoManager.getInstance().setUserInfoProvider(userId -> {
             fetchUserInfoFromServer(userId);
             return null;
         }, true);
-        // 配置消息通知相关设置
+
         notification();
     }
     
@@ -151,28 +151,28 @@ public class MyApp extends Application {
         String NEW_CHANNEL_ID = "rc_notification_id_v2";
         NotificationChannel channel = null;
         
-        // Android 8.0以上需要创建通知渠道
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            // 创建高优先级通知渠道
+
             channel = new NotificationChannel(
                     NEW_CHANNEL_ID,
-                    "重要消息通知",  // 渠道名称
-                    NotificationManager.IMPORTANCE_HIGH  // 重要程度
+                    "重要消息通知",
+                    NotificationManager.IMPORTANCE_HIGH
             );
-            // 启用指示灯提醒
+
             channel.enableLights(true);
-            // 显示桌面角标
+
             channel.setShowBadge(true);
-            // 允许在锁屏状态下显示通知内容
+
             channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-            // 注册通知渠道
+
             manager.createNotificationChannel(channel);
         }
         
-        // 配置融云通知相关参数
+
         NotificationConfig config = RongConfigCenter.notificationConfig();
-        // 前台其他页面时也显示通知
+
         config.setForegroundOtherPageAction(NotificationConfig.ForegroundOtherPageAction.Notification);
         config.setNotificationChannel(channel);
     }
@@ -194,13 +194,13 @@ public class MyApp extends Application {
                             fullAvatarUrl = Utils.rebuildUrl("upload/" + photo, getApplicationContext());
                         }
                     }
-                    // 构建融云用户信息对象
+
                     UserInfo userInfo = new UserInfo(
                             userId,
                             user.getNickname(),
-                            Uri.parse(fullAvatarUrl) // 如果 fullAvatarUrl 是空字符串，融云会显示你设置的默认头像
+                            Uri.parse(fullAvatarUrl)
                     );
-                    // 刷新本地用户信息缓存
+
                     RongUserInfoManager.getInstance().refreshUserInfoCache(userInfo);
                 }
             }
@@ -213,13 +213,13 @@ public class MyApp extends Application {
 
     
     private void initLibs() {
-        // 初始化X系列UI基础库（XUI框架）
+
         XBasicLibInit.init(this);
-        // 初始化应用版本更新检测功能
+
         XUpdateInit.init(this);
-        // 初始化友盟统计分析服务
+
         UMengInit.init(this);
-        // 初始化ANR（应用无响应）监控服务
+
         ANRWatchDogInit.init();
     }
 

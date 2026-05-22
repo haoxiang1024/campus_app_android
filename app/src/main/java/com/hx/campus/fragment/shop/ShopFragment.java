@@ -83,18 +83,18 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
 
         loadShopItems();
 
-        // 绑定兑换按钮点击事件
+
         mAdapter.setOnExchangeClickListener(item -> showExchangeConfirmDialog(item));
 
-        // 绑定商品卡片点击事件弹出详情
+
         mAdapter.setOnItemClickListener(item -> showItemDetailDialog(item));
 
-        // 绑定下拉刷新事件
+
         refreshLayout.setOnRefreshListener(refreshLayout -> loadShopItems());
 
-        // 绑定积分明细点击事件
+
         tvPointHistory.setOnClickListener(v -> requestPointHistory());
-        //我的订单
+
         TextView tvMyOrders = findViewById(R.id.tv_my_orders);
         tvMyOrders.setOnClickListener(v -> {
             openNewPage(MyOrderFragment.class);
@@ -130,7 +130,7 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
         });
     }
 
-    // 请求积分明细列表数据
+
     private void requestPointHistory() {
         if (user == null || user.getId() == -1) {
             XToastUtils.warning("请先登录");
@@ -183,7 +183,7 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
                 .show();
     }
 
-    // 请求兑换商品
+
     private void requestExchange(ShopItem item) {
         User currentUser = Utils.getBeanFromSp(getContext(), "User", "user");
         if (currentUser == null || currentUser.getId() == -1) {
@@ -197,13 +197,13 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
             @Override
             public void onResponse(Call<Result<String>> call, Response<Result<String>> response) {
                 if (response.body() != null && response.body().getStatus() == 0) {
-                    // 获取后端生成的核验码
+
                     String verifyCode = response.body().getData();
 
-                    // 兑换成功展示核验码和二维码弹窗
+
                     showVerifyCodeDialog(verifyCode, item);
 
-                    // 刷新最新积分和列表
+
                     fetchLatestUserInfo(userId);
                     refreshLayout.autoRefresh();
                 } else {
@@ -218,7 +218,7 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
         });
     }
 
-    // 弹出包含二维码和核验码的核验凭证弹窗
+
     private void showVerifyCodeDialog(String verifyCode, ShopItem item) {
         Utils.showResponse("兑换成功");
         LinearLayout layout = new LinearLayout(getContext());
@@ -226,7 +226,7 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
         layout.setGravity(Gravity.CENTER);
         layout.setPadding(50, 40, 50, 40);
 
-        // 顶部提示文字
+
         TextView tvTip = new TextView(getContext());
         tvTip.setText("请向管理员出示此二维码或核验码\n领取【" + item.getName() + "】");
         tvTip.setTextSize(16);
@@ -234,9 +234,9 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
         tvTip.setTextColor(Color.parseColor("#333333"));
         layout.addView(tvTip);
 
-        // 二维码 ImageView
+
         ImageView ivQrCode = new ImageView(getContext());
-        // 转换尺寸单位
+
         int qrSize = (int) (220 * getResources().getDisplayMetrics().density + 0.5f);
         LinearLayout.LayoutParams qrParams = new LinearLayout.LayoutParams(qrSize, qrSize);
         qrParams.setMargins(0, 60, 0, 60);
@@ -248,7 +248,7 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
         }
         layout.addView(ivQrCode);
 
-        // 底部显眼核验码
+
         TextView tvCode = new TextView(getContext());
         tvCode.setText("核验码：" + verifyCode);
         tvCode.setTextSize(22);
@@ -257,7 +257,7 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
         tvCode.setTextColor(Color.parseColor("#FF5722"));
         layout.addView(tvCode);
 
-        // 显示弹窗
+
         new MaterialDialog.Builder(getContext())
                 .customView(layout, false)
                 .cancelable(true)
@@ -266,7 +266,7 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
                 .onPositive((dialog, which) -> {
                     Bitmap viewBitmap = createBitmapFromView(layout);
                     if (viewBitmap != null) {
-                        // 保存到相册
+
                         saveBitmapToGallery(viewBitmap);
                     } else {
                         Toast.makeText(getContext(), "生成图片失败", Toast.LENGTH_SHORT).show();
@@ -277,31 +277,31 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
 
     
     private void saveBitmapToGallery(Bitmap bitmap) {
-        // 准备图片的元数据
+
         String fileName = "VerifyCode_" + System.currentTimeMillis() + ".png";
         ContentValues values = new ContentValues();
         values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
         values.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
 
-        // 适配 Android 10 及以上
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES); // 保存到 Pictures 目录
+            values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
             values.put(MediaStore.Images.Media.IS_PENDING, 1);
         }
 
-        // 插入图片信息并获取 Uri
+
         Uri uri = getContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
 
         if (uri != null) {
             try {
-                // 打开输出流并压缩图片
+
                 OutputStream outputStream = getContext().getContentResolver().openOutputStream(uri);
                 if (outputStream != null) {
                     bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
                     outputStream.close();
                 }
 
-                // 适配 Android 10：解除 PENDING 状态
+
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     values.clear();
                     values.put(MediaStore.Images.Media.IS_PENDING, 0);
@@ -319,26 +319,26 @@ public class ShopFragment extends BaseFragment<FragmentShopBinding> {
     }
     
     private Bitmap createBitmapFromView(View view) {
-        // 获取 View 的宽和高
+
         int width = view.getWidth();
         int height = view.getHeight();
         if (width <= 0 || height <= 0) {
             return null;
         }
 
-        // 创建一个和 View 大小一样的 Bitmap
+
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
 
-        // 绘制白色背景，防止保存后透明部分变黑
+
         canvas.drawColor(Color.WHITE);
 
-        // 将 View 的内容绘制到 Canvas 上
+
         view.draw(canvas);
 
         return bitmap;
     }
-    // 使用 ZXing 生成二维码图片数据
+
     private Bitmap createQRCode(String content, int width, int height) {
         try {
             Hashtable<EncodeHintType, Object> hints = new Hashtable<>();

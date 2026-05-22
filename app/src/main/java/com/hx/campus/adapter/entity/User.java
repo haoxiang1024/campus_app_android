@@ -19,7 +19,7 @@ public class User implements Serializable {
     private String sex;
     
     private String phone;
-    private int points; // 用户当前积分余额
+    private int points;
 
     
     private Date reg_date;

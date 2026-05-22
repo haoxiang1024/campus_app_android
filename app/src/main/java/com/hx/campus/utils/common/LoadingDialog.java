@@ -19,10 +19,10 @@ public class LoadingDialog extends Dialog {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE); // 隐藏标题栏
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.progress_dialog);
         progressBar = findViewById(R.id.progressBar);
-        setCancelable(false); // 禁止点击外部取消对话框
+        setCancelable(false);
     }
 }
 

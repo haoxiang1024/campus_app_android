@@ -43,20 +43,20 @@ public abstract class BroccoliSimpleDelegateAdapter<T> extends SimpleDelegateAda
 
     @Override
     protected void bindData(@NonNull RecyclerViewHolder holder, int position, T item) {
-        // 获取当前View对应的Broccoli实例
+
         Broccoli broccoli = mBroccoliMap.get(holder.itemView);
         if (broccoli == null) {
-            // 如果不存在则创建新的Broccoli实例
+
             broccoli = new Broccoli();
             mBroccoliMap.put(holder.itemView, broccoli);
         }
         
         if (mHasLoad) {
-            // 数据加载完成，移除占位符并绑定真实数据
+
             broccoli.removeAllPlaceholders();
             onBindData(holder, item, position);
         } else {
-            // 数据加载中，绑定占位符并显示骨架屏
+
             onBindBroccoli(holder, broccoli);
             broccoli.show();
         }

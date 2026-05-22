@@ -212,7 +212,7 @@ public class FontSliderBar extends View {
 
 
     public FontSliderBar setThumbIndex(int currentIndex) {
-        //处理越界
+
         if (indexOutOfRange(currentIndex)) {
             if(currentIndex<0){
                 mCurrentIndex = 0;
@@ -220,8 +220,8 @@ public class FontSliderBar extends View {
             if(currentIndex>mTickCount-1){
                 mCurrentIndex = mTickCount-1;
             }
-//            throw new IllegalArgumentException(
-//                    "A thumb index is out of bounds. Check that it is between 0 and mTickCount - 1");
+
+
         } else {
             if (mCurrentIndex != currentIndex) {
                 mCurrentIndex = currentIndex;
@@ -263,9 +263,9 @@ public class FontSliderBar extends View {
         }else{
             mThumb = new Thumb(getXCoordinate()+(mWith/mTickCount+getXCoordinate()/2)*mCurrentIndex-4, getYCoordinate(), mThumbColorNormal, mThumbColorPressed, mThumbRadius);
         }
-        //getWidth() - 2 * getXCoordinate()
-//        float xCoordinate = getBarLength() / (mTickCount - 1) * mCurrentIndex + getXCoordinate();
-//        mThumb = new Thumb(xCoordinate, getYCoordinate(), mThumbColorNormal, mThumbColorPressed, mThumbRadius);
+
+
+
     }
 
     private float getXCoordinate() {
@@ -315,7 +315,7 @@ public class FontSliderBar extends View {
         if (mThumb.isPressed()) {
             releaseThumb(mThumb);
         }else{
-            //点击事件
+
             final int tempIndex = mBar.getNearestTickIndex(x);
             if (tempIndex != mCurrentIndex) {
                 mCurrentIndex = tempIndex;
@@ -329,7 +329,7 @@ public class FontSliderBar extends View {
                 mThumb.setX(end);
                 invalidate();
             }
-            mThumb.release();//回收
+            mThumb.release();
         }
         return true;
     }
@@ -402,7 +402,7 @@ public class FontSliderBar extends View {
 
     private void moveThumb(Thumb thumb, float x) {
         if (x < mBar.getLeftX() || x > mBar.getRightX()) {
-            // Do nothing.
+
         } else {
             thumb.setX(x);
             invalidate();

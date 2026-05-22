@@ -19,7 +19,7 @@ public class PointHistoryAdapter extends RecyclerView.Adapter<PointHistoryAdapte
 
     private List<PointHistory> mData = new ArrayList<>();
     private OnItemClickListener mListener;
-    private List<PointHistory> mSourceData = new ArrayList<>(); // 原始数据备份
+    private List<PointHistory> mSourceData = new ArrayList<>();
     public void refresh(List<PointHistory> data) {
         if (data != null) {
             mSourceData.clear();
@@ -29,7 +29,7 @@ public class PointHistoryAdapter extends RecyclerView.Adapter<PointHistoryAdapte
             notifyDataSetChanged();
         }
     }
-    // 模糊搜索过滤逻辑
+
     public void filter(String query) {
         mData.clear();
         if (query.isEmpty()) {
@@ -64,7 +64,7 @@ public class PointHistoryAdapter extends RecyclerView.Adapter<PointHistoryAdapte
 
         holder.tvTitle.setText(item.getDescription());
         holder.tvTime.setText(item.getFormattedTime());
-        // 积分增减带符号显示
+
         if (item.getpoints_changed() > 0) {
             holder.tvPoints.setText("+" + item.getpoints_changed());
             holder.tvPoints.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.picture_color_bfe85d));

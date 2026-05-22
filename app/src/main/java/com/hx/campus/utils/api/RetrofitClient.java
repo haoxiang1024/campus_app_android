@@ -57,7 +57,7 @@ public class RetrofitClient {
 
     
     private RetrofitClient(String baseUrl) {
-        // Token 拦截器：为请求添加 Authorization 头
+
         Interceptor tokenInterceptor = chain -> {
             Request originalRequest = chain.request();
             String token = TokenUtils.getToken();
@@ -70,7 +70,7 @@ public class RetrofitClient {
             return chain.proceed(newRequest);
         };
 
-        // 认证拦截器：处理 401 未授权响应，触发强制退出逻辑
+
         Interceptor authInterceptor = chain -> {
             Response originalResponse = chain.proceed(chain.request());
             if (originalResponse.body() != null) {
@@ -78,48 +78,48 @@ public class RetrofitClient {
                 String jsonStr = responseBody.string();
                 MediaType mediaType = responseBody.contentType();
                 try {
-                // 尝试解析响应体为统一的 API 响应格式
+
                 ApiResponse apiResponse = gson.fromJson(jsonStr, ApiResponse.class);
-                    // 捕获业务401（status=401）
-                // 检查业务状态码是否为 401 或 HTTP 状态码为 401
+
+
                 if ((apiResponse != null && apiResponse.getStatus() == 401)
                         || originalResponse.code() == 401) {
                         String reason = apiResponse != null ? apiResponse.getMsg() : "您的账号已被禁用，请联系管理员";
                         handleForceLogout(reason);
                     }
                 } catch (Exception e) {
-                    // JSON 解析失败时记录错误日志
+
                     Log.e("解析业务 code 失败: ", e.getMessage());
                 }
-                // 重建响应体
+
                 ResponseBody newResponseBody = ResponseBody.create(mediaType, jsonStr);
                 return originalResponse.newBuilder().body(newResponseBody).build();
             }
-            // 处理HTTP 401
+
             if (originalResponse.code() == 401) {
                 handleForceLogout("您的账号已被禁用，请联系管理员");
             }
             return originalResponse;
         };
 
-        // 创建 OkHttpClient 并添加拦截器
+
         OkHttpClient client = new OkHttpClient.Builder()
                 .addInterceptor(tokenInterceptor)
                 .addInterceptor(authInterceptor)
                 .build();
 
-        // 创建自定义 Gson 实例，注册 Date 类型反序列化器
+
         Gson retrofitGson = new GsonBuilder()
                 .registerTypeAdapter(Date.class, (JsonDeserializer<Date>) (json, typeOfT, context) -> {
                     try {
                         if (json.isJsonPrimitive()) {
                             JsonPrimitive primitive = json.getAsJsonPrimitive();
-                            // 处理数字类型的时间戳（毫秒或秒）
+
                             if (primitive.isNumber()) {
                                 long timestamp = primitive.getAsLong();
                                 return new Date(timestamp > 1000000000000L ? timestamp : timestamp * 1000);
                             }
-                            // 处理字符串类型的时间
+
                             if (primitive.isString()) {
                                 return parseDateString(primitive.getAsString());
                             }
@@ -131,7 +131,7 @@ public class RetrofitClient {
                 })
                 .create();
 
-        // 构建 Retrofit 实例
+
         retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .client(client)
@@ -141,26 +141,26 @@ public class RetrofitClient {
 
     
     public void handleForceLogout(String reason) {
-        // 使用原子布尔保证只执行一次退出逻辑
+
         if (!isExiting.compareAndSet(false, true)) {
             return;
         }
-        // 在主线程执行退出操作
+
         new Handler(Looper.getMainLooper()).post(() -> {
             Log.e("执行强制退出逻辑: ", reason);
-            // 延迟显示提示信息
+
             new Handler(Looper.getMainLooper()).postDelayed(() -> {
                 XToastUtils.info(reason);
             }, 2000);
-            IMCenter.getInstance().disconnect(); // 断开融云
-            IMCenter.getInstance().logout();// 登出
-            TokenUtils.handleLogoutSuccess();   // 清除Token
-            XUtil.getActivityLifecycleHelper().exit(); // 退出所有页面
-            // 跳转至登录页
+            IMCenter.getInstance().disconnect();
+            IMCenter.getInstance().logout();
+            TokenUtils.handleLogoutSuccess();
+            XUtil.getActivityLifecycleHelper().exit();
+
             Intent intent = new Intent(mContext, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             mContext.startActivity(intent);
-            // 重置退出标志
+
             new Handler(Looper.getMainLooper()).postDelayed(() -> isExiting.set(false), 2000);
         });
     }
@@ -176,7 +176,7 @@ public class RetrofitClient {
     
     public static void init(Context context) {
         if (mInstance == null) {
-            // 使用同步锁确保线程安全
+
             synchronized (RetrofitClient.class) {
                 if (mInstance == null) {
                     mContext = context.getApplicationContext();
@@ -194,7 +194,7 @@ public class RetrofitClient {
 
     
     private Date parseDateString(String dateStr) {
-        // 解析 CST 时区格式
+
         if (dateStr.contains("CST")) {
             try {
                 SimpleDateFormat cstSdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss 'CST' yyyy", Locale.US);
@@ -205,7 +205,7 @@ public class RetrofitClient {
             }
         }
 
-        // 定义支持的日期格式数组
+
         String[] formats = {
                 "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
                 "yyyy-MM-dd HH:mm:ss",
@@ -214,7 +214,7 @@ public class RetrofitClient {
                 "yyyy-MM-dd HH:mm"
         };
 
-        // 各种日期格式
+
         for (String format : formats) {
             try {
                 SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.US);

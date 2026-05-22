@@ -29,17 +29,17 @@ import retrofit2.Response;
 @Page
 public class FoundFragment extends BaseFragment<FragmentFoundBinding> {
 
-    // 自动注入的标题参数
+
     @AutoWired(name = KEY_TITLE_NAME)
     String title;
-    // 标题参数键名常量
+
     public static final String KEY_TITLE_NAME = "title_name";
     LoadingDialog loadingDialog;
 
     
     @Override
     protected void initArgs() {
-        // 使用XRouter进行字段自动注入
+
         XRouter.getInstance().inject(this);
     }
 
@@ -47,7 +47,7 @@ public class FoundFragment extends BaseFragment<FragmentFoundBinding> {
     @NonNull
     @Override
     protected FragmentFoundBinding viewBindingInflate(@NonNull LayoutInflater inflater, ViewGroup container, boolean attachToRoot) {
-        // 使用FragmentFoundBinding inflate方法创建绑定对象
+
         return FragmentFoundBinding.inflate(inflater, container, attachToRoot);
     }
 
@@ -75,7 +75,7 @@ public class FoundFragment extends BaseFragment<FragmentFoundBinding> {
                     hideLoadingDialog();
                 }
             });
-        }, 300); // 300ms
+        }, 300);
     }
     private void setupViewPager(List<LostFoundType> types) {
         String[] titles = new String[types.size()];
@@ -105,18 +105,18 @@ public class FoundFragment extends BaseFragment<FragmentFoundBinding> {
     
     @Override
     protected TitleBar initTitle() {
-        // 获取父类初始化的标题栏
+
         TitleBar titleBar = super.initTitle();
-        // 添加右侧发布按钮
+
         titleBar.addAction(new TitleBar.ImageAction(R.drawable.add) {
             
             @Override
             public void performAction(android.view.View view) {
-                // 跳转到招领信息发布页面
+
                 openPage(AddFoundFragment.class);
             }
         });
-        // 设置页面标题为"招领"
+
         titleBar.setTitle("招领");
         return titleBar;
     }

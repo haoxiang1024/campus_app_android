@@ -44,13 +44,13 @@ public class PointHistoryFragment extends BaseFragment<FragmentPointHistoryBindi
 
     @Override
     protected void initViews() {
-        // 使用 binding.recyclerView 防止空指针闪退
+
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         mAdapter = new PointHistoryAdapter();
         binding.recyclerView.setAdapter(mAdapter);
 
-        // 设置列表项点击事件
+
         mAdapter.setOnItemClickListener((view, position) -> {
             PointHistory history = mAdapter.getItem(position);
             showHistoryDetailDialog(history);
@@ -58,9 +58,9 @@ public class PointHistoryFragment extends BaseFragment<FragmentPointHistoryBindi
 
 
         binding.ivSearch.setOnClickListener(v -> {
-            // 获取输入框中的文本并去除前后空格
+
             String keyword = binding.etSearch.getText().toString().trim();
-            // 调用适配器的过滤方法
+
             if (mAdapter != null) {
                 mAdapter.filter(keyword);
             }
@@ -69,7 +69,7 @@ public class PointHistoryFragment extends BaseFragment<FragmentPointHistoryBindi
         loadData();
     }
 
-    // 加载积分历史数据
+
     private void loadData() {
         User user = Utils.getBeanFromSp(getContext(), "User", "user");
         if (user == null) return;
@@ -88,13 +88,13 @@ public class PointHistoryFragment extends BaseFragment<FragmentPointHistoryBindi
         });
     }
 
-    // 显示详细信息的弹窗
+
     private void showHistoryDetailDialog(PointHistory history) {
         if (history == null || getContext() == null) return;
 
         String detailMsg = "积分变更：" + history.getDisplayPoints() + "\n" +
-                "变动类型：" + history.getTypeText() + "\n" + // 使用转换后的文本
-                "变动时间：" + history.getFormattedTime() + "\n" + // 使用格式化时间
+                "变动类型：" + history.getTypeText() + "\n" +
+                "变动时间：" + history.getFormattedTime() + "\n" +
                 "变动原因：" + history.getDescription();
 
         MaterialDialog.Builder builder = new MaterialDialog.Builder(getContext())

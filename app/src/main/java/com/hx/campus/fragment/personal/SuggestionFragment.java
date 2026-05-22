@@ -51,15 +51,15 @@ public class SuggestionFragment extends BaseFragment<FragmentSuggestionBinding> 
         int id = view.getId();
         switch (id) {
             case R.id.hot1:
-                //闪退如何解决
+
                 AgentWebActivity.goWeb(getContext(), Utils.rebuildUrl("/pages/appcrash.html", getContext()));
                 break;
             case R.id.hot2:
-                //手机号/账户问题
+
                 AgentWebActivity.goWeb(getContext(), Utils.rebuildUrl("/pages/account.html", getContext()));
                 break;
             case R.id.hot3:
-                //隐私保护问题
+
                 AgentWebActivity.goWeb(getContext(), Utils.rebuildUrl("/pages/privacy.html", getContext()));
                 break;
         }

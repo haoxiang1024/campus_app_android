@@ -69,7 +69,7 @@ import retrofit2.Response;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> implements View.OnClickListener, BottomNavigationView.OnNavigationItemSelectedListener, ClickUtils.OnClick2ExitListener, Toolbar.OnMenuItemClickListener {
 
-    private String[] mTitles;//标题数组
+    private String[] mTitles;
 
     @Override
     protected ActivityMainBinding viewBindingInflate(LayoutInflater inflater) {
@@ -89,15 +89,15 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (!checkLoginStatus()) {
-            return; // 如果未登录，跳转后直接结束，不再初始化后面的组件
+            return;
         }
         initViews();
         initData();
         initListeners();
         checkIMStatus();
-        // 检查并申请通知权限
+
         checkNotificationPermission();
-        // 检查是否是从外部链接唤起打开的
+
         handleDeepLinkIntent(getIntent());
 
     }
@@ -106,9 +106,9 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
         String token = TokenUtils.getToken();
         User user = Utils.getBeanFromSp(this, "User", "user");
 
-        // 如果 Token 没了或者 User 信息没了，都视为未登录
+
         if (TextUtils.isEmpty(token) || user == null) {
-            // 使用 openNewPage 弹出登录，并拦截掉 MainActivity 后续逻辑
+
             openNewPage(LoginFragment.class);
             return false;
         }
@@ -129,11 +129,11 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
             if (data != null && "hxcampus".equals(data.getScheme())) {
                 String path = data.getPath();
                 if ("/detail".equals(path)) {
-                    // 提取 URL 中的 id 参数
+
                     String idStr = data.getQueryParameter("id");
                     if (!TextUtils.isEmpty(idStr)) {
                         int id = Integer.parseInt(idStr);
-                        // 根据 ID 跳转详情页
+
                         jumpToDetail(id);
                     }
                 }
@@ -148,7 +148,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
             String idStr = uri.getQueryParameter("id");
             if (!TextUtils.isEmpty(idStr)) {
                 int id = Integer.parseInt(idStr);
-                // 执行页面跳转
+
                 jumpToDetail(id);
             }
         } else {
@@ -158,7 +158,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
 
     
     private void jumpToDetail(int foundId) {
-        // 提示用户正在加载
+
         Utils.showResponse("正在加载详情...");
         RetrofitClient.getInstance().getApi().getLostFoundById(foundId).enqueue(new Callback<Result<LostFound>>() {
             @Override
@@ -168,10 +168,10 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
                         LostFound lostFound = response.body().getData();
                         lostFound.setImg(Utils.getImageUrl(lostFound.getImg(), MainActivity.this));
                         if ("失物".equals(lostFound.getType())) {
-                            // 跳转到失物详情页面
+
                             openLost(lostFound);
                         } else {
-                            // 跳转到招领详情页面
+
                             openFound(lostFound);
                         }
                     } else {
@@ -212,7 +212,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
             if (ContextCompat.checkSelfPermission(this, "android.permission.POST_NOTIFICATIONS")
                     != PackageManager.PERMISSION_GRANTED) {
 
-                // 向用户发起申请
+
                 ActivityCompat.requestPermissions(this,
                         new String[]{"android.permission.POST_NOTIFICATIONS"}, 101);
             }
@@ -220,12 +220,12 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
     }
 
     private void checkIMStatus() {
-        // 检查融云当前的连接状态
+
         RongIMClient.ConnectionStatusListener.ConnectionStatus status =
                 IMCenter.getInstance().getCurrentConnectionStatus();
 
         if (status != RongIMClient.ConnectionStatusListener.ConnectionStatus.CONNECTED) {
-            // 从本地获取缓存的 Token 进行连接
+
             String cachedToken = TokenUtils.getImToken();
             if (!TextUtils.isEmpty(cachedToken)) {
                 RongIMClient.ConnectCallback connectCallback = new RongIMClient.ConnectCallback() {
@@ -270,27 +270,27 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
 
     private void initViews() {
         WidgetUtils.clearActivityBackground(this);
-        //标题数组
+
         mTitles = getResources().getStringArray(R.array.home_titles);
-        //初始化标题栏
+
         binding.includeMain.toolbar.setTitle(mTitles[0]);
         binding.includeMain.toolbar.inflateMenu(R.menu.menu_main);
         binding.includeMain.toolbar.setOnMenuItemClickListener(this);
-        initHeader();//初始化侧边栏
-        //主页内容填充
+        initHeader();
+
         BaseFragment[] fragments = new BaseFragment[]{
-                new DynamicFragment(),//主页
-                new MessageMainFragment(),//消息页
-                new LookFragment(),//查看信息页
-                new PersonalFragment()//我的页面
+                new DynamicFragment(),
+                new MessageMainFragment(),
+                new LookFragment(),
+                new PersonalFragment()
         };
         FragmentAdapter<BaseFragment> adapter = new FragmentAdapter<>(getSupportFragmentManager(), fragments);
-        binding.includeMain.viewPager.setOffscreenPageLimit(mTitles.length - 1);//设置ViewPager预加载页面数量的方法。
-        binding.includeMain.viewPager.setAdapter(adapter);//viewpager 适配器
+        binding.includeMain.viewPager.setOffscreenPageLimit(mTitles.length - 1);
+        binding.includeMain.viewPager.setAdapter(adapter);
     }
 
     private void initData() {
-        //已经登录成功设置token 下次无需重复登录
+
         TokenUtils.setToken(TokenUtils.getToken());
         XUpdateInit.checkUpdate(this, false);
     }
@@ -318,21 +318,21 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
             }
         }
 
-        //获取存储对象
+
         User user = Utils.getBeanFromSp(this, "User", "user");
 
         if (user != null) {
-            //加载图片
+
             if (TextUtils.isEmpty(user.getPhoto())) {
                 tvAvatar.setVisibility(View.GONE);
             } else {
                 tvAvatar.setVisibility(View.VISIBLE);
                 Glide.with(this).load(user.getPhoto()).into(ivAvatar);
             }
-            //设置昵称
+
             tvAvatar.setText(user.getNickname());
 
-            //设置简介与判断性别
+
             if ("男".equals(user.getSex())) {
                 tvSign.setText("小哥哥");
                 sexView.setVisibility(View.VISIBLE);
@@ -343,7 +343,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
                 Glide.with(this).load(R.drawable.women).into(sexView);
             }
         } else {
-            // 未登录状态下的默认 UI 显示
+
             tvAvatar.setVisibility(View.VISIBLE);
             tvAvatar.setText("未登录");
             tvSign.setText("点击登录/注册");
@@ -355,31 +355,31 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
 
 
     protected void initListeners() {
-        //页面切换行为
+
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, binding.drawerLayout, binding.includeMain.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         binding.drawerLayout.addDrawerListener(toggle);
-        toggle.syncState();//同步页面状态
-        //侧边栏点击事件
+        toggle.syncState();
+
         binding.navView.setNavigationItemSelectedListener(menuItem -> {
             if (menuItem.isCheckable()) {
-                binding.drawerLayout.closeDrawers();//关闭抽屉
-                return handleNavigationItemSelected(menuItem);//打开被选中项
+                binding.drawerLayout.closeDrawers();
+                return handleNavigationItemSelected(menuItem);
             } else {
                 int id = menuItem.getItemId();
                 if (id == R.id.nav_settings) {
-                    //设置页
+
                     openNewPage(SettingsFragment.class);
                 } else if (id == R.id.nav_about) {
-                    //关于页
+
                     openNewPage(AboutFragment.class);
                 } else if (id == R.id.nav_search) {
-                    //搜索页
+
                     openNewPage(SearchFragment.class);
                 }
             }
             return true;
         });
-        //主页事件监听
+
         binding.includeMain.viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -388,10 +388,10 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
 
             @Override
             public void onPageSelected(int position) {
-                MenuItem item = binding.includeMain.bottomNavigation.getMenu().getItem(position);//底部导航栏菜单选项
-                binding.includeMain.toolbar.setTitle(item.getTitle());//设置被选中的页面的标题
-                item.setChecked(true);//设置被选中的菜单项
-                updateSideNavStatus(item);//更新侧边栏菜单选中状态
+                MenuItem item = binding.includeMain.bottomNavigation.getMenu().getItem(position);
+                binding.includeMain.toolbar.setTitle(item.getTitle());
+                item.setChecked(true);
+                updateSideNavStatus(item);
             }
 
             @Override
@@ -399,15 +399,15 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
 
             }
         });
-        binding.includeMain.bottomNavigation.setOnNavigationItemSelectedListener(this);//底部导航栏点击事件(onNavigationItemSelected)
+        binding.includeMain.bottomNavigation.setOnNavigationItemSelectedListener(this);
     }
 
     
     private boolean handleNavigationItemSelected(@NonNull MenuItem menuItem) {
         int index = CollectionUtils.arrayIndexOf(mTitles, menuItem.getTitle());
         if (index != -1) {
-            binding.includeMain.toolbar.setTitle(menuItem.getTitle());//设置标题栏标题
-            binding.includeMain.viewPager.setCurrentItem(index, false);//设置主页页面被选中页
+            binding.includeMain.toolbar.setTitle(menuItem.getTitle());
+            binding.includeMain.viewPager.setCurrentItem(index, false);
             return true;
         }
         return false;
@@ -432,8 +432,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         int index = CollectionUtils.arrayIndexOf(mTitles, menuItem.getTitle());
         if (index != -1) {
-            binding.includeMain.toolbar.setTitle(menuItem.getTitle());//设置标题栏标题
-            binding.includeMain.viewPager.setCurrentItem(index, false);//设置主页页面被选中页
+            binding.includeMain.toolbar.setTitle(menuItem.getTitle());
+            binding.includeMain.viewPager.setCurrentItem(index, false);
             updateSideNavStatus(menuItem);
             return true;
         }
@@ -463,13 +463,13 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements V
                             fullAvatarUrl = Utils.rebuildUrl("upload/" + photo, getApplicationContext());
                         }
                     }
-                    // 构建融云用户信息对象
+
                     UserInfo userInfo = new UserInfo(
                             userId,
                             user.getNickname(),
-                            Uri.parse(fullAvatarUrl) // 如果 fullAvatarUrl 是空字符串，融云会显示你设置的默认头像
+                            Uri.parse(fullAvatarUrl)
                     );
-                    // 刷新本地用户信息缓存
+
                     RongUserInfoManager.getInstance().refreshUserInfoCache(userInfo);
                 }
             }

@@ -67,18 +67,18 @@ import retrofit2.Response;
 @Page(anim = CoreAnim.fade)
 public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
 
-    // 信息适配器，用于显示推荐内容列表
+
     private SimpleDelegateAdapter<NewInfo> newInfoSimpleDelegateAdapter;
-    // 信息数据列表
+
     private List<NewInfo> list = new ArrayList<>();
-    // 地图相关变量
+
     private com.baidu.mapapi.map.MapView mMapView;
     private BaiduMap mBaiduMap;
     private boolean isMapMode = false;
-    // 保存当前地图上的所有原始数据
+
     private List<LostFound> currentMapDataList = new ArrayList<>();
 
-    // 保存当前的弹窗实例
+
     private MaterialDialog mBottomSheetDialog;
 
     @NonNull
@@ -94,13 +94,13 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
 
     @Override
     protected void initViews() {
-        // 初始化顶部固定的 Banner
+
         initFixedBanner();
 
-        //  初始化顶部固定的 九宫格菜单
+
         initFixedGrid();
 
-        //  初始化下方可滑动的列表
+
         VirtualLayoutManager virtualLayoutManager = new VirtualLayoutManager(getContext());
         binding.recyclerView.setLayoutManager(virtualLayoutManager);
         RecyclerView.RecycledViewPool viewPool = new RecyclerView.RecycledViewPool();
@@ -121,13 +121,13 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
                         String url = "";
                         switch (pos) {
                             case 0:
-                                url = "/pages/notification.html"; // 系统公告
+                                url = "/pages/notification.html";
                                 break;
                             case 1:
-                                url = "/pages/appcrash.html";    // 崩溃日志
+                                url = "/pages/appcrash.html";
                                 break;
                             case 2:
-                                url = "/pages/privacy.html";     // 隐私协议
+                                url = "/pages/privacy.html";
                                 break;
                             default:
                                 url = "/pages/notification.html";
@@ -181,7 +181,7 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
 
     
     private void adapter(VirtualLayoutManager virtualLayoutManager) {
-        // 仅保留标题适配器
+
         SingleDelegateAdapter titleAdapter = new SingleDelegateAdapter(R.layout.adapter_title_item) {
             @Override
             public void onBindViewHolder(@NonNull RecyclerViewHolder holder, int position) {
@@ -189,7 +189,7 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
             }
         };
 
-        // 仅保留推荐内容适配器
+
         newInfoSimpleDelegateAdapter = new BroccoliSimpleDelegateAdapter<NewInfo>(R.layout.adapter_news_card_view_list_item, new LinearLayoutHelper(), DemoDataProvider.getEmptyNewInfo()) {
             @Override
             protected void onBindData(RecyclerViewHolder holder, NewInfo model, int position) {
@@ -220,14 +220,14 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
         };
 
         DelegateAdapter delegateAdapter = new DelegateAdapter(virtualLayoutManager);
-        // 不再添加 Banner 和 Grid
+
         delegateAdapter.addAdapter(titleAdapter);
         delegateAdapter.addAdapter(newInfoSimpleDelegateAdapter);
         binding.recyclerView.setAdapter(delegateAdapter);
     }
 
     private void baiduMap() {
-        //初始化控件
+
         mMapView = binding.bmapView;
         mBaiduMap = mMapView.getMap();
         mBaiduMap.setOnMarkerClickListener(marker -> {
@@ -240,20 +240,20 @@ public class DynamicFragment extends BaseFragment<FragmentNewsBinding> {
             }
             return true;
         });
-        // 切换到地图模式
+
         binding.fabSwitchMode.setOnClickListener(v -> {
             isMapMode = true;
-            // 隐藏整个主界面内容(包括Banner, Grid和列表)
+
             findViewById(R.id.ll_main_content).setVisibility(View.GONE);
             mMapView.setVisibility(View.VISIBLE);
             binding.fabMapBack.setVisibility(View.VISIBLE);
             binding.llMapControls.setVisibility(View.VISIBLE);
             binding.fabSwitchMode.setVisibility(View.GONE);
         });
-        // 退出地图模式
+
         binding.fabMapBack.setOnClickListener(v -> {
             isMapMode = false;
-            // 恢复主界面内容
+
             findViewById(R.id.ll_main_content).setVisibility(View.VISIBLE);
             mMapView.setVisibility(View.GONE);
             binding.fabMapBack.setVisibility(View.GONE);

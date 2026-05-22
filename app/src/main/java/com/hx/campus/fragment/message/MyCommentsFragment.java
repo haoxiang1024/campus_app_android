@@ -47,11 +47,11 @@ public class MyCommentsFragment extends BaseFragment<LayoutCommonListBinding> {
 
     @Override
     protected void initViews() {
-        // 设置 RecyclerView 布局管理器
+
         WidgetUtils.initRecyclerView(binding.recyclerView);
         user = Utils.getBeanFromSp(getContext(), "User", "user");
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        // 初始化适配器
+
         mAdapter = new BaseRecyclerAdapter<Comment>(mDataList) {
             @Override
             protected int getItemLayoutId(int viewType) {
@@ -64,7 +64,7 @@ public class MyCommentsFragment extends BaseFragment<LayoutCommonListBinding> {
                     holder.text(R.id.tv_nickname, user.getNickname() != null ? user.getNickname() : "校友");
                     com.bumptech.glide.Glide.with(getContext())
                             .load(user.getPhoto())
-                            .placeholder(R.drawable.default_avatar) // 默认占位图
+                            .placeholder(R.drawable.default_avatar)
                             .circleCrop()
                             .into((android.widget.ImageView) holder.findViewById(R.id.iv_avatar));
                 }
@@ -75,7 +75,7 @@ public class MyCommentsFragment extends BaseFragment<LayoutCommonListBinding> {
 
         binding.recyclerView.setAdapter(mAdapter);
 
-        // 加载数据
+
         loadData();
     }
 
@@ -85,7 +85,7 @@ public class MyCommentsFragment extends BaseFragment<LayoutCommonListBinding> {
             jumpDetail(item);
         });
 
-        // 删除该评论
+
         mAdapter.setOnItemLongClickListener((itemView, item, position) -> {
             new MaterialDialog.Builder(getContext())
                     .title("提示")
@@ -93,9 +93,9 @@ public class MyCommentsFragment extends BaseFragment<LayoutCommonListBinding> {
                     .positiveText("确定")
                     .negativeText("取消")
                     .onPositive((dialog, which) -> {
-                        // 调用删除接口
+
                         deleteCommentApi(item.getId(), position);
-                        checkEmptyState(); // 重新检查空状态
+                        checkEmptyState();
                     })
                     .show();
         });
@@ -110,7 +110,7 @@ public class MyCommentsFragment extends BaseFragment<LayoutCommonListBinding> {
         public void onResponse(Call<Result<LostFound>> call, Response<Result<LostFound>> response) {
             if (response.isSuccessful() && response.body() != null){
                 LostFound lostFound=response.body().getData();
-                //设置图片路径
+
                 lostFound.setImg(Utils.getImageUrl(lostFound.getImg(), getContext()));
                 if (lostFound.getType().equals("失物")){
                     openNewPage(LostDetailFragment.class, LostDetailFragment.KEY_LOST, lostFound);
@@ -129,7 +129,7 @@ public class MyCommentsFragment extends BaseFragment<LayoutCommonListBinding> {
     }
 
     private void loadData() {
-        // 清空原有数据并刷新
+
         mDataList.clear();
         mAdapter.refresh(mDataList);
         checkEmptyState();
@@ -138,7 +138,7 @@ public class MyCommentsFragment extends BaseFragment<LayoutCommonListBinding> {
             return;
         }
 
-        // 网络请求加载评论
+
         RetrofitClient.getInstance().getApi().getCommentsByUserId(user.getId()).enqueue(new Callback<Result<List<Comment>>>() {
             @Override
             public void onResponse(Call<Result<List<Comment>>> call, Response<Result<List<Comment>>> response) {
@@ -146,7 +146,7 @@ public class MyCommentsFragment extends BaseFragment<LayoutCommonListBinding> {
                     List<Comment> newData = response.body().getData();
                     if (newData != null && !newData.isEmpty()) {
                         mDataList.addAll(newData);
-                        mAdapter.refresh(mDataList); // 刷新适配器
+                        mAdapter.refresh(mDataList);
                     }
                 }
                 checkEmptyState();
@@ -167,12 +167,12 @@ public class MyCommentsFragment extends BaseFragment<LayoutCommonListBinding> {
             Utils.showResponse("出错了");
             return;
         }
-        // 调用删除接口
+
         RetrofitClient.getInstance().getApi().deleteComment(commentId).enqueue(new Callback<Result<String>>() {
             @Override
             public void onResponse(Call<Result<String>> call, Response<Result<String>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                    // 删除成功，更新列表
+
                     mDataList.remove(position);
                     mAdapter.refresh(mDataList);
                     Utils.showResponse("删除成功");

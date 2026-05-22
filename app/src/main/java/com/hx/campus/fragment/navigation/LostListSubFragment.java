@@ -44,7 +44,7 @@ public class LostListSubFragment extends BaseFragment<LayoutCommonListBinding> {
     protected void initViews() {
         mTabTitle = getArguments() != null ? getArguments().getString("tab_title") : "";
         mAdapter = new LostFoundRecyclerAdapter(getContext(), lost -> {
-            // 跳转详情页
+
             openPage(LostDetailFragment.class, LostDetailFragment.KEY_LOST, lost);
         });
         binding.recyclerView.setAdapter(mAdapter);

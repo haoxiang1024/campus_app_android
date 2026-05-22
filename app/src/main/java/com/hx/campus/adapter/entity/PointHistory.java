@@ -11,17 +11,17 @@ public class PointHistory implements Serializable {
     @SerializedName("user_id")
     private int user_id;
 
-    private int type; // 变动类型：1-发帖, 2-评论, 3-兑换消耗 等
+    private int type;
 
     @SerializedName("points_changed")
-    private int points_changed; // 变动数值，正数或负数
+    private int points_changed;
 
     private String description;
 
     @SerializedName("create_time")
     private String create_time;
 
-    // --- Getter 和 Setter ---
+
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
@@ -45,7 +45,7 @@ public class PointHistory implements Serializable {
         if (points_changed > 0) {
             return "+" + points_changed;
         } else {
-            return String.valueOf(points_changed); // 负数自带 '-' 号
+            return String.valueOf(points_changed);
         }
     }
     public String getTypeText() {

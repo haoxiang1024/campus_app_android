@@ -33,7 +33,7 @@ public class LostFoundDetailAdapter extends BaseAdapter {
             dataList.clear();
         }
         dataList.addAll(data);
-        notifyDataSetChanged(); // 刷新界面
+        notifyDataSetChanged();
     }
 
     @Override
@@ -51,16 +51,16 @@ public class LostFoundDetailAdapter extends BaseAdapter {
         return position;
     }
 
-    // 定义两种视图类型：0 代表失物，1 代表招领
+
     @Override
     public int getItemViewType(int position) {
-        // 根据实体类中的 type 字段判断
+
         return "0".equals(getItem(position).getType()) ? 0 : 1;
     }
 
     @Override
     public int getViewTypeCount() {
-        return 2; // 总共有两种布局
+        return 2;
     }
 
     @Override
@@ -69,7 +69,7 @@ public class LostFoundDetailAdapter extends BaseAdapter {
         int type = getItemViewType(position);
 
         if (type == 0) {
-            // 处理失物布局
+
             LostItemsBinding lostBinding;
             if (view == null) {
                 lostBinding = LostItemsBinding.inflate(LayoutInflater.from(context), viewGroup, false);
@@ -78,14 +78,14 @@ public class LostFoundDetailAdapter extends BaseAdapter {
             } else {
                 lostBinding = (LostItemsBinding) view.getTag();
             }
-            // 绑定数据
+
             lostBinding.lostTitle.setText(item.getTitle());
             lostBinding.authorName.setText(item.getNickname());
             lostBinding.tvLostContent.setText(item.getContent());
             loadImage(item.getImg(), lostBinding.lostImg);
 
         } else {
-            // 处理招领布局
+
             FoundItemsBinding foundBinding;
             if (view == null) {
                 foundBinding = FoundItemsBinding.inflate(LayoutInflater.from(context), viewGroup, false);
@@ -94,7 +94,7 @@ public class LostFoundDetailAdapter extends BaseAdapter {
             } else {
                 foundBinding = (FoundItemsBinding) view.getTag();
             }
-            // 绑定数据
+
             foundBinding.lostTitle.setText(item.getTitle());
             foundBinding.authorName.setText(item.getNickname());
             foundBinding.tvLostContent.setText(item.getContent());
@@ -104,7 +104,7 @@ public class LostFoundDetailAdapter extends BaseAdapter {
         return view;
     }
 
-    // 提取公共的图片加载逻辑
+
     
     private void loadImage(String imgUrl, android.widget.ImageView imageView) {
         if (TextUtils.isEmpty(imgUrl)) {

@@ -53,11 +53,11 @@ public class SettingsFragment extends BaseFragment<FragmentSettingsBinding> impl
         int id = superTextView.getId();
         switch (id) {
             case R.id.menu_common:
-                //通用设置页面
+
                 openPage(GeneralFragment.class);
                 break;
             case R.id.menu_privacy:
-                //权限
+
                 Intent intent = new Intent();
                 intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
                 Uri uri = Uri.fromParts("package", getPackageName(), null);
@@ -66,14 +66,14 @@ public class SettingsFragment extends BaseFragment<FragmentSettingsBinding> impl
                 startActivity(intent);
                 break;
             case R.id.menu_logout:
-                //退出登录
+
                 DialogLoader.getInstance().showConfirmDialog(
                         getContext(),
                         getString(R.string.lab_logout_confirm),
                         getString(R.string.lab_yes),
                         (dialog, which) -> {
                             dialog.dismiss();
-                            //im断开连接
+
                             IMCenter.getInstance().disconnect();
                             XUtil.getActivityLifecycleHelper().exit();
                             TokenUtils.handleLogoutSuccess();

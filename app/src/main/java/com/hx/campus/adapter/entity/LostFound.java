@@ -47,10 +47,10 @@ public class LostFound implements Serializable {
     private String type;
     
     private LostFoundType lostfoundtype;
-    //纬度
+
     private double longitude;
 
-    //经度
+
     private double latitude;
 
     public double getLatitude() {

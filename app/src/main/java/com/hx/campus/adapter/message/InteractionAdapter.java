@@ -36,7 +36,7 @@ public class InteractionAdapter extends RecyclerView.Adapter<InteractionAdapter.
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.mListener = listener;
     }
-    // 更新数据的方法
+
     
     public void setData(List<InteractionMsg> list) {
         this.dataList = list;

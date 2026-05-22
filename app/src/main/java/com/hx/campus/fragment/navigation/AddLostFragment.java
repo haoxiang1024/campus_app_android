@@ -203,7 +203,7 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
         });
     }
 
-    // 初始化弹窗与地图检索
+
     private void showMapChooseDialog() {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_map_choose, null);
         EditText etSearch = view.findViewById(R.id.et_map_search);
@@ -213,7 +213,7 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
         BaiduMap baiduMap = mapView.getMap();
         tvAddress.setText("当前选中位置：请搜索或点击地图");
 
-        // 反地理编码
+
         GeoCoder geoCoder = GeoCoder.newInstance();
         geoCoder.setOnGetGeoCodeResultListener(new OnGetGeoCoderResultListener() {
             @Override
@@ -289,7 +289,7 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
                 .show();
     }
 
-    // 更新地图标记点
+
     private void updateSelection(LatLng latLng, String address, TextView tvAddress, BaiduMap baiduMap) {
         baiduMap.clear();
         baiduMap.addOverlay(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.fromResource(android.R.drawable.ic_menu_mylocation)));
@@ -301,7 +301,7 @@ public class AddLostFragment extends BaseFragment<FragmentAddLostBinding> {
         tvAddress.setText("当前选中位置：" + tempAddress);
     }
 
-    // 格式化经纬度
+
     private double formatLocation(double value) {
         return Double.parseDouble(String.format(Locale.US, "%.6f", value));
     }

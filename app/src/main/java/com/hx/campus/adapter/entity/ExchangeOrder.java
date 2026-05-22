@@ -4,16 +4,16 @@ import java.util.Date;
 
 public class ExchangeOrder {
     private Integer id;
-    private String order_no;       // 订单号
-    private Integer user_id;       // 用户ID
-    private Integer item_id;       // 商品ID
-    private String item_name;      // 商品名称(快照)
-    private Integer points_cost;   // 消耗积分
-    private String verify_code;    // 8位提货核验码
-    private Integer status;       // 状态：0-待核验, 1-已核验, 2-已取消
+    private String order_no;
+    private Integer user_id;
+    private Integer item_id;
+    private String item_name;
+    private Integer points_cost;
+    private String verify_code;
+    private Integer status;
     private Date create_time;
-    private Date verify_time;//核验时间
-    private Integer verify_admin_id; // 核验管理员ID
+    private Date verify_time;
+    private Integer verify_admin_id;
     private String item_image;
 
     public String getItem_image() {

@@ -107,7 +107,7 @@ public class MyOrderFragment extends BaseFragment<FragmentMyOrderBinding> {
         });
     }
 
-    // 显示订单详情弹窗
+
     private void showOrderDetailDialog(ExchangeOrder order) {
         MaterialDialog dialog = new MaterialDialog.Builder(getContext())
                 .customView(R.layout.dialog_order_detail, true)
@@ -162,7 +162,7 @@ public class MyOrderFragment extends BaseFragment<FragmentMyOrderBinding> {
         dialog.show();
     }
 
-    // 弹出包含二维码和核验码的凭证弹窗
+
     private void showVerifyCodeDialog(String verifyCode, String itemName) {
         LinearLayout layout = new LinearLayout(getContext());
         layout.setOrientation(LinearLayout.VERTICAL);
@@ -213,7 +213,7 @@ public class MyOrderFragment extends BaseFragment<FragmentMyOrderBinding> {
                 .show();
     }
 
-    // 将 View 转换为 Bitmap
+
     private Bitmap createBitmapFromView(View view) {
         int width = view.getWidth();
         int height = view.getHeight();
@@ -221,12 +221,12 @@ public class MyOrderFragment extends BaseFragment<FragmentMyOrderBinding> {
 
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
-        canvas.drawColor(Color.WHITE); // 绘制白色背景防止透明变黑
+        canvas.drawColor(Color.WHITE);
         view.draw(canvas);
         return bitmap;
     }
 
-    // 将 Bitmap 保存到手机相册
+
     private void saveBitmapToGallery(Bitmap bitmap) {
         String fileName = "VerifyCode_" + System.currentTimeMillis() + ".png";
         ContentValues values = new ContentValues();
@@ -263,7 +263,7 @@ public class MyOrderFragment extends BaseFragment<FragmentMyOrderBinding> {
         }
     }
 
-    // 生成二维码
+
     private Bitmap createQRCode(String content, int width, int height) {
         try {
             Hashtable<EncodeHintType, Object> hints = new Hashtable<>();
@@ -287,7 +287,7 @@ public class MyOrderFragment extends BaseFragment<FragmentMyOrderBinding> {
         }
     }
 
-    // 格式化时间
+
     public static String formatTime(Object timeObj) {
         if (timeObj == null) return "";
         if (timeObj instanceof String) {
@@ -302,7 +302,7 @@ public class MyOrderFragment extends BaseFragment<FragmentMyOrderBinding> {
         return String.valueOf(timeObj);
     }
 
-    // 加载订单列表
+
     private void loadOrders(String keyword) {
         User user = Utils.getBeanFromSp(getContext(), "User", "user");
         if (user == null) return;
@@ -329,7 +329,7 @@ public class MyOrderFragment extends BaseFragment<FragmentMyOrderBinding> {
         });
     }
 
-    // 删除订单
+
     private void deleteOrder(ExchangeOrder order) {
         ApiService apiService = RetrofitClient.getInstance().getApi();
         User user = Utils.getBeanFromSp(getContext(), "User", "user");

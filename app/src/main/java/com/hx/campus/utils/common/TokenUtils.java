@@ -18,7 +18,7 @@ public final class TokenUtils {
     private static final String KEY_PROFILE_CHANNEL = "github";
     private static String sToken;
     private static Context context;
-    // 专门存储融云 IM Token 的键
+
     private static final String KEY_IM_TOKEN = "com.hx.campus.utils.KEY_IM_TOKEN";
     
     public static String getImToken() {
@@ -83,12 +83,12 @@ public final class TokenUtils {
     
     public static void handleLogoutSuccess() {
         MobclickAgent.onProfileSignOff();
-        //登出时，清除账号信息
+
         clearToken();
 
         XToastUtils.success(Utils.getString(context, R.string.logout_success));
         SettingUtils.setIsAgreePrivacy(false);
-        //跳转到登录页
+
         ActivityUtils.startActivity(LoginActivity.class);
     }
 

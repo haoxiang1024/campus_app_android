@@ -27,7 +27,7 @@ public class CacheClean {
         deleteDir(context.getCacheDir());
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             deleteDir(context.getExternalCacheDir());
-            //TODO 有网页清理时注意排错，是否存在/data/data/应用package目录下找不到database文件夹的问题
+
             context.deleteDatabase("webview.db");
             context.deleteDatabase("webviewCache.db");
         }
@@ -59,7 +59,7 @@ public class CacheClean {
             File[] fileList = file.listFiles();
             if (fileList != null && fileList.length > 0) {
                 for (int i = 0; i < fileList.length; i++) {
-                    // 如果下面还有文件
+
                     if (fileList[i].isDirectory()) {
                         size = size + getFolderSize(fileList[i]);
                     } else {

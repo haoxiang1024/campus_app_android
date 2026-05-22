@@ -305,7 +305,7 @@ public class LostInfoDetailFragment extends BaseFragment<FragmentLostInfoDetailB
         if (position >= 0) binding.state.setSelection(position);
         binding.tvDate.setText(Utils.dateFormat(lost.getPubDate()));
 
-        // 根据当前状态判断是否禁用下拉框
+
         if ("待审核".equals(lost.getState()) || "已驳回".equals(lost.getState())) {
             binding.state.setEnabled(false);
         } else {

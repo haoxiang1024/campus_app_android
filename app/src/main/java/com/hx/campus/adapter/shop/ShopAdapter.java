@@ -67,14 +67,14 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ViewHolder> {
         }
         holder.btnExchange.setUseShape();
 
-        // 兑换按钮点击事件
+
         holder.btnExchange.setOnClickListener(v -> {
             if (mExchangeListener != null) {
                 mExchangeListener.onExchangeClick(item);
             }
         });
 
-        // 整个商品卡片点击事件
+
         holder.itemView.setOnClickListener(v -> {
             if (mItemClickListener != null) {
                 mItemClickListener.onItemClick(item);

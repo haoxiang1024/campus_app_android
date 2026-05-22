@@ -35,7 +35,7 @@ public class LollipopFixedWebView extends WebView {
 
     public static Context getFixedContext(Context context) {
         if (isLollipopWebViewBug()) {
-            // Avoid crashing on Android 5 and 6 (API level 21 to 23)
+
             return context.createConfigurationContext(new Configuration());
         }
         return context;

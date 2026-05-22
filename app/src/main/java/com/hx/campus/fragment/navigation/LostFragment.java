@@ -67,7 +67,7 @@ public class LostFragment extends BaseFragment<FragmentLostBinding> {
                     hideLoadingDialog();
                 }
             });
-        }, 300); // 300ms
+        }, 300);
     }
 
     private void setupViewPager(List<LostFoundType> types) {
@@ -103,7 +103,7 @@ public class LostFragment extends BaseFragment<FragmentLostBinding> {
         titleBar.addAction(new TitleBar.ImageAction(R.drawable.add) {
             @Override
             public void performAction(android.view.View view) {
-                // 跳转到发布页
+
                 openPage(AddLostFragment.class);
             }
         });

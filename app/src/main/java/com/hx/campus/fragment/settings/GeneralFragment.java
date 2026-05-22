@@ -51,7 +51,7 @@ public class GeneralFragment extends BaseFragment<FragmentGeneralBinding> implem
     protected void initListeners() {
         super.initListeners();
         binding.menuCache.setOnSuperTextViewClickListener(this);
-        // 绑定注销按钮的点击事件
+
         binding.menuDeleteAccount.setOnSuperTextViewClickListener(this);
     }
 
@@ -62,7 +62,7 @@ public class GeneralFragment extends BaseFragment<FragmentGeneralBinding> implem
         if (id == R.id.menu_cache) {
             handleCacheClear();
         } else if (id == R.id.menu_delete_account) {
-            // 触发注销警告弹窗
+
             showDeleteAccountDialog();
         }
     }
@@ -87,7 +87,7 @@ public class GeneralFragment extends BaseFragment<FragmentGeneralBinding> implem
                 .positiveColorRes(R.color.xui_config_color_red)
                 .negativeText("取消")
                 .onPositive((dialog, which) -> {
-                    // 用户确认后，发起网络请求
+
                     requestDeleteAccount();
                 })
                 .show();
@@ -109,16 +109,16 @@ public class GeneralFragment extends BaseFragment<FragmentGeneralBinding> implem
 
             private void logOut() {
 
-                // 在主线程执行退出操作
+
                 new Handler(Looper.getMainLooper()).post(() -> {
-                    IMCenter.getInstance().disconnect(); // 断开融云
-                    IMCenter.getInstance().logout();// 登出
-                    TokenUtils.handleLogoutSuccess();   // 清除Token
-                    XUtil.getActivityLifecycleHelper().exit(); // 退出所有页面
-                    Context activeContext = XUtil.getContext();
-                    // 彻底退出之前的页面栈
+                    IMCenter.getInstance().disconnect();
+                    IMCenter.getInstance().logout();
+                    TokenUtils.handleLogoutSuccess();
                     XUtil.getActivityLifecycleHelper().exit();
-                    // 跳转至登录页
+                    Context activeContext = XUtil.getContext();
+
+                    XUtil.getActivityLifecycleHelper().exit();
+
                     Intent intent = new Intent(activeContext, LoginActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     activeContext.startActivity(intent);

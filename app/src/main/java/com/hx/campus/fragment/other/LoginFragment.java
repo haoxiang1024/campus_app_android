@@ -43,10 +43,10 @@ import io.rong.imlib.RongIMClient;
 @Page(anim = CoreAnim.none)
 public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements View.OnClickListener {
 
-    LoadingDialog loadingDialog;//加载动画
-    // 设置连接超时时间
+    LoadingDialog loadingDialog;
+
     private final int timeLimit = 10;
-    // 声明视图变量
+
     private MaterialEditText etPassword;
     private AppCompatImageView ivPwdToggle;
     private boolean isPasswordVisible = false;
@@ -57,11 +57,11 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements
 
 
 
-    //初始化控件
+
     @Override
     protected void initViews() {
 
-        //隐私政策弹窗
+
         if (!SettingUtils.isAgreePrivacy()) {
             Utils.showPrivacyDialog(getContext(), (dialog, which) -> {
                 dialog.dismiss();
@@ -81,26 +81,26 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements
         ivPwdToggle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 切换可见状态
+
                 isPasswordVisible = !isPasswordVisible;
 
                 if (isPasswordVisible) {
-                    // 显示密码
+
                     etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
                     ivPwdToggle.setImageResource(R.drawable.ic_eye_open);
                 } else {
-                    // 隐藏密码
+
                     etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
                     ivPwdToggle.setImageResource(R.drawable.ic_eye_closed);
                 }
 
-                // 保持光标在末尾
+
                 etPassword.setSelection(etPassword.getText().length());
             }
         });
     }
 
-    //初始化标题栏
+
     @Override
     protected TitleBar initTitle() {
         TitleBar titleBar = super.initTitle()
@@ -112,7 +112,7 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements
         return titleBar;
     }
 
-    //初始化监听器
+
     @Override
     protected void initListeners() {
         binding.btnLogin.setOnClickListener(this);
@@ -134,14 +134,14 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements
         ViewUtils.setEnabled(binding.btnLogin, isChecked);
     }
 
-    //提交隐私政策
+
     private void handleSubmitPrivacy() {
         SettingUtils.setIsAgreePrivacy(true);
         UMengInit.init();
 
     }
 
-    //控件点击事件
+
     @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View v) {
@@ -149,28 +149,28 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements
         try {
             switch (id) {
                 case R.id.btn_login:
-                    // 登录
+
                     if (binding.etPhoneNumber.validate() && binding.etPassword.validate()) {
-                        //校验成功进行登录
+
                         Login();
                     }else {
                         Utils.showResponse(ResponseMsg.ACCOUNT_PWD_ERROR);
                     }
                     break;
                 case R.id.tv_user_protocol:
-                    // 用户协议
+
                     Utils.gotoProtocol(this, false, true);
                     break;
                 case R.id.tv_privacy_protocol:
-                    // 隐私政策
+
                     Utils.gotoProtocol(this, true, true);
                     break;
                 case R.id.tv_forget_password:
-                    // 忘记密码
+
                     openNewPage(ResetPwdFragment.class);
                     break;
                 case R.id.tv_reg:
-                    //注册
+
                     openNewPage(RegFragment.class);
                     break;
                 default:
@@ -186,7 +186,7 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements
 
     
     private void Login() {
-        //登录注册的处理
+
         String phoneNumber = binding.etPhoneNumber.getEditValue();
         String password = binding.etPassword.getEditValue();
         login(phoneNumber, password);
@@ -204,7 +204,7 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements
                         LoginResponseDTO loginData = response.body().getData();
                         User user = loginData.getUserInfo();
                         if(user.getstate()==0){
-                            //用户状态为0，被封禁
+
                             Utils.showResponse("用户被禁用!");
                             return;
                         }
@@ -237,9 +237,9 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements
             public void onResponse(retrofit2.Call<Result<String>> call, retrofit2.Response<Result<String>> response) {
                 if (response.body() != null && response.body().isSuccess()) {
                     String imToken = response.body().getData();
-                    // 执行连接逻辑
+
                     performIMConnect(imToken);
-                    // 登录全流程完成，跳转主页
+
                     hideLoadingDialog();
                     ActivityUtils.startActivity(MainActivity.class);
                 } else {
@@ -250,13 +250,13 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements
             }
             
             private void performIMConnect(String token) {
-                // 从本地存储获取旧 Token
+
                 String localToken = TokenUtils.getImToken();
                 RongIMClient.ConnectCallback connectCallback=new RongIMClient.ConnectCallback() {
                     @Override
                     public void onSuccess(String userId) {
                         Log.e("IM_LOG", "融云连接成功: " + userId);
-                    // 连接成功后，持久化新的 Token 到 MMKV
+
                         TokenUtils.setImToken(token);
                     }
 
@@ -272,11 +272,11 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements
                 };
 
                 if (token.equals(localToken)) {
-                    // 非首次连接：不传超时参数
+
                     Log.e("IM_LOG", "Token一致，执行快速连接...");
                     IMCenter.getInstance().connect(token, connectCallback);
                 } else {
-                    // 首次连接：传入超时时间
+
                     Log.e("IM_LOG", "Token变更，执行带超时的首次连接...");
                     IMCenter.getInstance().connect(token, timeLimit, connectCallback);
                 }
@@ -302,7 +302,7 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements
         super.onDestroy();
 
     }
-    // 显示加载动画
+
     private void showLoadingDialog() {
         if (loadingDialog == null) {
             Context context = getContext();
@@ -311,7 +311,7 @@ public class LoginFragment extends BaseFragment<FragmentLoginBinding> implements
         loadingDialog.show();
     }
 
-    // 隐藏加载动画
+
     private void hideLoadingDialog() {
         if (loadingDialog != null && loadingDialog.isShowing()) {
             loadingDialog.dismiss();

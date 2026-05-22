@@ -9,7 +9,7 @@ public class ShopItem  {
     private String image_url;
     private Integer required_points;
     private Integer stock;
-    private Integer status; // 0-下架, 1-上架
+    private Integer status;
     private Date create_time;
     private Date update_time;
 

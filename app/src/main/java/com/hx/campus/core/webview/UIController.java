@@ -27,7 +27,7 @@ public class UIController extends AgentWebUIControllerImplBase {
 
     @Override
     public void onSelectItemsPrompt(WebView view, String url, String[] items, Handler.Callback callback) {
-        // 使用默认的UI
+
         super.onSelectItemsPrompt(view, url, items, callback);
     }
 

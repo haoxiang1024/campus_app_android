@@ -1,22 +1,22 @@
 package com.hx.campus.adapter.entity;
 
 
-//回复评论
+
 public class InteractionMsg {
     
-    public int lostfoundId; // 帖子ID
+    public int lostfoundId;
     
-    public int commentId;   // 这条评论自身的ID
+    public int commentId;
     
-    public int userId;      // 发这条评论的人的ID
+    public int userId;
     
-    public String username;     // 评论人昵称
+    public String username;
     
-    public String avatarUrl;    // 评论人头像链接
+    public String avatarUrl;
     
-    public String content;      // 评论内容
+    public String content;
     
-    public String time;         // 评论时间
+    public String time;
 
     @Override
     public String toString() {

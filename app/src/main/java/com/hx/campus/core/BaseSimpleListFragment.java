@@ -37,7 +37,7 @@ public abstract class BaseSimpleListFragment extends XPageSimpleListFragment {
 
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
-        //屏幕旋转时刷新一下title
+
         super.onConfigurationChanged(newConfig);
         ViewGroup root = (ViewGroup) getRootView();
         if (root.getChildAt(0) instanceof TitleBar) {
@@ -58,7 +58,7 @@ public abstract class BaseSimpleListFragment extends XPageSimpleListFragment {
         MobclickAgent.onPageEnd(getPageName());
     }
 
-    //==============================页面跳转api===================================//
+
 
     
     public <T extends XPageFragment> Fragment openNewPage(Class<T> clazz) {

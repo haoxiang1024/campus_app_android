@@ -66,7 +66,7 @@ public class PhotoFragment extends BaseFragment<FragmentPhotoBinding> {
     @Override
     protected void initListeners() {
         super.initListeners();
-        // 选择图片
+
         binding.chooseimg.setOnClickListener(v -> {
             if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, STORAGE_PERMISSION);
@@ -75,7 +75,7 @@ public class PhotoFragment extends BaseFragment<FragmentPhotoBinding> {
             }
         });
 
-        // 上传图片
+
         binding.uploadimg.setOnClickListener(v -> {
             if (mFile == null) {
                 XToast.info(getContext(), Utils.getString(getContext(), R.string.no_image_selected_yet)).show();
@@ -128,20 +128,20 @@ public class PhotoFragment extends BaseFragment<FragmentPhotoBinding> {
                 if (response.isSuccessful() && response.body() != null) {
                     Result<User> result = response.body();
                     if (result.isSuccess()) {
-                        // 更新本地缓存
+
                         Utils.doUserData(result.getData());
                         User user = Utils.getBeanFromSp(getContext(), "User", "user");
-                        //IM刷新
+
                         UserInfo userInfo = new UserInfo(
                                 String.valueOf(user.getId()),
                                 user.getNickname(),
                                 Uri.parse(user.getPhoto())
                         );
                         RongUserInfoManager.getInstance().refreshUserInfoCache(userInfo);
-                        // 显示成功提示
+
                         XToast.success(getContext(), "修改头像成功！").show();
 
-                        // 延迟跳转，确保提示可见
+
                         binding.getRoot().postDelayed(() -> {
                             if (isAdded()) {
                                 startActivity(new Intent(getContext(), MainActivity.class));

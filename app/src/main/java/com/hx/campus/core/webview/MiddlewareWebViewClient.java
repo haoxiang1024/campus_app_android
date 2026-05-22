@@ -60,10 +60,10 @@ public class MiddlewareWebViewClient extends MiddlewareWebClientBase {
     public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
         url = url.toLowerCase();
         if (!hasAdUrl(url)) {
-            //正常加载
+
             return super.shouldInterceptRequest(view, url);
         } else {
-            //含有广告资源屏蔽请求
+
             return new WebResourceResponse(null, null, null);
         }
     }
@@ -73,10 +73,10 @@ public class MiddlewareWebViewClient extends MiddlewareWebClientBase {
     public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
         String url = request.getUrl().toString().toLowerCase();
         if (!hasAdUrl(url)) {
-            //正常加载
+
             return super.shouldInterceptRequest(view, request);
         } else {
-            //含有广告资源屏蔽请求
+
             return new WebResourceResponse(null, null, null);
         }
     }
@@ -84,10 +84,10 @@ public class MiddlewareWebViewClient extends MiddlewareWebClientBase {
     
     private boolean shouldOverrideUrlLoadingByApp(WebView webView, final String url) {
         if (url.startsWith("http") || url.startsWith("https") || url.startsWith("ftp")) {
-            //不拦截http, https, ftp的请求
+
             Uri uri = Uri.parse(url);
             if (uri != null && !(APP_LINK_HOST.equals(uri.getHost())
-                    //防止xui官网被拦截
+
                     && url.contains("xpage"))) {
                 return false;
             }
